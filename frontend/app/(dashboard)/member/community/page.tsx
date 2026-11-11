@@ -21,8 +21,7 @@ import {
   AlertTriangle,
   Trophy,
   Globe,
-  TrendingUp,
-  Tag
+  Plus
 } from "lucide-react";
 import { LikeButton } from "@/components/ui/LikeButton";
 import { useAuthStore } from "@/store/authStore";
@@ -76,7 +75,9 @@ export default function CommunityPage() {
   const [expandedComments, setExpandedComments] = useState<string | null>(null);
   const [commentInputs, setCommentInputs] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(true);
+  const [isComposerExpanded, setIsComposerExpanded] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Post Actions Menu State
   const [openActionPostId, setOpenActionPostId] = useState<string | null>(null);
@@ -125,6 +126,7 @@ export default function CommunityPage() {
     if (!newPostContent.includes(tag.trim())) {
       setNewPostContent(prev => prev ? `${prev} ${tag}` : tag);
     }
+    textareaRef.current?.focus();
   };
 
   // Image Selection Handler
@@ -148,6 +150,7 @@ export default function CommunityPage() {
     setSelectedImage(file);
     const objectUrl = URL.createObjectURL(file);
     setPreviewUrl(objectUrl);
+    setIsComposerExpanded(true);
   };
 
   // Remove Selected Image
@@ -198,6 +201,7 @@ export default function CommunityPage() {
         toast.success("Post published to community feed!");
         setNewPostContent("");
         removeSelectedImage();
+        setIsComposerExpanded(false);
         fetchPosts(activeTab);
       }
     } catch (err: any) {
@@ -206,6 +210,12 @@ export default function CommunityPage() {
     } finally {
       setIsPosting(false);
     }
+  };
+
+  const handleDiscardDraft = () => {
+    setNewPostContent("");
+    removeSelectedImage();
+    setIsComposerExpanded(false);
   };
 
   // Delete Post Handlers
@@ -344,7 +354,7 @@ export default function CommunityPage() {
     }
   };
 
-  // Unique community athletes for the top discovery reel
+  // Unique community athletes for the Instagram-style story reel
   const featuredAthletes = (() => {
     const athleteMap = new Map<string, any>();
     for (const p of posts) {
@@ -352,276 +362,21 @@ export default function CommunityPage() {
         athleteMap.set(p.author._id, p.author);
       }
     }
-    return Array.from(athleteMap.values()).slice(0, 8);
+    return Array.from(athleteMap.values()).slice(0, 10);
   })();
 
   const followingCount = user?.following?.length || 0;
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6 pb-16">
+    <div className="max-w-2xl mx-auto space-y-5 pb-16">
       
-      {/* Top Section: Hero Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-1">
-        <div>
-          <h1 className="text-3xl sm:text-4xl font-display font-extrabold tracking-tight text-text-primary">
-            Community Feed
-          </h1>
-          <p className="text-xs sm:text-sm text-text-muted mt-1 max-w-xl">
-            Share training milestones, log personal records, and celebrate victories together.
-          </p>
-        </div>
-
-        {/* Action Link: Active Challenges */}
-        <div className="flex items-center gap-2 self-start sm:self-center">
-          <Link
-            href="/member/community/challenges"
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-surface border border-border hover:border-indigo-500/30 text-xs font-semibold text-text-primary hover:text-indigo-600 dark:hover:text-indigo-400 transition-all shadow-xs hover:bg-slate-100 dark:hover:bg-white/[0.04]"
-          >
-            <Trophy className="w-4 h-4 text-amber-500" />
-            <span>Active Challenges</span>
-          </Link>
-        </div>
-      </div>
-
-      {/* Featured Athletes & Coaches Horizontal Reel */}
-      {featuredAthletes.length > 0 && (
-        <div className="bg-surface/70 backdrop-blur-md rounded-3xl border border-border p-4 space-y-2.5 shadow-xs">
-          <div className="flex items-center justify-between px-1">
-            <div className="flex items-center gap-2">
-              <Users className="w-4 h-4 text-indigo-500" />
-              <span className="text-xs font-bold text-text-primary uppercase tracking-wider">
-                Discover Athletes & Coaches
-              </span>
-            </div>
-            <span className="text-[11px] text-text-muted">Tap to view profiles</span>
-          </div>
-
-          <div className="flex items-center gap-3 overflow-x-auto pb-1 pt-1 no-scrollbar">
-            {featuredAthletes.map((athlete: any) => {
-              const isFollowed = (athlete.followers || []).includes(user?.id);
-              const athleteName = getDisplayName(athlete);
-              const initial = getDisplayInitial(athlete);
-
-              return (
-                <div
-                  key={athlete._id}
-                  className="flex-shrink-0 flex items-center gap-2.5 p-2 pr-3 rounded-2xl bg-background/70 border border-border hover:border-indigo-500/30 transition-all group"
-                >
-                  <button
-                    type="button"
-                    onClick={() => navigateToProfile(athlete._id)}
-                    className="w-10 h-10 rounded-full overflow-hidden border border-indigo-500/20 bg-indigo-500/10 flex items-center justify-center font-bold text-xs text-indigo-600 dark:text-indigo-400 cursor-pointer group-hover:scale-105 transition-transform shrink-0"
-                    title={`View ${athleteName}'s profile`}
-                  >
-                    {athlete.avatar ? (
-                      <img src={formatImageUrl(athlete.avatar)} alt={athleteName} className="w-full h-full object-cover" />
-                    ) : (
-                      <span>{initial}</span>
-                    )}
-                  </button>
-
-                  <div className="min-w-0">
-                    <button
-                      type="button"
-                      onClick={() => navigateToProfile(athlete._id)}
-                      className="font-semibold text-xs text-text-primary hover:underline truncate block text-left max-w-[105px] cursor-pointer"
-                    >
-                      {athleteName}
-                    </button>
-                    <span className="text-[10px] text-text-muted capitalize block">
-                      {athlete.role === 'coach' ? 'Coach' : 'Athlete'}
-                    </span>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => handleToggleFollow(athlete._id)}
-                    className={`ml-1 text-[11px] font-semibold px-2.5 py-1 rounded-full transition-all cursor-pointer ${
-                      isFollowed
-                        ? 'bg-slate-100 hover:bg-rose-50 text-slate-700 hover:text-rose-600 dark:bg-white/[0.08] dark:hover:bg-rose-500/10 dark:text-slate-300 dark:hover:text-rose-400 border border-border'
-                        : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-2xs'
-                    }`}
-                  >
-                    {isFollowed ? 'Following' : 'Follow'}
-                  </button>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* Senior-Level Post Creator Card */}
-      <motion.div 
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-surface rounded-3xl p-5 sm:p-6 border border-border shadow-sm hover:border-indigo-500/25 transition-all space-y-4"
-      >
-        <form onSubmit={handlePostSubmit} className="space-y-4">
-          {/* Creator Header: User Avatar, Name & Post Mode */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={() => navigateToProfile(user?.id)}
-                className="w-11 h-11 rounded-full bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30 flex items-center justify-center font-bold text-sm shrink-0 shadow-xs cursor-pointer hover:ring-2 hover:ring-indigo-500/30 transition-all overflow-hidden"
-                title="View your profile"
-              >
-                {user?.avatar ? (
-                  <img src={formatImageUrl(user.avatar)} alt={user.name || "You"} className="w-full h-full object-cover" />
-                ) : (
-                  <span>{user?.name?.charAt(0)?.toUpperCase() || 'U'}</span>
-                )}
-              </button>
-
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold text-sm text-text-primary tracking-tight">
-                    {user?.name || "Athlete"}
-                  </span>
-                  <span className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-background border border-border text-text-muted">
-                    <Globe className="w-3 h-3 text-indigo-500" />
-                    <span>Public to Feed</span>
-                  </span>
-                </div>
-                <p className="text-[11px] text-text-muted">Share your daily training with the community</p>
-              </div>
-            </div>
-
-            {/* Quick Draft Clear if text or photo */}
-            {(newPostContent.trim() || selectedImage) && (
-              <button
-                type="button"
-                onClick={() => {
-                  setNewPostContent("");
-                  removeSelectedImage();
-                }}
-                className="text-[11px] text-text-muted hover:text-rose-500 transition-colors font-medium cursor-pointer"
-              >
-                Discard
-              </button>
-            )}
-          </div>
-
-          {/* Borderless Textarea Input */}
-          <div className="pt-1">
-            <textarea 
-              value={newPostContent}
-              onChange={(e) => setNewPostContent(e.target.value)}
-              placeholder={`What's your workout win today, ${user?.name ? user.name.split(' ')[0] : 'Athlete'}? Log a PR, share a routine, or celebrate a milestone...`}
-              maxLength={500}
-              className="w-full bg-transparent border-0 focus:outline-none focus:ring-0 text-sm sm:text-base text-text-primary placeholder:text-text-muted/60 resize-none min-h-[90px] leading-relaxed p-0 selection:bg-indigo-500/20"
-            />
-          </div>
-
-          {/* Fitness Milestone Quick Tags Strip */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar pt-1 border-t border-border/50">
-            <span className="text-[10px] uppercase font-bold text-text-muted shrink-0 mr-1 flex items-center gap-1">
-              <Sparkles className="w-3 h-3 text-indigo-500" />
-              Quick Tags:
-            </span>
-            {MILESTONE_TAGS.map((item, idx) => (
-              <button
-                key={idx}
-                type="button"
-                onClick={() => handleAddTag(item.tag)}
-                className="shrink-0 text-[11px] font-medium px-2.5 py-1 rounded-full bg-background hover:bg-indigo-500/10 hover:text-indigo-600 dark:hover:text-indigo-400 text-text-muted border border-border/80 transition-all cursor-pointer hover:border-indigo-500/20 active:scale-95"
-              >
-                {item.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Image Attachment Preview */}
-          {previewUrl && (
-            <div className="relative inline-block w-full">
-              <div className="relative rounded-2xl overflow-hidden border border-border bg-black/10 dark:bg-black/30 shadow-sm max-h-72 flex items-center justify-center">
-                <img 
-                  src={previewUrl} 
-                  alt="Selected preview" 
-                  className="w-full h-auto max-h-72 object-cover" 
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
-                
-                <button
-                  type="button"
-                  onClick={removeSelectedImage}
-                  className="absolute top-2.5 right-2.5 p-1.5 rounded-full bg-slate-900/80 hover:bg-rose-600 text-white backdrop-blur-md transition-all active:scale-90 shadow-md cursor-pointer"
-                  title="Remove image"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-
-                <div className="absolute bottom-2.5 left-3 text-[11px] text-white/90 font-medium bg-black/50 backdrop-blur-sm px-2.5 py-1 rounded-lg border border-white/10">
-                  📷 {selectedImage?.name} • {((selectedImage?.size || 0) / (1024 * 1024)).toFixed(1)} MB
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Action Toolbar */}
-          <div className="flex items-center justify-between pt-2 border-t border-border">
-            <div className="flex items-center gap-2">
-              <input 
-                ref={fileInputRef} 
-                type="file" 
-                accept="image/*" 
-                className="hidden" 
-                onChange={handleImageSelect} 
-              />
-              <button 
-                type="button" 
-                onClick={() => fileInputRef.current?.click()}
-                className={`flex items-center gap-2 text-xs font-semibold px-3.5 py-2 rounded-xl border transition-all cursor-pointer ${
-                  selectedImage
-                    ? 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/30'
-                    : 'bg-background hover:bg-indigo-50 dark:hover:bg-indigo-500/10 text-text-muted hover:text-indigo-600 dark:hover:text-indigo-400 border-border hover:border-indigo-500/20'
-                }`}
-                title="Attach workout photo"
-              >
-                <ImageIcon className="w-4 h-4 text-indigo-500" />
-                <span>{selectedImage ? "Change Photo" : "Add Photo"}</span>
-              </button>
-            </div>
-
-            <div className="flex items-center gap-3">
-              {/* Character Counter */}
-              <span className={`text-[11px] font-mono ${
-                newPostContent.length > 450 
-                  ? 'text-amber-500 font-bold' 
-                  : 'text-text-muted'
-              }`}>
-                {newPostContent.length}/500
-              </span>
-
-              <button 
-                type="submit"
-                disabled={(!newPostContent.trim() && !selectedImage) || isPosting}
-                className="bg-indigo-600 hover:bg-indigo-500 text-white px-5 sm:px-6 py-2.5 rounded-full text-xs sm:text-sm font-semibold shadow-md shadow-indigo-500/25 active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer"
-              >
-                {isPosting ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Publishing...</span>
-                  </>
-                ) : (
-                  <>
-                    <span>Publish Post</span>
-                    <Send className="w-3.5 h-3.5" />
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-        </form>
-      </motion.div>
-
-      {/* Modern Feed Navigation Tabs */}
-      <div className="flex items-center justify-between gap-3 pt-2">
-        <div className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-surface border border-border shadow-xs">
+      {/* 1. PINNED TOP BAR: For You, Following, You */}
+      <div className="sticky top-0 z-20 bg-background/90 backdrop-blur-xl border-b border-border/70 py-2.5 -mx-4 sm:-mx-6 md:-mx-10 px-4 sm:px-6 md:px-10 flex items-center justify-between gap-3 shadow-xs">
+        {/* Navigation Tabs Segmented Control */}
+        <div className="flex items-center gap-1 p-1 rounded-2xl bg-surface border border-border shadow-2xs">
           <button
             onClick={() => handleTabChange('all')}
-            className={`py-2 px-4 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer ${
+            className={`py-1.5 px-3 sm:px-4 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
               activeTab === 'all'
                 ? 'bg-indigo-600 text-white shadow-xs'
                 : 'text-text-muted hover:text-text-primary hover:bg-slate-100 dark:hover:bg-white/[0.05]'
@@ -633,7 +388,7 @@ export default function CommunityPage() {
 
           <button
             onClick={() => handleTabChange('following')}
-            className={`py-2 px-4 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer ${
+            className={`py-1.5 px-3 sm:px-4 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
               activeTab === 'following'
                 ? 'bg-indigo-600 text-white shadow-xs'
                 : 'text-text-muted hover:text-text-primary hover:bg-slate-100 dark:hover:bg-white/[0.05]'
@@ -654,25 +409,316 @@ export default function CommunityPage() {
 
           <button
             onClick={() => handleTabChange('me')}
-            className={`py-2 px-4 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer ${
+            className={`py-1.5 px-3 sm:px-4 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
               activeTab === 'me'
                 ? 'bg-indigo-600 text-white shadow-xs'
                 : 'text-text-muted hover:text-text-primary hover:bg-slate-100 dark:hover:bg-white/[0.05]'
             }`}
           >
             <UserIcon className="w-3.5 h-3.5" />
-            <span>My Posts</span>
+            <span>You</span>
           </button>
         </div>
 
-        <div className="hidden sm:flex items-center gap-2 text-xs text-text-muted">
-          <TrendingUp className="w-3.5 h-3.5 text-indigo-500" />
-          <span>{posts.length} {posts.length === 1 ? 'post' : 'posts'} active</span>
+        {/* Right Quick Action: + Post Trigger & Challenges */}
+        <div className="flex items-center gap-2">
+          {!isComposerExpanded && (
+            <button
+              type="button"
+              onClick={() => {
+                setIsComposerExpanded(true);
+                setTimeout(() => textareaRef.current?.focus(), 60);
+              }}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-xs transition-all cursor-pointer active:scale-95"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Post PR</span>
+            </button>
+          )}
+
+          <Link
+            href="/member/community/challenges"
+            className="p-2 sm:px-3 sm:py-2 rounded-xl bg-surface border border-border hover:bg-slate-100 dark:hover:bg-white/[0.05] text-xs font-semibold text-text-primary transition-all flex items-center gap-1.5 shadow-2xs"
+            title="Active Challenges"
+          >
+            <Trophy className="w-4 h-4 text-amber-500" />
+            <span className="hidden md:inline">Challenges</span>
+          </Link>
         </div>
       </div>
 
+      {/* 2. INSTAGRAM-STYLE STORIES / DISCOVER ATHLETES REEL */}
+      <div className="py-2.5 overflow-x-auto no-scrollbar flex items-start gap-4 border-b border-border/40 pb-4">
+        {/* Story Item 1: Your PR / Share Workout */}
+        <div 
+          onClick={() => {
+            setIsComposerExpanded(true);
+            setTimeout(() => textareaRef.current?.focus(), 60);
+          }}
+          className="flex flex-col items-center flex-shrink-0 cursor-pointer group"
+        >
+          <div className="relative w-16 h-16 sm:w-17 sm:h-17 rounded-full p-[2px] bg-slate-200 dark:bg-white/10 group-hover:scale-105 transition-transform flex items-center justify-center">
+            <div className="w-full h-full rounded-full border-2 border-surface overflow-hidden bg-surface flex items-center justify-center font-bold text-sm text-indigo-600 dark:text-indigo-400">
+              {user?.avatar ? (
+                <img src={formatImageUrl(user.avatar)} alt={user.name || "You"} className="w-full h-full object-cover" />
+              ) : (
+                <span>{user?.name?.charAt(0)?.toUpperCase() || 'U'}</span>
+              )}
+            </div>
+            {/* Blue Plus Badge */}
+            <div className="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-indigo-600 text-white border-2 border-surface flex items-center justify-center shadow-xs">
+              <Plus className="w-3 h-3 stroke-[3]" />
+            </div>
+          </div>
+          <span className="text-[11px] font-medium text-text-primary mt-1.5 truncate max-w-[68px] text-center">
+            Your PR
+          </span>
+        </div>
+
+        {/* Athletes & Coaches with Instagram-Style Gradient Story Rings */}
+        {featuredAthletes.map((athlete: any) => {
+          const athleteName = getDisplayName(athlete);
+          const firstName = athleteName.split(' ')[0];
+          const initial = getDisplayInitial(athlete);
+          const isCoach = athlete.role === 'coach';
+
+          return (
+            <div
+              key={athlete._id}
+              onClick={() => navigateToProfile(athlete._id)}
+              className="flex flex-col items-center flex-shrink-0 cursor-pointer group"
+              title={`View ${athleteName}'s profile`}
+            >
+              <div className={`relative w-16 h-16 sm:w-17 sm:h-17 rounded-full p-[2.5px] transition-transform group-hover:scale-105 shadow-2xs ${
+                isCoach
+                  ? 'bg-gradient-to-tr from-emerald-500 via-teal-500 to-indigo-500'
+                  : 'bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600'
+              }`}>
+                <div className="w-full h-full rounded-full border-2 border-surface overflow-hidden bg-surface flex items-center justify-center font-bold text-sm text-indigo-600 dark:text-indigo-400">
+                  {athlete.avatar ? (
+                    <img src={formatImageUrl(athlete.avatar)} alt={athleteName} className="w-full h-full object-cover" />
+                  ) : (
+                    <span>{initial}</span>
+                  )}
+                </div>
+
+                {/* Coach Badge Icon */}
+                {isCoach && (
+                  <div className="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-emerald-600 text-white border-2 border-surface flex items-center justify-center text-[9px] font-bold shadow-xs" title="Verified Coach">
+                    ★
+                  </div>
+                )}
+              </div>
+
+              <span className="text-[11px] font-medium text-text-primary mt-1.5 truncate max-w-[70px] text-center">
+                {firstName}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* 3. POST CREATOR: COMPACT TRIGGER BAR vs EXPANDED COMPOSER */}
+      <div className="bg-surface rounded-3xl border border-border shadow-sm overflow-hidden transition-all">
+        {!isComposerExpanded ? (
+          /* Sleek 1-line Compact Trigger (Instagram / LinkedIn / Threads style) */
+          <div 
+            onClick={() => {
+              setIsComposerExpanded(true);
+              setTimeout(() => textareaRef.current?.focus(), 60);
+            }}
+            className="p-3 sm:p-4 flex items-center gap-3 cursor-pointer hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors"
+          >
+            <div className="w-10 h-10 rounded-full bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30 flex items-center justify-center font-bold text-sm shrink-0 overflow-hidden shadow-xs">
+              {user?.avatar ? (
+                <img src={formatImageUrl(user.avatar)} alt={user.name || "You"} className="w-full h-full object-cover" />
+              ) : (
+                <span>{user?.name?.charAt(0)?.toUpperCase() || 'U'}</span>
+              )}
+            </div>
+
+            <div className="flex-1 bg-background hover:bg-slate-100 dark:hover:bg-white/[0.04] border border-border rounded-2xl px-4 py-2.5 text-xs sm:text-sm text-text-muted transition-colors flex items-center justify-between">
+              <span className="truncate">
+                What&apos;s your workout win today, {user?.name ? user.name.split(' ')[0] : 'Athlete'}? Share a PR...
+              </span>
+              <Sparkles className="w-4 h-4 text-indigo-500 shrink-0 ml-2" />
+            </div>
+
+            {/* Quick Photo Upload Button */}
+            <input 
+              ref={fileInputRef} 
+              type="file" 
+              accept="image/*" 
+              className="hidden" 
+              onChange={handleImageSelect} 
+            />
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                fileInputRef.current?.click();
+              }}
+              className="p-2.5 rounded-2xl bg-background hover:bg-indigo-500/10 border border-border text-text-muted hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors shrink-0 cursor-pointer shadow-2xs"
+              title="Attach Photo"
+            >
+              <ImageIcon className="w-4 h-4 text-indigo-500" />
+            </button>
+          </div>
+        ) : (
+          /* Expanded Full Social Composer */
+          <motion.div 
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="p-5 sm:p-6 space-y-4"
+          >
+            <form onSubmit={handlePostSubmit} className="space-y-4">
+              {/* Creator Header: User Avatar, Name & Collapse/Discard Button */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 rounded-full bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30 flex items-center justify-center font-bold text-sm shrink-0 shadow-xs overflow-hidden">
+                    {user?.avatar ? (
+                      <img src={formatImageUrl(user.avatar)} alt={user.name || "You"} className="w-full h-full object-cover" />
+                    ) : (
+                      <span>{user?.name?.charAt(0)?.toUpperCase() || 'U'}</span>
+                    )}
+                  </div>
+
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-sm text-text-primary tracking-tight">
+                        {user?.name || "Athlete"}
+                      </span>
+                      <span className="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-background border border-border text-text-muted">
+                        <Globe className="w-3 h-3 text-indigo-500" />
+                        <span>Public Feed</span>
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-text-muted">Share your daily training with the community</p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleDiscardDraft}
+                  className="p-1.5 rounded-full text-text-muted hover:text-text-primary hover:bg-slate-100 dark:hover:bg-white/[0.08] transition-colors cursor-pointer"
+                  title="Close composer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Textarea Input */}
+              <div className="pt-1">
+                <textarea 
+                  ref={textareaRef}
+                  value={newPostContent}
+                  onChange={(e) => setNewPostContent(e.target.value)}
+                  placeholder={`What's your workout win today, ${user?.name ? user.name.split(' ')[0] : 'Athlete'}? Log a PR, share a routine, or celebrate a milestone...`}
+                  maxLength={500}
+                  className="w-full bg-transparent border-0 focus:outline-none focus:ring-0 text-sm sm:text-base text-text-primary placeholder:text-text-muted/60 resize-none min-h-[90px] leading-relaxed p-0 selection:bg-indigo-500/20"
+                />
+              </div>
+
+              {/* Fitness Milestone Quick Tags Strip */}
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar pt-1 border-t border-border/50">
+                <span className="text-[10px] uppercase font-bold text-text-muted shrink-0 mr-1 flex items-center gap-1">
+                  <Sparkles className="w-3 h-3 text-indigo-500" />
+                  Quick Tags:
+                </span>
+                {MILESTONE_TAGS.map((item, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => handleAddTag(item.tag)}
+                    className="shrink-0 text-[11px] font-medium px-2.5 py-1 rounded-full bg-background hover:bg-indigo-500/10 hover:text-indigo-600 dark:hover:text-indigo-400 text-text-muted border border-border/80 transition-all cursor-pointer hover:border-indigo-500/20 active:scale-95"
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Image Attachment Preview */}
+              {previewUrl && (
+                <div className="relative inline-block w-full">
+                  <div className="relative rounded-2xl overflow-hidden border border-border bg-black/10 dark:bg-black/30 shadow-sm max-h-72 flex items-center justify-center">
+                    <img 
+                      src={previewUrl} 
+                      alt="Selected preview" 
+                      className="w-full h-auto max-h-72 object-cover" 
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
+                    
+                    <button
+                      type="button"
+                      onClick={removeSelectedImage}
+                      className="absolute top-2.5 right-2.5 p-1.5 rounded-full bg-slate-900/80 hover:bg-rose-600 text-white backdrop-blur-md transition-all active:scale-90 shadow-md cursor-pointer"
+                      title="Remove image"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+
+                    <div className="absolute bottom-2.5 left-3 text-[11px] text-white/90 font-medium bg-black/50 backdrop-blur-sm px-2.5 py-1 rounded-lg border border-white/10">
+                      📷 {selectedImage?.name} • {((selectedImage?.size || 0) / (1024 * 1024)).toFixed(1)} MB
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Action Toolbar */}
+              <div className="flex items-center justify-between pt-2 border-t border-border">
+                <div className="flex items-center gap-2">
+                  <button 
+                    type="button" 
+                    onClick={() => fileInputRef.current?.click()}
+                    className={`flex items-center gap-2 text-xs font-semibold px-3.5 py-2 rounded-xl border transition-all cursor-pointer ${
+                      selectedImage
+                        ? 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/30'
+                        : 'bg-background hover:bg-indigo-50 dark:hover:bg-indigo-500/10 text-text-muted hover:text-indigo-600 dark:hover:text-indigo-400 border-border hover:border-indigo-500/20'
+                    }`}
+                    title="Attach workout photo"
+                  >
+                    <ImageIcon className="w-4 h-4 text-indigo-500" />
+                    <span>{selectedImage ? "Change Photo" : "Add Photo"}</span>
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  {/* Character Counter */}
+                  <span className={`text-[11px] font-mono ${
+                    newPostContent.length > 450 
+                      ? 'text-amber-500 font-bold' 
+                      : 'text-text-muted'
+                  }`}>
+                    {newPostContent.length}/500
+                  </span>
+
+                  <button 
+                    type="submit"
+                    disabled={(!newPostContent.trim() && !selectedImage) || isPosting}
+                    className="bg-indigo-600 hover:bg-indigo-500 text-white px-5 sm:px-6 py-2.5 rounded-full text-xs sm:text-sm font-semibold shadow-md shadow-indigo-500/25 active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer"
+                  >
+                    {isPosting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>Publishing...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Publish Post</span>
+                        <Send className="w-3.5 h-3.5" />
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </form>
+          </motion.div>
+        )}
+      </div>
+
       {/* Feed Stream */}
-      <div className="space-y-6">
+      <div className="space-y-6 pt-1">
         {isLoading && (
           <div className="text-center py-12 flex flex-col items-center gap-2">
             <Loader2 className="w-6 h-6 animate-spin text-indigo-500" />
