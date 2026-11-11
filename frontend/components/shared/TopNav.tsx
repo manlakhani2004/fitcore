@@ -29,7 +29,7 @@ export function TopNav() {
 
   return (
     <>
-      <header className="h-16 bg-surface/80 dark:bg-[#0B0C10]/80 backdrop-blur-xl border-b border-border sticky top-0 z-30 px-6 sm:px-8 flex items-center justify-between w-full select-none transition-colors">
+      <header className="h-16 bg-surface/80 backdrop-blur-xl border-b border-border sticky top-0 z-30 px-6 sm:px-8 flex items-center justify-between w-full select-none transition-colors">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 lg:hidden pl-10">
             <span className="font-semibold text-base tracking-tight text-text-primary">FitCore</span>

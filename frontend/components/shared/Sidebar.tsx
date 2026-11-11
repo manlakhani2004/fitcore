@@ -103,13 +103,13 @@ export function Sidebar() {
   const navItems = user?.role === 'admin' ? ADMIN_NAV : user?.role === 'coach' ? COACH_NAV : MEMBER_NAV;
 
   const sidebarContent = (
-    <div className="flex flex-col h-full bg-surface dark:bg-[#10121A] border-r border-border overflow-hidden select-none transition-colors">
+    <div className="flex flex-col h-full bg-surface border-r border-border overflow-hidden select-none transition-colors">
       {/* Brand Header */}
       <div className="h-18 px-5 border-b border-border flex items-center justify-between shrink-0">
         {!collapsed ? (
           <Link href="/" className="flex items-center gap-3 group">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 via-indigo-600 to-emerald-500 p-[1.5px] shadow-md shadow-indigo-500/20">
-              <div className="w-full h-full bg-white dark:bg-[#10121A] rounded-[10px] flex items-center justify-center">
+              <div className="w-full h-full bg-surface rounded-[10px] flex items-center justify-center">
                 <span className="font-mono text-sm font-black text-indigo-600 dark:text-white tracking-tight">FC</span>
               </div>
             </div>
@@ -128,7 +128,7 @@ export function Sidebar() {
         ) : (
           <div className="mx-auto">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 via-indigo-600 to-emerald-500 p-[1.5px] shadow-md">
-              <div className="w-full h-full bg-white dark:bg-[#10121A] rounded-[10px] flex items-center justify-center">
+              <div className="w-full h-full bg-surface rounded-[10px] flex items-center justify-center">
                 <span className="font-mono text-sm font-black text-indigo-600 dark:text-white tracking-tight">FC</span>
               </div>
             </div>
@@ -183,7 +183,7 @@ export function Sidebar() {
       </nav>
 
       {/* Footer Profile & Logout Card */}
-      <div className="p-3 border-t border-border bg-slate-50 dark:bg-[#0E1017]">
+      <div className="p-3 border-t border-border bg-surface-recessed">
         {!collapsed ? (
           <div className="space-y-2">
             <div className="flex items-center justify-between px-2 py-0.5 text-xs text-text-muted">
