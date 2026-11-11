@@ -543,3 +543,4 @@ export default function AthleteProfilePage({ params }: { params: Promise<{ id: s
     </div>
   );
 }
+

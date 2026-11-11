@@ -288,37 +288,140 @@ exports.getMyCoach = async (req, res) => {
     }
 };
 
-// @desc    Get member's messages with their coach
+// @desc    Get member's messages with a user or their coach
 // @route   GET /api/users/my-messages
 // @access  Private
 exports.getMyMessages = async (req, res) => {
     try {
-        const assignment = await ClientAssignment.findOne({ clientId: req.user.id });
-        if (!assignment) {
-            return res.status(200).json({ success: true, data: [] });
+        let otherUserId = req.query.user || req.query.userId || req.query.recipientId;
+
+        // If no user specified in query, look for assigned coach
+        if (!otherUserId) {
+            const assignment = await ClientAssignment.findOne({ clientId: req.user.id });
+            if (assignment && assignment.coachId) {
+                otherUserId = assignment.coachId;
+            }
         }
+
+        // If still no user, find the user's most recent conversation
+        if (!otherUserId) {
+            const lastMsg = await Message.findOne({
+                $or: [{ senderId: req.user.id }, { receiverId: req.user.id }]
+            }).sort({ createdAt: -1 });
+
+            if (lastMsg) {
+                otherUserId = lastMsg.senderId.toString() === req.user.id.toString() 
+                    ? lastMsg.receiverId 
+                    : lastMsg.senderId;
+            }
+        }
+
+        if (!otherUserId) {
+            return res.status(200).json({ success: true, data: [], targetUser: null });
+        }
+
+        const targetUser = await User.findById(otherUserId).select('name email avatar role bio');
 
         const messages = await Message.find({
             $or: [
-                { senderId: req.user.id, receiverId: assignment.coachId },
-                { senderId: assignment.coachId, receiverId: req.user.id }
+                { senderId: req.user.id, receiverId: otherUserId },
+                { senderId: otherUserId, receiverId: req.user.id }
             ]
         }).sort({ createdAt: 1 });
 
-        // Automatically mark incoming messages from coach as read
+        // Automatically mark incoming messages from this user as read
         await Message.updateMany(
-            { senderId: assignment.coachId, receiverId: req.user.id, isRead: false },
+            { senderId: otherUserId, receiverId: req.user.id, isRead: false },
             { isRead: true }
         );
 
-        res.status(200).json({ success: true, data: messages });
+        res.status(200).json({ 
+            success: true, 
+            data: messages,
+            targetUser: targetUser || null
+        });
     } catch (err) {
-        console.error(err);
+        console.error('getMyMessages error:', err);
         res.status(500).json({ success: false, message: 'Server Error' });
     }
 };
 
-// @desc    Get member unread messages count from coach
+// @desc    Get member's active conversations list
+// @route   GET /api/users/conversations
+// @access  Private
+exports.getConversations = async (req, res) => {
+    try {
+        const myId = req.user.id;
+
+        // Find all messages where user is sender or receiver
+        const messages = await Message.find({
+            $or: [{ senderId: myId }, { receiverId: myId }]
+        }).sort({ createdAt: -1 });
+
+        const conversationMap = new Map();
+
+        for (const msg of messages) {
+            const otherUserId = msg.senderId.toString() === myId.toString()
+                ? msg.receiverId.toString()
+                : msg.senderId.toString();
+
+            if (!conversationMap.has(otherUserId)) {
+                conversationMap.set(otherUserId, {
+                    lastMessage: msg.content,
+                    lastMessageAt: msg.createdAt,
+                    unreadCount: (!msg.isRead && msg.receiverId.toString() === myId.toString()) ? 1 : 0
+                });
+            } else if (!msg.isRead && msg.receiverId.toString() === myId.toString()) {
+                const conv = conversationMap.get(otherUserId);
+                conv.unreadCount += 1;
+            }
+        }
+
+        // Also check if user has an assigned coach who might not have sent messages yet
+        const assignment = await ClientAssignment.findOne({ clientId: myId }).populate('coachId', 'name email avatar role');
+        if (assignment && assignment.coachId) {
+            const coachIdStr = assignment.coachId._id.toString();
+            if (!conversationMap.has(coachIdStr)) {
+                conversationMap.set(coachIdStr, {
+                    lastMessage: 'Tap to start conversation',
+                    lastMessageAt: assignment.createdAt || new Date(0),
+                    unreadCount: 0,
+                    isCoach: true
+                });
+            } else {
+                conversationMap.get(coachIdStr).isCoach = true;
+            }
+        }
+
+        const userIds = Array.from(conversationMap.keys());
+        const users = await User.find({ _id: { $in: userIds } }).select('name email avatar role bio');
+
+        const conversations = users.map(u => {
+            const conv = conversationMap.get(u._id.toString());
+            return {
+                user: {
+                    _id: u._id,
+                    name: u.name,
+                    email: u.email,
+                    avatar: u.avatar,
+                    role: u.role,
+                    bio: u.bio || ''
+                },
+                lastMessage: conv?.lastMessage || '',
+                lastMessageAt: conv?.lastMessageAt || null,
+                unreadCount: conv?.unreadCount || 0,
+                isCoach: conv?.isCoach || u.role === 'coach'
+            };
+        }).sort((a, b) => new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime());
+
+        res.status(200).json({ success: true, count: conversations.length, data: conversations });
+    } catch (err) {
+        console.error('getConversations error:', err);
+        res.status(500).json({ success: false, message: 'Server Error' });
+    }
+};
+
+// @desc    Get member unread messages count
 // @route   GET /api/users/unread-messages
 // @access  Private
 exports.getMemberUnreadCount = async (req, res) => {
@@ -334,36 +437,49 @@ exports.getMemberUnreadCount = async (req, res) => {
     }
 };
 
-// @desc    Send message to my coach
+// @desc    Send message to a user or coach
 // @route   POST /api/users/my-messages
 // @access  Private
 exports.sendMyMessage = async (req, res) => {
     try {
-        const { content } = req.body;
-        const assignment = await ClientAssignment.findOne({ clientId: req.user.id });
-        if (!assignment) {
-            return res.status(400).json({ success: false, message: 'No coach assigned' });
+        const { content, receiverId, recipientId, user: targetUserId } = req.body;
+        let targetId = receiverId || recipientId || targetUserId;
+
+        if (!targetId) {
+            const assignment = await ClientAssignment.findOne({ clientId: req.user.id });
+            if (assignment && assignment.coachId) {
+                targetId = assignment.coachId;
+            }
+        }
+
+        if (!targetId) {
+            return res.status(400).json({ success: false, message: 'Please specify a recipient for your message.' });
+        }
+
+        const trimmed = (content || '').trim();
+        if (!trimmed) {
+            return res.status(400).json({ success: false, message: 'Message content cannot be empty.' });
         }
 
         const msg = await Message.create({
             senderId: req.user.id,
-            receiverId: assignment.coachId,
-            content
+            receiverId: targetId,
+            content: trimmed
         });
 
-        // Notify the coach
+        // Notify the recipient
         const Notification = require('../models/Notification');
         await Notification.create({
-            recipient: assignment.coachId,
+            recipient: targetId,
             title: 'New Message',
-            message: `${req.user.name || 'Your client'} sent you a message`,
+            message: `${req.user.name || 'Someone'} sent you a message`,
             type: 'info',
-            link: '/coach/dashboard'
-        });
+            link: `/member/inbox?user=${req.user.id}`
+        }).catch(() => {});
 
         res.status(201).json({ success: true, data: msg });
     } catch (err) {
-        console.error(err);
+        console.error('sendMyMessage error:', err);
         res.status(500).json({ success: false, message: 'Server Error' });
     }
 };

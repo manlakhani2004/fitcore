@@ -17,6 +17,7 @@ const {
     setMyCoach,
     getMyMessages,
     sendMyMessage,
+    getConversations,
     getMemberUnreadCount
 } = require('../controllers/userController');
 
@@ -45,6 +46,7 @@ router.delete('/account', deleteAccount);
 router.get('/my-coach', getMyCoach);
 router.put('/my-coach', setMyCoach);
 router.get('/unread-messages', getMemberUnreadCount);
+router.get('/conversations', getConversations);
 router.route('/my-messages')
     .get(getMyMessages)
     .post(sendMyMessage);
