@@ -75,7 +75,7 @@ export function CheckoutModal({ isOpen, onClose, onConfirm, amount, title, descr
           <button
             onClick={handlePayment}
             disabled={processing}
-            className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-4 rounded-xl transition-all shadow-[0_0_20px_rgba(108,99,255,0.3)] hover:shadow-[0_0_25px_rgba(108,99,255,0.5)] flex items-center justify-center gap-2"
+            className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 text-sm disabled:opacity-50"
           >
             {processing ? (
               <>

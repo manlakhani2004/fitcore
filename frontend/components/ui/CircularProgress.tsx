@@ -29,7 +29,7 @@ export function CircularProgress({
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          stroke="var(--color-border)"
+          stroke="#1E2230"
           strokeWidth={strokeWidth}
           fill="transparent"
         />
@@ -38,20 +38,19 @@ export function CircularProgress({
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          stroke="var(--color-primary)"
+          stroke="#4F46E5"
           strokeWidth={strokeWidth}
           fill="transparent"
           strokeLinecap="round"
           strokeDasharray={circumference}
           initial={{ strokeDashoffset: circumference }}
           animate={{ strokeDashoffset: offset }}
-          transition={{ duration: 1.5, ease: "easeOut" }}
-          className="drop-shadow-[0_0_10px_rgba(108,99,255,0.4)]"
+          transition={{ duration: 1.2, ease: "easeOut" }}
         />
       </svg>
       <div className="absolute flex flex-col items-center justify-center text-center">
-        <span className="text-4xl font-display font-bold text-text-primary">{label}</span>
-        <span className="text-sm font-medium text-text-muted">{sublabel}</span>
+        <span className="text-3xl md:text-4xl font-mono font-bold text-white tracking-tight">{label}</span>
+        <span className="text-xs font-medium text-slate-400 mt-0.5">{sublabel}</span>
       </div>
     </div>
   );

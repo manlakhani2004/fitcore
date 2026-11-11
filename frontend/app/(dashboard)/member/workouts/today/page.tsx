@@ -219,7 +219,7 @@ export default function DailyWorkoutPage() {
     setSavingLog(true);
 
     const end = Date.now() + 2 * 1000;
-    const colors = ['#6C63FF', '#00F5A0', '#FF4C6A'];
+    const colors = ['#6366F1', '#10B981', '#F59E0B'];
 
     (function frame() {
       confetti({
@@ -281,37 +281,36 @@ export default function DailyWorkoutPage() {
   if (isFinished) {
     return (
       <motion.div 
-        initial={{ opacity: 0, scale: 0.9 }}
+        initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="max-w-2xl mx-auto mt-20 bg-surface border border-border p-10 rounded-3xl text-center shadow-2xl relative overflow-hidden"
+        className="max-w-2xl mx-auto mt-20 bg-[#12141C] border border-[#1E2230] p-8 md:p-10 rounded-2xl text-center shadow-2xl relative overflow-hidden"
       >
-        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary to-accent" />
-        <Trophy className="w-20 h-20 text-accent mx-auto mb-6" />
-        <h1 className="text-4xl font-display font-bold mb-4">Workout Complete!</h1>
-        <p className="text-text-muted mb-8">You crushed "{workout.name}". Great job staying consistent with progressive overload.</p>
+        <Trophy className="w-16 h-16 text-amber-400 mx-auto mb-5" />
+        <h1 className="text-3xl font-semibold text-white tracking-tight mb-3">Workout Complete</h1>
+        <p className="text-slate-400 text-sm mb-8">You crushed &quot;{workout.name}&quot;. Great job staying consistent with progressive overload.</p>
         
         <div className="flex justify-center gap-8 mb-8">
           <div className="text-center">
-            <div className="text-3xl font-mono font-bold text-primary">{Math.max(1, Math.round(secondsElapsed / 60))}</div>
-            <div className="text-xs text-text-muted uppercase">Minutes</div>
+            <div className="text-3xl font-mono font-bold text-white">{Math.max(1, Math.round(secondsElapsed / 60))}</div>
+            <div className="text-xs text-slate-400 uppercase font-semibold mt-1">Minutes</div>
           </div>
           <div className="text-center">
-            <div className="text-3xl font-mono font-bold text-accent">{Math.max(50, currentCompleted * 25 || 280)}</div>
-            <div className="text-xs text-text-muted uppercase">Calories</div>
+            <div className="text-3xl font-mono font-bold text-emerald-400">{Math.max(50, currentCompleted * 25 || 280)}</div>
+            <div className="text-xs text-slate-400 uppercase font-semibold mt-1">Calories</div>
           </div>
           <div className="text-center">
-            <div className="text-3xl font-mono font-bold text-yellow-400">+{earnedPoints}</div>
-            <div className="text-xs text-text-muted uppercase">XP Points</div>
+            <div className="text-3xl font-mono font-bold text-amber-400">+{earnedPoints}</div>
+            <div className="text-xs text-slate-400 uppercase font-semibold mt-1">XP Points</div>
           </div>
         </div>
 
-        <div className="flex items-center justify-center gap-2 mb-8 text-sm font-bold text-text-muted bg-background/50 border border-border py-2 px-4 rounded-xl w-fit mx-auto">
-          <Award className="w-4 h-4 text-accent" />
+        <div className="flex items-center justify-center gap-2 mb-8 text-xs font-semibold text-slate-300 bg-[#0E1017] border border-[#1E2230] py-2 px-4 rounded-xl w-fit mx-auto">
+          <Award className="w-4 h-4 text-indigo-400" />
           <span>Current Level: {userLevel}</span>
         </div>
 
         <Link href="/member/workouts">
-          <button className="bg-primary hover:bg-primary-hover text-white px-8 py-3 rounded-xl font-bold transition-all shadow-lg hover:-translate-y-1">
+          <button className="bg-indigo-600 hover:bg-indigo-500 text-white px-7 py-3 rounded-xl font-semibold text-xs tracking-wide transition-all shadow-sm">
             Back to Workouts
           </button>
         </Link>

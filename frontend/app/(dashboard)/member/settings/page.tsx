@@ -168,9 +168,9 @@ function SettingsContent() {
   const strokeDasharray = 283;
   const strokeDashoffset = strokeDasharray - (strokeDasharray * bmiPercentage * 0.75);
 
-  let bmiColor = "#00F5A0";
-  if (safeBmi < 18.5) bmiColor = "#6C63FF";
-  if (safeBmi >= 25) bmiColor = "#FF4C6A";
+  let bmiColor = "#10B981";
+  if (safeBmi < 18.5) bmiColor = "#6366F1";
+  if (safeBmi >= 25) bmiColor = "#F59E0B";
 
   return (
     <div className="max-w-6xl mx-auto space-y-8 pb-20">

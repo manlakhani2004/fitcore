@@ -300,12 +300,12 @@ function MembershipContent() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 * i }}
                   whileHover={{ y: -5, scale: 1.02 }}
-                  className={`bg-surface rounded-3xl p-6 flex flex-col relative border-2 transition-all ${
-                    plan.isPopular ? 'border-primary shadow-[0_0_20px_rgba(108,99,255,0.15)]' : 'border-border hover:border-primary/50'
+                  className={`rounded-2xl p-6 flex flex-col relative border transition-all ${
+                    plan.isPopular ? 'border-indigo-500/80 bg-[#151824]' : 'border-[#1E2230] hover:border-slate-700 bg-[#12141C]'
                   }`}
                 >
                   {plan.isPopular && (
-                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-primary to-accent text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg whitespace-nowrap animate-pulse">
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-indigo-600 text-white text-[10px] font-semibold tracking-wider uppercase px-3 py-0.5 rounded-full shadow-sm whitespace-nowrap">
                       MOST POPULAR
                     </div>
                   )}

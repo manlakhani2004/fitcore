@@ -705,11 +705,11 @@ function ClientsContent() {
                           date: new Date(m.date).toLocaleDateString(),
                           val: chartMetric === 'weight' ? m.weight : (m.bodyFat || 15)
                         }))}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#262626" />
-                          <XAxis dataKey="date" stroke="#737373" fontSize={11} />
-                          <YAxis stroke="#737373" fontSize={11} domain={['auto', 'auto']} />
-                          <Tooltip contentStyle={{ backgroundColor: '#171717', borderColor: '#262626' }} />
-                          <Line type="monotone" dataKey="val" stroke="#6C63FF" strokeWidth={2} dot={{ r: 4 }} />
+                          <CartesianGrid strokeDasharray="3 3" stroke="#1E2230" />
+                          <XAxis dataKey="date" stroke="#64748B" fontSize={11} />
+                          <YAxis stroke="#64748B" fontSize={11} domain={['auto', 'auto']} />
+                          <Tooltip contentStyle={{ backgroundColor: '#12141C', borderColor: '#1E2230', borderRadius: '8px' }} />
+                          <Line type="monotone" dataKey="val" stroke="#6366F1" strokeWidth={2} dot={{ r: 4, fill: '#6366F1' }} />
                         </ReLineChart>
                       </ResponsiveContainer>
                     ) : (

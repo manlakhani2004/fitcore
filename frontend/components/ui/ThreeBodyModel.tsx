@@ -310,7 +310,7 @@ export function ThreeBodyModel({
     hotspotConfigs.forEach(cfg => {
       const nodeGeo = new THREE.SphereGeometry(0.12, 16, 16);
       const nodeMat = new THREE.MeshBasicMaterial({
-        color: cfg.name === selectedPart ? 0x00F5A0 : 0x6C63FF
+        color: cfg.name === selectedPart ? 0x10B981 : 0x4F46E5
       });
       const nodeMesh = new THREE.Mesh(nodeGeo, nodeMat);
       nodeMesh.position.set(...cfg.pos);
@@ -389,15 +389,15 @@ export function ThreeBodyModel({
     Object.keys(hotspotsRef.current).forEach(partName => {
       const mesh = hotspotsRef.current[partName];
       if (mesh && mesh.material instanceof THREE.MeshBasicMaterial) {
-        mesh.material.color.setHex(partName === selectedPart ? 0x00F5A0 : 0x6C63FF);
+        mesh.material.color.setHex(partName === selectedPart ? 0x10B981 : 0x4F46E5);
       }
     });
   }, [selectedPart]);
 
   return (
     <div ref={containerRef} className="w-full h-full relative cursor-grab active:cursor-grabbing">
-      <div className="absolute top-2 left-2 pointer-events-none bg-surface/90 border border-border px-2.5 py-1 rounded-lg text-[10px] font-bold text-text-primary flex items-center gap-1.5 shadow-md">
-        <span className="w-2 h-2 rounded-full bg-accent animate-pulse" /> Three.js Orbit Engine • Drag to Rotate 360°
+      <div className="absolute top-2 left-2 pointer-events-none bg-[#12141C]/90 border border-[#1E2230] px-2.5 py-1 rounded-lg text-[10px] font-semibold text-slate-200 flex items-center gap-1.5 shadow-sm">
+        <span className="w-2 h-2 rounded-full bg-emerald-500" /> Three.js Orbit Engine • Drag to Rotate 360°
       </div>
     </div>
   );

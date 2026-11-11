@@ -223,51 +223,51 @@ function MyCoachContent() {
   });
 
   if (loading) {
-    return <div className="flex h-64 items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
+    return <div className="flex h-64 items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-indigo-500" /></div>;
   }
 
   return (
-    <div className="max-w-6xl mx-auto pb-10 space-y-8">
+    <div className="max-w-6xl mx-auto pb-10 space-y-6">
       {/* Coach Info Header */}
       {coach ? (
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-          className="bg-surface rounded-3xl p-6 md:p-8 border border-border flex flex-col md:flex-row items-start md:items-center gap-6 shadow-sm">
-          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-2xl font-bold text-primary shrink-0 border border-primary/20">
+        <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }}
+          className="bg-[#12141C] rounded-2xl p-6 md:p-7 border border-[#1E2230] flex flex-col md:flex-row items-start md:items-center gap-6 shadow-sm">
+          <div className="w-14 h-14 rounded-full bg-white/[0.05] flex items-center justify-center text-xl font-bold text-white shrink-0 border border-white/[0.08]">
             {coach.coachId?.name?.charAt(0) || 'C'}
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-display font-bold">{coach.coachId?.name || 'My Coach'}</h1>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-accent/10 text-accent border border-accent/20">
+              <h1 className="text-xl md:text-2xl font-semibold text-white tracking-tight">{coach.coachId?.name || 'My Coach'}</h1>
+              <span className="px-2.5 py-0.5 rounded-md text-[10px] font-semibold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                 Assigned
               </span>
             </div>
-            <p className="text-text-muted text-sm mt-0.5">Your personal coach — assigned programs, meal plans, daily tasks, and live video check-ins.</p>
+            <p className="text-slate-400 text-xs md:text-sm mt-1">Your dedicated coach — assigned training programs, nutrition protocols, daily habits, and live consultations.</p>
           </div>
           <button 
             onClick={() => {
               setActiveTab("meetings");
               setIsBookingOpen(true);
             }}
-            className="inline-flex items-center gap-2 bg-primary text-white hover:bg-primary-hover px-5 py-3 rounded-2xl font-bold text-sm transition-all shadow-lg hover:shadow-primary/30 shrink-0"
+            className="inline-flex items-center gap-2 bg-indigo-600 text-white hover:bg-indigo-500 px-4 py-2.5 rounded-xl font-semibold text-xs tracking-wide transition-all shadow-sm shrink-0"
           >
-            <Video className="w-4 h-4" /> Book Online Meeting
+            <Video className="w-3.5 h-3.5" /> Book Online Meeting
           </button>
         </motion.div>
       ) : (
-        <div className="bg-surface rounded-3xl p-6 md:p-8 border border-border flex flex-col sm:flex-row items-center justify-between gap-6">
+        <div className="bg-[#12141C] rounded-2xl p-6 md:p-7 border border-[#1E2230] flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
-              <User className="w-8 h-8" />
+            <div className="w-12 h-12 rounded-xl bg-white/[0.05] border border-white/[0.08] flex items-center justify-center text-slate-200">
+              <User className="w-6 h-6" />
             </div>
             <div>
-              <h2 className="text-xl font-display font-bold">No Coach Assigned Yet</h2>
-              <p className="text-sm text-text-muted">Select an elite coach below to unlock custom programming and 1-on-1 calls.</p>
+              <h2 className="text-lg font-semibold text-white">No Coach Assigned Yet</h2>
+              <p className="text-xs text-slate-400 mt-0.5">Select a certified coach below to unlock custom programming and 1-on-1 consultations.</p>
             </div>
           </div>
           <button
             onClick={() => setActiveTab("coaches")}
-            className="px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-bold shadow-md hover:bg-primary-hover transition-colors"
+            className="px-4 py-2.5 bg-indigo-600 text-white rounded-xl text-xs font-semibold shadow-sm hover:bg-indigo-500 transition-colors"
           >
             Explore Coaches
           </button>
@@ -275,18 +275,18 @@ function MyCoachContent() {
       )}
 
       {/* Tab Navigation */}
-      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide border-b border-border">
+      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide border-b border-[#1E2230]">
         {TABS.map(tab => (
           <button key={tab.key} onClick={() => {
             setActiveTab(tab.key);
             if (tab.key === 'messages') setMemberUnreadCount(0);
           }}
-            className={`flex items-center gap-2 px-5 py-3 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
+            className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold transition-colors border-b-2 whitespace-nowrap ${
               activeTab === tab.key
-                ? 'border-primary text-primary font-bold'
-                : 'border-transparent text-text-muted hover:text-text-primary'
+                ? 'border-indigo-500 text-white'
+                : 'border-transparent text-slate-400 hover:text-white'
             }`}>
-            <tab.icon className="w-4 h-4" />
+            <tab.icon className="w-3.5 h-3.5" />
             <span>{tab.label}</span>
             {tab.key === 'messages' && memberUnreadCount > 0 && activeTab !== 'messages' && (
               <span className="bg-danger text-white text-[10px] font-extrabold px-1.5 py-0.5 rounded-full shadow-sm shadow-danger/40 animate-pulse">
@@ -430,33 +430,33 @@ function MyCoachContent() {
 
         {/* 4. Messages */}
         {activeTab === "messages" && (
-          <div className="bg-surface rounded-3xl border border-border flex flex-col h-[600px] overflow-hidden">
-            <div className="p-4 border-b border-border bg-background/50 flex items-center justify-between">
+          <div className="bg-[#12141C] rounded-2xl border border-[#1E2230] flex flex-col h-[560px] overflow-hidden">
+            <div className="p-4 border-b border-[#1E2230] bg-[#0E1017] flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary">
+                <div className="w-9 h-9 rounded-full bg-white/[0.05] border border-white/[0.08] flex items-center justify-center font-semibold text-slate-200 text-xs">
                   {coach?.coachId?.name?.charAt(0) || 'C'}
                 </div>
                 <div>
-                  <h4 className="font-bold text-sm">{coach?.coachId?.name || 'Coach'}</h4>
-                  <span className="text-xs text-accent flex items-center gap-1">● Online</span>
+                  <h4 className="font-semibold text-xs text-white">{coach?.coachId?.name || 'Coach'}</h4>
+                  <span className="text-[11px] text-emerald-400 flex items-center gap-1">● Online</span>
                 </div>
               </div>
             </div>
 
             <div className="flex-1 overflow-y-auto p-4 space-y-3">
               {messages.length === 0 ? (
-                <div className="text-center py-12 text-text-muted text-sm">Send your first message to your coach!</div>
+                <div className="text-center py-12 text-slate-500 text-xs">Send your first message to your coach!</div>
               ) : (
                 messages.map((m: any, i: number) => {
                   const isMe = m.senderRole === 'member';
                   return (
                     <div key={m._id || i} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
-                      <div className={`max-w-[75%] rounded-2xl px-4 py-2.5 text-sm ${
-                        isMe ? 'bg-primary text-white rounded-br-none' : 'bg-background border border-border text-text-primary rounded-bl-none'
+                      <div className={`max-w-[75%] rounded-xl px-3.5 py-2 text-xs leading-relaxed ${
+                        isMe ? 'bg-indigo-600 text-white rounded-br-none' : 'bg-[#0E1017] border border-[#1E2230] text-slate-200 rounded-bl-none'
                       }`}>
                         {m.content}
                       </div>
-                      <span className="text-[10px] text-text-muted px-1 mt-0.5">
+                      <span className="text-[10px] text-slate-500 px-1 mt-0.5">
                         {new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </div>
@@ -466,13 +466,13 @@ function MyCoachContent() {
               <div ref={messagesEndRef} />
             </div>
 
-            <form onSubmit={sendMessage} className="p-4 border-t border-border bg-background/50 flex gap-3">
+            <form onSubmit={sendMessage} className="p-3 border-t border-[#1E2230] bg-[#0E1017] flex gap-2">
               <input type="text" value={msgInput} onChange={(e) => setMsgInput(e.target.value)}
-                placeholder="Type a message..."
-                className="flex-1 bg-surface border border-border rounded-xl px-4 py-3 focus:outline-none focus:border-primary transition-colors text-sm" />
+                placeholder="Type a message to your coach..."
+                className="flex-1 bg-[#12141C] border border-[#1E2230] rounded-xl px-3.5 py-2 focus:outline-none focus:border-indigo-500 transition-colors text-xs text-white placeholder-slate-500" />
               <button type="submit" disabled={!msgInput.trim() || sending}
-                className="bg-primary hover:bg-primary-hover disabled:opacity-50 text-white p-3 rounded-xl transition-all">
-                {sending ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
+                className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white p-2.5 rounded-xl transition-all shadow-sm">
+                {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
               </button>
             </form>
           </div>
