@@ -11,18 +11,21 @@ const cookieOptions = (maxAge) => ({
     maxAge
 });
 
+const TOKEN_EXPIRY_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+const REFRESH_TOKEN_EXPIRY_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
+
 // Helper to generate tokens
 const generateTokens = (user) => {
     const accessToken = jwt.sign(
         { id: user._id, role: user.role, name: user.name },
         process.env.JWT_SECRET,
-        { expiresIn: '15m' }
+        { expiresIn: '7d' }
     );
 
     const refreshToken = jwt.sign(
         { id: user._id, name: user.name },
         process.env.JWT_REFRESH_SECRET,
-        { expiresIn: '7d' }
+        { expiresIn: '30d' }
     );
 
     return { accessToken, refreshToken };
@@ -73,8 +76,8 @@ exports.register = async (req, res) => {
         user.refreshToken = refreshToken;
         await user.save();
 
-        res.cookie('token', accessToken, cookieOptions(15 * 60 * 1000))
-            .cookie('refreshToken', refreshToken, cookieOptions(7 * 24 * 60 * 60 * 1000))
+        res.cookie('token', accessToken, cookieOptions(TOKEN_EXPIRY_MS))
+            .cookie('refreshToken', refreshToken, cookieOptions(REFRESH_TOKEN_EXPIRY_MS))
             .status(201).json({
                 success: true,
                 data: { id: user._id, name: user.name, email: user.email, role: user.role }
@@ -115,8 +118,8 @@ exports.login = async (req, res) => {
         user.refreshToken = refreshToken;
         await user.save();
 
-        res.cookie('token', accessToken, cookieOptions(15 * 60 * 1000))
-            .cookie('refreshToken', refreshToken, cookieOptions(7 * 24 * 60 * 60 * 1000))
+        res.cookie('token', accessToken, cookieOptions(TOKEN_EXPIRY_MS))
+            .cookie('refreshToken', refreshToken, cookieOptions(REFRESH_TOKEN_EXPIRY_MS))
             .status(200).json({
                 success: true,
                 data: { id: user._id, name: user.name, email: user.email, role: user.role }
@@ -132,14 +135,14 @@ exports.login = async (req, res) => {
 // @access  Public
 exports.refreshToken = async (req, res) => {
     try {
-        const token = req.cookies.refreshToken || req.body.refreshToken;
+        const token = req.cookies?.refreshToken || req.body?.refreshToken;
         if (!token) return res.status(401).json({ success: false, message: 'No refresh token provided' });
 
         const decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
         const user = await User.findById(decoded.id);
 
-        if (!user || user.refreshToken !== token) {
-            return res.status(401).json({ success: false, message: 'Invalid refresh token' });
+        if (!user) {
+            return res.status(401).json({ success: false, message: 'User not found' });
         }
 
         const tokens = generateTokens(user);
@@ -147,14 +150,14 @@ exports.refreshToken = async (req, res) => {
         user.refreshToken = tokens.refreshToken;
         await user.save();
 
-        res.cookie('token', tokens.accessToken, cookieOptions(15 * 60 * 1000))
-            .cookie('refreshToken', tokens.refreshToken, cookieOptions(7 * 24 * 60 * 60 * 1000))
+        res.cookie('token', tokens.accessToken, cookieOptions(TOKEN_EXPIRY_MS))
+            .cookie('refreshToken', tokens.refreshToken, cookieOptions(REFRESH_TOKEN_EXPIRY_MS))
             .status(200).json({
                 success: true,
                 user: { id: user._id, name: user.name, email: user.email, role: user.role }
             });
     } catch (err) {
-        console.error(err);
+        console.error('refreshToken error:', err.message);
         res.status(401).json({ success: false, message: 'Token refresh failed' });
     }
 };

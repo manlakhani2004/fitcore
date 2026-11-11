@@ -62,11 +62,14 @@ api.interceptors.response.use(
           processQueue(null, null);
           return api(originalRequest);
         }
-      } catch (refreshError) {
+      } catch (refreshError: any) {
         processQueue(refreshError, null);
-        if (typeof window !== 'undefined' && !window.location.pathname.includes('/login')) {
-          useAuthStore.getState().logout();
-          window.location.href = '/login';
+        // Only log out if the refresh token itself is definitely invalid (401)
+        if (refreshError?.response?.status === 401) {
+          if (typeof window !== 'undefined' && !window.location.pathname.includes('/login')) {
+            useAuthStore.getState().logout();
+            window.location.href = '/login';
+          }
         }
         return Promise.reject(refreshError);
       } finally {

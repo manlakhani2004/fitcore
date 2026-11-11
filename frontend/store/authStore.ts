@@ -3,7 +3,7 @@ import { create } from 'zustand';
 interface AuthState {
   user: any | null;
   isAuthenticated: boolean;
-  login: (user: any, token: string) => void;
+  login: (user: any, token?: string) => void;
   logout: () => void;
   setAccessToken: (token: string) => void;
   setUser: (user: any) => void;
@@ -11,12 +11,25 @@ interface AuthState {
 
 const USER_KEY = 'fitcore_user';
 
+const getInitialUser = () => {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem(USER_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+};
+
+const initialUser = getInitialUser();
+
 export const useAuthStore = create<AuthState>()((set) => ({
-  user: null,
-  isAuthenticated: false,
+  user: initialUser,
+  isAuthenticated: !!initialUser,
   login: (user, token) => {
-    // token is no longer saved to localStorage
-    localStorage.setItem(USER_KEY, JSON.stringify(user));
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(USER_KEY, JSON.stringify(user));
+    }
     set({ user, isAuthenticated: true });
   },
   logout: async () => {
@@ -30,14 +43,18 @@ export const useAuthStore = create<AuthState>()((set) => ({
     } catch (err) {
       console.error('Logout error', err);
     }
-    localStorage.removeItem(USER_KEY);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(USER_KEY);
+    }
     set({ user: null, isAuthenticated: false });
   },
   setAccessToken: (token) => {
     // No-op since we use httpOnly cookies
   },
   setUser: (user) => {
-    localStorage.setItem(USER_KEY, JSON.stringify(user));
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(USER_KEY, JSON.stringify(user));
+    }
     set({ user, isAuthenticated: true });
   },
 }));

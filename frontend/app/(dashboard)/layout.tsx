@@ -5,7 +5,7 @@ import { TopNav } from "@/components/shared/TopNav";
 import { FitBot } from "@/components/ui/FitBot";
 import { useAuthStore } from "@/store/authStore";
 import { useRouter, usePathname } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import api from "@/lib/api";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -13,23 +13,33 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const router = useRouter();
   const pathname = usePathname();
   const initDone = useRef(false);
+  const [mounted, setMounted] = useState(false);
 
-  // 1. Initial auth sync & refresh on mount
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // 1. Initial auth sync & background token refresh on mount
   useEffect(() => {
     if (initDone.current) return;
     initDone.current = true;
 
-    api.post('/auth/refresh-token').then(res => {
-      if (res.data?.success && res.data?.user) {
-        setUser(res.data.user);
-      } else {
-        logout();
-        router.replace('/login');
-      }
-    }).catch(() => {
-      logout();
-      router.replace('/login');
-    });
+    api.post('/auth/refresh-token')
+      .then(res => {
+        if (res.data?.success && res.data?.user) {
+          setUser(res.data.user);
+        }
+      })
+      .catch((err) => {
+        // If 401 Unauthorized explicitly returned from backend, token is expired
+        if (err.response?.status === 401) {
+          const storedUser = typeof window !== 'undefined' ? localStorage.getItem('fitcore_user') : null;
+          if (!storedUser) {
+            logout();
+            router.replace('/login');
+          }
+        }
+      });
   }, [logout, router, setUser]);
 
   // 2. Strict Continuous RBAC Guard on every route navigation
@@ -45,7 +55,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }
   }, [pathname, user, router]);
 
-  if (!isAuthenticated) return null;
+  // Redirect if definitely unauthenticated after mounting
+  useEffect(() => {
+    if (mounted && !isAuthenticated && !user) {
+      router.replace('/login');
+    }
+  }, [mounted, isAuthenticated, user, router]);
+
+  if (!mounted || (!isAuthenticated && !user)) return null;
 
   return (
     <div suppressHydrationWarning className="flex h-screen bg-background overflow-hidden">
