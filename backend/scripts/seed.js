@@ -17,6 +17,7 @@ const CoachAvailability = require('../models/CoachAvailability');
 const WorkoutProgram = require('../models/WorkoutProgram');
 const DietPlan = require('../models/DietPlan');
 const SystemSetting = require('../models/SystemSetting');
+const Exercise = require('../models/Exercise');
 
 // Connect to DB
 mongoose.connect(process.env.MONGODB_URI);
@@ -279,6 +280,11 @@ const seedDB = async () => {
             },
             { upsert: true, new: true }
         );
+
+        console.log('Seeding Exercise Library...');
+        const { exercises } = require('./seedExercises');
+        await Exercise.deleteMany();
+        await Exercise.insertMany(exercises);
 
         console.log('Data successfully seeded!');
         console.log('--- TEST ACCOUNTS (Password: man@1610) ---');
