@@ -230,8 +230,9 @@ exports.getUserCommunityProfile = async (req, res) => {
 
         const athletePosts = await Post.find({ author: targetUser._id })
             .sort({ createdAt: -1 })
-            .limit(6)
-            .populate('author', 'name email avatar role');
+            .limit(20)
+            .populate('author', 'name email avatar role')
+            .populate('comments.author', 'name email avatar role');
 
         const isFollowing = (targetUser.followers || []).some(id => id.toString() === req.user.id);
 

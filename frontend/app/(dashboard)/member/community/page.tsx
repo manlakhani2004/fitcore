@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Image as ImageIcon, 
@@ -53,6 +54,7 @@ function formatImageUrl(url?: string): string {
 }
 
 export default function CommunityPage() {
+  const router = useRouter();
   const user = useAuthStore((state) => state.user);
   const [posts, setPosts] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<FeedTab>("all");
@@ -71,11 +73,6 @@ export default function CommunityPage() {
   // Delete Post Modal State
   const [postToDelete, setPostToDelete] = useState<string | null>(null);
   const [isDeletingPost, setIsDeletingPost] = useState(false);
-
-  // Athlete Profile Modal State
-  const [profileModalUserId, setProfileModalUserId] = useState<string | null>(null);
-  const [profileData, setProfileData] = useState<any>(null);
-  const [isLoadingProfile, setIsLoadingProfile] = useState(false);
   const [isFollowLoading, setIsFollowLoading] = useState(false);
 
   // Close menus on outside click
@@ -232,20 +229,8 @@ export default function CommunityPage() {
     try {
       const res = await api.post(`/community/users/${targetUserId}/follow`);
       if (res.data.success) {
-        const { isFollowing, followersCount, message } = res.data;
+        const { isFollowing, message } = res.data;
         toast.success(message);
-
-        // Update profile modal state if open
-        if (profileData && profileData.user._id === targetUserId) {
-          setProfileData((prev: any) => ({
-            ...prev,
-            user: {
-              ...prev.user,
-              isFollowing,
-              followersCount
-            }
-          }));
-        }
 
         // Update post feed follow badges
         setPosts((prev) =>
@@ -274,27 +259,10 @@ export default function CommunityPage() {
     }
   };
 
-  // Open Athlete Profile Modal
-  const openProfileModal = async (authorId: string) => {
+  // Navigate to Dedicated Athlete Profile Page
+  const navigateToProfile = (authorId?: string) => {
     if (!authorId) return;
-    setProfileModalUserId(authorId);
-    setIsLoadingProfile(true);
-    try {
-      const res = await api.get(`/community/users/${authorId}/profile`);
-      if (res.data.success) {
-        setProfileData(res.data.data);
-      }
-    } catch (err) {
-      toast.error("Failed to load athlete profile.");
-      setProfileModalUserId(null);
-    } finally {
-      setIsLoadingProfile(false);
-    }
-  };
-
-  const closeProfileModal = () => {
-    setProfileModalUserId(null);
-    setProfileData(null);
+    router.push(`/member/community/profile/${authorId}`);
   };
 
   // Copy Post Link
@@ -400,7 +368,7 @@ export default function CommunityPage() {
         <form onSubmit={handlePostSubmit}>
           <div className="flex gap-4">
             <div 
-              onClick={() => openProfileModal(user?.id || '')}
+              onClick={() => navigateToProfile(user?.id)}
               className="w-10 h-10 rounded-full bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30 flex items-center justify-center font-bold text-sm shrink-0 shadow-sm cursor-pointer hover:ring-2 hover:ring-indigo-500/30 transition-all"
               title="View your profile"
             >
@@ -541,7 +509,7 @@ export default function CommunityPage() {
                   <div className="flex items-center gap-3.5 min-w-0">
                     <button
                       type="button"
-                      onClick={() => openProfileModal(post.author?._id)}
+                      onClick={() => navigateToProfile(post.author?._id)}
                       className="w-10 h-10 rounded-full bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30 flex items-center justify-center font-bold text-sm shrink-0 overflow-hidden shadow-sm hover:scale-105 transition-transform cursor-pointer"
                       title={`View ${authorName}'s profile`}
                     >
@@ -556,7 +524,7 @@ export default function CommunityPage() {
                       <div className="flex items-center gap-2">
                         <button
                           type="button"
-                          onClick={() => openProfileModal(post.author?._id)}
+                          onClick={() => navigateToProfile(post.author?._id)}
                           className="font-semibold text-sm text-text-primary tracking-tight leading-snug hover:underline truncate cursor-pointer text-left"
                         >
                           {authorName}
@@ -626,7 +594,7 @@ export default function CommunityPage() {
                           type="button"
                           onClick={() => {
                             setOpenActionPostId(null);
-                            openProfileModal(post.author?._id);
+                            navigateToProfile(post.author?._id);
                           }}
                           className="w-full px-3.5 py-2 text-left text-xs font-medium text-text-primary hover:bg-slate-100 dark:hover:bg-white/[0.06] flex items-center gap-2"
                         >
@@ -717,7 +685,7 @@ export default function CommunityPage() {
                             <div key={c._id} className="flex gap-3 items-start group">
                               <button
                                 type="button"
-                                onClick={() => openProfileModal(c.author?._id)}
+                                onClick={() => navigateToProfile(c.author?._id)}
                                 className="w-8 h-8 rounded-full bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30 flex items-center justify-center text-xs font-bold shrink-0 overflow-hidden mt-0.5 cursor-pointer hover:scale-105 transition-transform"
                                 title={`View ${commentAuthorName}'s profile`}
                               >
@@ -731,7 +699,7 @@ export default function CommunityPage() {
                                 <div className="flex items-center justify-between gap-2">
                                   <button
                                     type="button"
-                                    onClick={() => openProfileModal(c.author?._id)}
+                                    onClick={() => navigateToProfile(c.author?._id)}
                                     className="font-semibold text-xs text-text-primary hover:underline cursor-pointer text-left"
                                   >
                                     {commentAuthorName}
@@ -832,173 +800,6 @@ export default function CommunityPage() {
                   )}
                 </button>
               </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
-      {/* Athlete Profile Modal */}
-      <AnimatePresence>
-        {profileModalUserId && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="w-full max-w-md bg-surface border border-border rounded-3xl p-6 shadow-2xl relative max-h-[85vh] overflow-y-auto"
-            >
-              {/* Close Button */}
-              <button
-                type="button"
-                onClick={closeProfileModal}
-                className="absolute top-4 right-4 p-2 rounded-full text-text-muted hover:text-text-primary hover:bg-slate-100 dark:hover:bg-white/[0.08] transition-colors cursor-pointer"
-                title="Close"
-              >
-                <X className="w-5 h-5" />
-              </button>
-
-              {isLoadingProfile && (
-                <div className="py-16 text-center flex flex-col items-center gap-3">
-                  <Loader2 className="w-7 h-7 animate-spin text-indigo-500" />
-                  <p className="text-xs text-text-muted">Loading athlete profile...</p>
-                </div>
-              )}
-
-              {!isLoadingProfile && profileData && (
-                <div className="space-y-6">
-                  {/* Top Profile Card */}
-                  <div className="flex flex-col items-center text-center space-y-3 pt-2">
-                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-indigo-500 to-emerald-500 p-[2px] shadow-lg shadow-indigo-500/20">
-                      <div className="w-full h-full rounded-full bg-surface overflow-hidden flex items-center justify-center font-bold text-2xl text-indigo-600 dark:text-white">
-                        {profileData.user.avatar ? (
-                          <img src={formatImageUrl(profileData.user.avatar)} alt={profileData.user.name} className="w-full h-full object-cover" />
-                        ) : (
-                          <span>{profileData.user.name?.charAt(0)?.toUpperCase() || 'A'}</span>
-                        )}
-                      </div>
-                    </div>
-
-                    <div>
-                      <div className="flex items-center justify-center gap-2">
-                        <h2 className="text-xl font-bold text-text-primary tracking-tight">{profileData.user.name}</h2>
-                        <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded capitalize">
-                          {profileData.user.role}
-                        </span>
-                      </div>
-                      <p className="text-xs text-text-muted mt-0.5">
-                        Member since {new Date(profileData.user.createdAt).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}
-                      </p>
-                    </div>
-
-                    {profileData.user.bio && (
-                      <p className="text-xs text-slate-600 dark:text-slate-300 max-w-xs leading-relaxed italic">
-                        &quot;{profileData.user.bio}&quot;
-                      </p>
-                    )}
-
-                    {/* Follow Action Button */}
-                    {!profileData.user.isSelf ? (
-                      <button
-                        type="button"
-                        onClick={() => handleToggleFollow(profileData.user._id)}
-                        disabled={isFollowLoading}
-                        className={`px-6 py-2 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
-                          profileData.user.isFollowing
-                            ? 'bg-slate-100 hover:bg-rose-50 text-slate-700 hover:text-rose-600 dark:bg-white/[0.08] dark:hover:bg-rose-500/10 dark:text-slate-300 dark:hover:text-rose-400 border border-border'
-                            : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-500/20'
-                        }`}
-                      >
-                        {profileData.user.isFollowing ? (
-                          <>
-                            <UserCheck className="w-3.5 h-3.5" />
-                            <span>Following</span>
-                          </>
-                        ) : (
-                          <>
-                            <UserPlus className="w-3.5 h-3.5" />
-                            <span>Follow Athlete</span>
-                          </>
-                        )}
-                      </button>
-                    ) : (
-                      <span className="text-xs font-semibold px-3 py-1 rounded-full bg-slate-100 dark:bg-white/[0.05] text-text-muted border border-border">
-                        Your Profile
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Follower Stats Row */}
-                  <div className="grid grid-cols-4 gap-2 text-center p-3 rounded-2xl bg-background border border-border">
-                    <div>
-                      <p className="text-base font-bold font-mono text-text-primary">{profileData.user.followersCount || 0}</p>
-                      <p className="text-[10px] text-text-muted uppercase tracking-wider mt-0.5">Followers</p>
-                    </div>
-                    <div>
-                      <p className="text-base font-bold font-mono text-text-primary">{profileData.user.followingCount || 0}</p>
-                      <p className="text-[10px] text-text-muted uppercase tracking-wider mt-0.5">Following</p>
-                    </div>
-                    <div>
-                      <p className="text-base font-bold font-mono text-text-primary">{profileData.metrics.totalWorkouts || 0}</p>
-                      <p className="text-[10px] text-text-muted uppercase tracking-wider mt-0.5">Workouts</p>
-                    </div>
-                    <div>
-                      <p className="text-base font-bold font-mono text-text-primary">{profileData.metrics.totalPosts || 0}</p>
-                      <p className="text-[10px] text-text-muted uppercase tracking-wider mt-0.5">Posts</p>
-                    </div>
-                  </div>
-
-                  {/* Fitness Goals */}
-                  {profileData.profile?.fitnessGoals?.length > 0 && (
-                    <div className="space-y-2">
-                      <span className="text-[11px] font-semibold uppercase tracking-wider text-text-muted block">
-                        Focus Areas & Goals
-                      </span>
-                      <div className="flex flex-wrap gap-1.5">
-                        {profileData.profile.fitnessGoals.map((g: string) => (
-                          <span 
-                            key={g}
-                            className="px-2.5 py-1 rounded-lg text-xs font-medium bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 capitalize"
-                          >
-                            {g.replace('_', ' ')}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Recent Athlete Activity */}
-                  <div className="space-y-3 pt-2">
-                    <span className="text-[11px] font-semibold uppercase tracking-wider text-text-muted block">
-                      Recent Activity ({profileData.recentPosts?.length || 0})
-                    </span>
-                    {profileData.recentPosts?.length === 0 ? (
-                      <p className="text-xs text-text-muted italic">No recent posts from this athlete.</p>
-                    ) : (
-                      <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
-                        {profileData.recentPosts.map((rp: any) => (
-                          <div 
-                            key={rp._id} 
-                            className="p-3 rounded-xl bg-background border border-border space-y-1.5 text-left"
-                          >
-                            <div className="flex items-center justify-between text-[10px] text-text-muted">
-                              <span>{new Date(rp.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
-                              <span className="flex items-center gap-1">❤️ {rp.likes?.length || 0}</span>
-                            </div>
-                            {rp.content && <p className="text-xs text-text-primary line-clamp-2">{rp.content}</p>}
-                            {rp.imageUrl && (
-                              <img 
-                                src={formatImageUrl(rp.imageUrl)} 
-                                alt="Thumbnail" 
-                                className="w-full h-24 object-cover rounded-lg border border-border" 
-                              />
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
             </motion.div>
           </div>
         )}
