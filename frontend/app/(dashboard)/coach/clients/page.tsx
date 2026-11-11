@@ -639,6 +639,7 @@ function ClientsContent() {
                     selectedPart={selectedBodyPart}
                     onSelectPart={(part) => setSelectedBodyPart(part as BodyPart)}
                     rotationAngle={rotationAngle}
+                    isSpinning={isSpinning}
                   />
                   <div className="absolute bottom-3 left-3 text-[11px] text-text-muted bg-surface/80 backdrop-blur px-2.5 py-1 rounded-lg border border-border pointer-events-none">
                     Drag to rotate · Click muscle groups
