@@ -4,18 +4,20 @@ import { useState, useEffect, Suspense } from "react";
 import { 
   Lock, Download, Trash2, Shield, User, Heart, 
   Activity, Target, Edit2, Check, X, UploadCloud, 
-  ChevronDown, AlertTriangle, Loader2 
+  ChevronDown, AlertTriangle, Loader2, Sun, Moon, Laptop, Palette
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import api from "@/lib/api";
 import toast from "react-hot-toast";
 import { useAuthStore } from "@/store/authStore";
+import { useTheme } from "@/context/ThemeContext";
 import { useRouter, useSearchParams } from "next/navigation";
 
 const GOALS = ['weight_loss', 'muscle_gain', 'endurance', 'flexibility', 'maintenance'];
 
 function SettingsContent() {
   const { logout, user } = useAuthStore();
+  const { theme, setTheme } = useTheme();
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -202,6 +204,12 @@ function SettingsContent() {
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-colors ${activeTab === 'privacy' ? 'bg-primary text-white shadow-md' : 'text-text-muted hover:bg-surface hover:text-primary'}`}
           >
             <Lock className="w-5 h-5" /> Data & Privacy
+          </button>
+          <button 
+            onClick={() => setActiveTab('appearance')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-colors ${activeTab === 'appearance' ? 'bg-primary text-white shadow-md' : 'text-text-muted hover:bg-surface hover:text-primary'}`}
+          >
+            <Palette className="w-5 h-5" /> Theme & Appearance
           </button>
         </div>
 
@@ -450,6 +458,90 @@ function SettingsContent() {
                   className="flex items-center gap-2 bg-danger/10 border border-danger/20 text-danger hover:bg-danger hover:text-white px-5 py-3 rounded-xl font-bold text-sm transition-all"
                 >
                   <Trash2 className="w-4 h-4" /> Delete My Account
+                </button>
+              </div>
+            </motion.div>
+          )}
+
+          {/* 4. Theme & Appearance Tab */}
+          {activeTab === 'appearance' && (
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+              <div>
+                <h2 className="text-xl font-bold mb-1">Visual Theme & Appearance</h2>
+                <p className="text-sm text-text-muted">Customize how the FitCore dashboard, workout library, and coach telemetry render on your device.</p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+                {/* Light Option */}
+                <button
+                  type="button"
+                  onClick={() => setTheme('light')}
+                  className={`p-5 rounded-2xl border flex flex-col items-center gap-3 transition-all text-left ${
+                    theme === 'light' 
+                      ? 'border-indigo-600 bg-indigo-500/10 shadow-sm ring-1 ring-indigo-500' 
+                      : 'border-border bg-surface hover:border-slate-400'
+                  }`}
+                >
+                  <div className="w-12 h-12 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-amber-500 shadow-sm">
+                    <Sun className="w-6 h-6" />
+                  </div>
+                  <div className="text-center">
+                    <p className="text-sm font-bold text-text-primary">Light Mode</p>
+                    <p className="text-xs text-text-muted mt-0.5">Clean white & light slate aesthetic</p>
+                  </div>
+                  {theme === 'light' && (
+                    <span className="text-[11px] font-bold text-indigo-500 bg-indigo-500/15 px-2.5 py-0.5 rounded-full mt-1">
+                      Active
+                    </span>
+                  )}
+                </button>
+
+                {/* Dark Option */}
+                <button
+                  type="button"
+                  onClick={() => setTheme('dark')}
+                  className={`p-5 rounded-2xl border flex flex-col items-center gap-3 transition-all text-left ${
+                    theme === 'dark' 
+                      ? 'border-indigo-600 bg-indigo-500/10 shadow-sm ring-1 ring-indigo-500' 
+                      : 'border-border bg-surface hover:border-slate-700'
+                  }`}
+                >
+                  <div className="w-12 h-12 rounded-xl bg-[#0B0C10] border border-[#1E2230] flex items-center justify-center text-indigo-400 shadow-sm">
+                    <Moon className="w-6 h-6" />
+                  </div>
+                  <div className="text-center">
+                    <p className="text-sm font-bold text-text-primary">Dark Mode</p>
+                    <p className="text-xs text-text-muted mt-0.5">Obsidian slate & Electric Indigo</p>
+                  </div>
+                  {theme === 'dark' && (
+                    <span className="text-[11px] font-bold text-indigo-500 bg-indigo-500/15 px-2.5 py-0.5 rounded-full mt-1">
+                      Active
+                    </span>
+                  )}
+                </button>
+
+                {/* System Option */}
+                <button
+                  type="button"
+                  onClick={() => setTheme('system')}
+                  className={`p-5 rounded-2xl border flex flex-col items-center gap-3 transition-all text-left ${
+                    theme === 'system' 
+                      ? 'border-indigo-600 bg-indigo-500/10 shadow-sm ring-1 ring-indigo-500' 
+                      : 'border-border bg-surface hover:border-slate-500'
+                  }`}
+                >
+                  <div className="w-12 h-12 rounded-xl bg-surface border border-border flex items-center justify-center text-text-muted shadow-sm">
+                    <Laptop className="w-6 h-6" />
+                  </div>
+                  <div className="text-center">
+                    <p className="text-sm font-bold text-text-primary">System Match</p>
+                    <p className="text-xs text-text-muted mt-0.5">Automatically syncs with OS theme</p>
+                  </div>
+                  {theme === 'system' && (
+                    <span className="text-[11px] font-bold text-indigo-500 bg-indigo-500/15 px-2.5 py-0.5 rounded-full mt-1">
+                      Active
+                    </span>
+                  )}
                 </button>
               </div>
             </motion.div>

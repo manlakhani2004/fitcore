@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight, Target, Users, ShieldCheck } from "lucide-react";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 export default function AboutPage() {
   return (
@@ -21,12 +22,13 @@ export default function AboutPage() {
             <Link href="/about" className="text-primary transition-colors">About</Link>
             <Link href="/contact" className="hover:text-primary transition-colors">Contact</Link>
           </div>
-          <div className="flex items-center gap-4">
-            <Link href="/login" className="text-sm font-bold text-text-primary hover:text-primary transition-colors hidden sm:block">
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <Link href="/login" className="text-sm font-semibold text-text-primary hover:text-primary transition-colors hidden sm:block">
               Log In
             </Link>
             <Link href="/register">
-              <button className="bg-primary hover:bg-primary-hover text-white px-6 py-2.5 rounded-full text-sm font-bold transition-all hover:shadow-[0_0_20px_rgba(108,99,255,0.4)]">
+              <button className="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl text-xs font-semibold tracking-wide transition-all shadow-sm">
                 Start Free Trial
               </button>
             </Link>

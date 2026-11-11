@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Syne, JetBrains_Mono } from "next/font/google";
 import { Toaster } from "react-hot-toast";
+import { ThemeProvider } from "@/context/ThemeContext";
 import "./globals.css";
 
 const inter = Inter({
@@ -31,11 +32,37 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${inter.variable} ${syne.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-background text-text-primary selection:bg-primary/30">
-        {children}
-        <Toaster position="top-right" />
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var saved = localStorage.getItem('fitcore-theme');
+                  var isDark = saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches) || !saved;
+                  if (isDark) {
+                    document.documentElement.classList.add('dark');
+                    document.documentElement.classList.remove('light');
+                    document.documentElement.style.colorScheme = 'dark';
+                  } else {
+                    document.documentElement.classList.remove('dark');
+                    document.documentElement.classList.add('light');
+                    document.documentElement.style.colorScheme = 'light';
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
+      </head>
+      <body className="min-h-full flex flex-col bg-background text-text-primary selection:bg-primary/30 transition-colors duration-150">
+        <ThemeProvider>
+          {children}
+          <Toaster position="top-right" />
+        </ThemeProvider>
       </body>
     </html>
   );

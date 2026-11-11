@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { useRouter } from "next/navigation";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 const MEMBER_NAV = [
   { name: "Dashboard", href: "/member/dashboard", icon: LayoutDashboard },
@@ -102,24 +103,24 @@ export function Sidebar() {
   const navItems = user?.role === 'admin' ? ADMIN_NAV : user?.role === 'coach' ? COACH_NAV : MEMBER_NAV;
 
   const sidebarContent = (
-    <div className="flex flex-col h-full bg-[#10121A] border-r border-[#1C202C] overflow-hidden select-none">
+    <div className="flex flex-col h-full bg-surface dark:bg-[#10121A] border-r border-border overflow-hidden select-none transition-colors">
       {/* Brand Header */}
-      <div className="h-18 px-5 border-b border-[#1C202C] flex items-center justify-between shrink-0">
+      <div className="h-18 px-5 border-b border-border flex items-center justify-between shrink-0">
         {!collapsed ? (
           <Link href="/" className="flex items-center gap-3 group">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 via-indigo-600 to-emerald-500 p-[1.5px] shadow-md shadow-indigo-500/20">
-              <div className="w-full h-full bg-[#10121A] rounded-[10px] flex items-center justify-center">
-                <span className="font-mono text-sm font-black text-white tracking-tight">FC</span>
+              <div className="w-full h-full bg-white dark:bg-[#10121A] rounded-[10px] flex items-center justify-center">
+                <span className="font-mono text-sm font-black text-indigo-600 dark:text-white tracking-tight">FC</span>
               </div>
             </div>
             <div className="flex flex-col">
               <div className="flex items-center gap-1.5">
-                <span className="text-lg font-bold tracking-tight text-white leading-none">FitCore</span>
-                <span className="text-[10px] font-mono font-bold text-indigo-400 bg-indigo-500/15 border border-indigo-500/30 px-1.5 py-0.5 rounded leading-none">
+                <span className="text-lg font-bold tracking-tight text-text-primary leading-none">FitCore</span>
+                <span className="text-[10px] font-mono font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 dark:bg-indigo-500/15 border border-indigo-500/30 px-1.5 py-0.5 rounded leading-none">
                   PRO
                 </span>
               </div>
-              <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider mt-1">
+              <span className="text-[10px] font-medium text-text-muted uppercase tracking-wider mt-1">
                 {user?.role === 'coach' ? 'Coach Platform' : user?.role === 'admin' ? 'Admin HQ' : 'Athlete Portal'}
               </span>
             </div>
@@ -127,8 +128,8 @@ export function Sidebar() {
         ) : (
           <div className="mx-auto">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 via-indigo-600 to-emerald-500 p-[1.5px] shadow-md">
-              <div className="w-full h-full bg-[#10121A] rounded-[10px] flex items-center justify-center">
-                <span className="font-mono text-sm font-black text-white tracking-tight">FC</span>
+              <div className="w-full h-full bg-white dark:bg-[#10121A] rounded-[10px] flex items-center justify-center">
+                <span className="font-mono text-sm font-black text-indigo-600 dark:text-white tracking-tight">FC</span>
               </div>
             </div>
           </div>
@@ -137,7 +138,7 @@ export function Sidebar() {
 
       {/* Nav Section Label */}
       {!collapsed && (
-        <div className="px-5 pt-5 pb-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+        <div className="px-5 pt-5 pb-2 text-[11px] font-bold uppercase tracking-wider text-text-muted">
           Navigation
         </div>
       )}
@@ -153,15 +154,15 @@ export function Sidebar() {
             <Link key={item.name} href={item.href}>
               <span className={`relative flex items-center gap-3.5 px-3.5 py-3 rounded-xl transition-all group ${
                 isActive 
-                  ? 'bg-indigo-600/15 text-white font-semibold border border-indigo-500/30 shadow-sm' 
-                  : 'text-slate-300 hover:text-white hover:bg-white/[0.05]'
+                  ? 'bg-indigo-600/10 dark:bg-indigo-600/20 text-indigo-600 dark:text-white font-semibold border border-indigo-500/30 shadow-sm' 
+                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/[0.05]'
               }`}>
                 <div className="relative shrink-0 flex items-center justify-center">
                   <item.icon className={`w-5 h-5 transition-colors ${
-                    isActive ? 'text-indigo-400' : 'text-slate-400 group-hover:text-slate-200'
+                    isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-200'
                   }`} />
                   {collapsed && showBadge && (
-                    <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-rose-500 rounded-full ring-2 ring-[#10121A] animate-pulse" />
+                    <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-rose-500 rounded-full ring-2 ring-surface animate-pulse" />
                   )}
                 </div>
 
@@ -182,37 +183,47 @@ export function Sidebar() {
       </nav>
 
       {/* Footer Profile & Logout Card */}
-      <div className="p-3 border-t border-[#1C202C] bg-[#0E1017]">
+      <div className="p-3 border-t border-border bg-slate-50 dark:bg-[#0E1017]">
         {!collapsed ? (
-          <div className="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-surface/70 border border-border">
-            <Link 
-              href={user?.role === 'coach' ? '/coach/profile' : user?.role === 'admin' ? '/admin/settings' : '/member/settings?tab=profile'}
-              className="flex items-center gap-2.5 min-w-0 flex-1 hover:opacity-90 transition-opacity"
-            >
-              <div className="w-8 h-8 rounded-lg bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center font-bold text-xs text-indigo-300 shrink-0">
-                {user?.name?.charAt(0) || 'U'}
-              </div>
-              <div className="min-w-0">
-                <p className="text-xs font-semibold text-white truncate leading-tight">{user?.name || 'Athlete'}</p>
-                <p className="text-[10px] text-slate-400 capitalize truncate font-medium mt-0.5">{user?.role || 'Member'}</p>
-              </div>
-            </Link>
-            <button
-              onClick={() => setShowLogoutModal(true)}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors shrink-0"
-              title="Sign Out"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between px-2 py-0.5 text-xs text-text-muted">
+              <span>Theme Mode</span>
+              <ThemeToggle showLabel />
+            </div>
+
+            <div className="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-surface border border-border shadow-sm">
+              <Link 
+                href={user?.role === 'coach' ? '/coach/profile' : user?.role === 'admin' ? '/admin/settings' : '/member/settings?tab=profile'}
+                className="flex items-center gap-2.5 min-w-0 flex-1 hover:opacity-90 transition-opacity"
+              >
+                <div className="w-8 h-8 rounded-lg bg-indigo-500/10 dark:bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center font-bold text-xs text-indigo-600 dark:text-indigo-300 shrink-0">
+                  {user?.name?.charAt(0) || 'U'}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold text-text-primary truncate leading-tight">{user?.name || 'Athlete'}</p>
+                  <p className="text-[10px] text-text-muted capitalize truncate font-medium mt-0.5">{user?.role || 'Member'}</p>
+                </div>
+              </Link>
+              <button
+                onClick={() => setShowLogoutModal(true)}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 transition-colors shrink-0"
+                title="Sign Out"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         ) : (
-          <button
-            onClick={() => setShowLogoutModal(true)}
-            className="w-full flex items-center justify-center p-2 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
-            title="Sign Out"
-          >
-            <LogOut className="w-5 h-5" />
-          </button>
+          <div className="space-y-2 flex flex-col items-center">
+            <ThemeToggle />
+            <button
+              onClick={() => setShowLogoutModal(true)}
+              className="w-full flex items-center justify-center p-2 rounded-xl text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 transition-colors"
+              title="Sign Out"
+            >
+              <LogOut className="w-5 h-5" />
+            </button>
+          </div>
         )}
       </div>
     </div>
@@ -231,7 +242,7 @@ export function Sidebar() {
         {/* Collapse Toggle */}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="absolute -right-3 top-1/2 transform -translate-y-1/2 bg-[#12141C] border border-[#1C202C] rounded-full p-1 text-slate-400 hover:text-white z-30 shadow-md transition-colors"
+          className="absolute -right-3 top-1/2 transform -translate-y-1/2 bg-surface border border-border rounded-full p-1 text-text-muted hover:text-text-primary z-30 shadow-md transition-colors"
           title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           {collapsed ? <ChevronRight className="w-3.5 h-3.5" /> : <ChevronLeft className="w-3.5 h-3.5" />}
@@ -242,7 +253,7 @@ export function Sidebar() {
       <div className="md:hidden fixed top-4 left-4 z-50">
         <button
           onClick={() => setMobileOpen(true)}
-          className="bg-[#12141C] p-2.5 rounded-lg border border-[#1C202C] shadow-lg text-slate-200"
+          className="bg-surface p-2.5 rounded-lg border border-border shadow-lg text-text-primary"
         >
           <Menu className="w-5 h-5" />
         </button>

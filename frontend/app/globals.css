@@ -1,20 +1,64 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  /* LIGHT MODE (Clean, high-end Apple / Stripe aesthetic) */
+  --bg-base: #F8FAFC;            /* Clean light grey canvas */
+  --bg-surface: #FFFFFF;         /* Crisp white cards */
+  --bg-surface-hover: #F1F5F9;   /* Slate 100 hover */
+  --bg-surface-elevated: #FFFFFF;/* Elevated modal/card */
+  --bg-card-recessed: #F1F5F9;   /* Slate 100 inner tile */
+  --border-color: #E2E8F0;       /* Slate 200 border */
+  --border-subtle: rgba(0, 0, 0, 0.06);
+  --text-main: #0F172A;          /* Slate 900 primary text */
+  --text-muted: #64748B;         /* Slate 500 secondary text */
+  --text-subtle: #94A3B8;        /* Slate 400 tertiary text */
+  
+  --glass-panel-bg: rgba(255, 255, 255, 0.85);
+  --glass-card-bg: #FFFFFF;
+  --glass-card-border: #E2E8F0;
+
+  color-scheme: light;
+}
+
+.dark, html.dark, :root.dark {
+  /* DARK MODE (Senior Obsidian design system) */
+  --bg-base: #0B0C10;            /* Deep obsidian canvas */
+  --bg-surface: #12141C;         /* Obsidian card */
+  --bg-surface-hover: #181B26;   /* Obsidian hover */
+  --bg-surface-elevated: #181B26;/* Elevated modal/card */
+  --bg-card-recessed: #0E1017;   /* Recessed inner tile */
+  --border-color: #1E2230;       /* Slate border */
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --text-main: #F8FAFC;          /* Crisp white text */
+  --text-muted: #94A3B8;         /* Slate 400 text */
+  --text-subtle: #64748B;        /* Slate 500 text */
+
+  --glass-panel-bg: rgba(18, 20, 28, 0.75);
+  --glass-card-bg: #12141C;
+  --glass-card-border: #1E2230;
+
+  color-scheme: dark;
+}
+
 @theme inline {
-  --color-background: #0B0C10;
-  --color-surface: #12141C;
-  --color-surface-hover: #181B26;
-  --color-border: #1E2230;
-  --color-border-subtle: rgba(255, 255, 255, 0.06);
+  --color-background: var(--bg-base);
+  --color-surface: var(--bg-surface);
+  --color-surface-hover: var(--bg-surface-hover);
+  --color-surface-elevated: var(--bg-surface-elevated);
+  --color-surface-recessed: var(--bg-card-recessed);
+  --color-border: var(--border-color);
+  --color-border-subtle: var(--border-subtle);
   --color-primary: #4F46E5;
   --color-primary-hover: #4338CA;
   --color-accent: #10B981;
   --color-accent-hover: #059669;
   --color-warning: #F59E0B;
   --color-danger: #EF4444;
-  --color-text-primary: #F8FAFC;
-  --color-text-muted: #94A3B8;
-  --color-text-subtle: #64748B;
+  --color-text-primary: var(--text-main);
+  --color-text-muted: var(--text-muted);
+  --color-text-subtle: var(--text-subtle);
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-syne), ui-sans-serif, system-ui, sans-serif;
@@ -35,16 +79,72 @@
   }
 }
 
-:root {
-  color-scheme: dark;
-}
-
 body {
   background-color: var(--color-background);
   color: var(--color-text-primary);
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Light mode automatic adaptation for explicit obsidian classes */
+html:not(.dark) .bg-\[\#12141C\],
+html:not(.dark) [class*="bg-[#12141C]"] {
+  background-color: #FFFFFF !important;
+}
+
+html:not(.dark) .bg-\[\#0B0C10\],
+html:not(.dark) [class*="bg-[#0B0C10]"] {
+  background-color: #F8FAFC !important;
+}
+
+html:not(.dark) .bg-\[\#0E1017\],
+html:not(.dark) [class*="bg-[#0E1017]"] {
+  background-color: #F1F5F9 !important;
+}
+
+html:not(.dark) .bg-\[\#10121A\],
+html:not(.dark) [class*="bg-[#10121A]"] {
+  background-color: #F8FAFC !important;
+}
+
+html:not(.dark) .bg-\[\#151824\],
+html:not(.dark) [class*="bg-[#151824]"] {
+  background-color: #F8FAFC !important;
+}
+
+html:not(.dark) .border-\[\#1E2230\],
+html:not(.dark) [class*="border-[#1E2230]"],
+html:not(.dark) .border-\[\#1C202C\],
+html:not(.dark) [class*="border-[#1C202C]"] {
+  border-color: #E2E8F0 !important;
+}
+
+html:not(.dark) .text-white:not([class*="bg-indigo"]):not([class*="bg-primary"]):not([class*="bg-rose"]):not([class*="bg-emerald"]):not([class*="bg-amber"]):not([class*="bg-sky"]):not([class*="bg-blue"]):not([class*="badge"]) {
+  color: #0F172A;
+}
+
+html:not(.dark) .text-slate-400 {
+  color: #64748B;
+}
+
+html:not(.dark) .text-slate-300 {
+  color: #475569;
+}
+
+html:not(.dark) .text-slate-200 {
+  color: #1E293B;
+}
+
+html:not(.dark) .bg-white\/\[0\.05\],
+html:not(.dark) .bg-white\/\[0\.04\],
+html:not(.dark) .bg-white\/\[0\.08\] {
+  background-color: #F1F5F9 !important;
+}
+
+html:not(.dark) .border-white\/\[0\.08\],
+html:not(.dark) .border-white\/\[0\.07\] {
+  border-color: #E2E8F0 !important;
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
@@ -54,25 +154,25 @@ body {
 
 /* Hide scrollbar for IE, Edge and Firefox */
 .scrollbar-hide {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 /* Glass panel utility */
 .glass-panel {
-  background: rgba(18, 20, 28, 0.75);
+  background: var(--glass-panel-bg);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  border: 1px solid var(--border-color);
 }
 
 .glass-card {
-  background: #12141C;
-  border: 1px solid #1E2230;
+  background: var(--glass-card-bg);
+  border: 1px solid var(--glass-card-border);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .glass-card:hover {
   border-color: rgba(99, 102, 241, 0.35);
-  background: #141722;
+  background: var(--color-surface-hover);
 }
