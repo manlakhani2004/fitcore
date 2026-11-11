@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Dumbbell, 
-  Apple, 
   Flame, 
   Droplets, 
   CheckCircle2, 
@@ -14,15 +13,18 @@ import {
   Calendar, 
   ChevronRight, 
   Plus, 
-  TrendingUp, 
   Activity, 
   Clock, 
-  Sparkles, 
   User, 
   Award, 
   Scale, 
   ExternalLink,
-  Loader2
+  Loader2,
+  Target,
+  Zap,
+  TrendingUp,
+  ShieldCheck,
+  Check
 } from "lucide-react";
 import Link from "next/link";
 import api from "@/lib/api";
@@ -104,7 +106,7 @@ export default function MemberDashboard() {
           ...prev,
           waterIntake: res.data.data.waterIntake
         }));
-        toast.success(`+${amount}ml logged! Stay hydrated 💧`);
+        toast.success(`+${amount}ml logged`);
       }
     } catch {
       toast.error("Failed to log water");
@@ -119,7 +121,7 @@ export default function MemberDashboard() {
       const res = await api.put(`/tasks/my/${taskId}`);
       if (res.data?.success) {
         setTasks(prev => prev.map(t => t._id === taskId ? res.data.data : t));
-        toast.success(res.data.data.completed ? "Task completed! 🎯" : "Task marked pending");
+        toast.success(res.data.data.completed ? "Task completed" : "Task marked pending");
       }
     } catch {
       toast.error("Failed to update task");
@@ -148,111 +150,107 @@ export default function MemberDashboard() {
 
   const completedTasksCount = tasks.filter(t => t.completed).length;
 
-  const timeOfDay = (() => {
-    const hour = new Date().getHours();
-    if (hour < 12) return "Morning";
-    if (hour < 18) return "Afternoon";
-    return "Evening";
-  })();
+  const formattedDate = new Intl.DateTimeFormat('en-US', {
+    weekday: 'long',
+    month: 'short',
+    day: 'numeric'
+  }).format(new Date());
 
   if (loading) {
     return (
-      <div className="flex h-[60vh] items-center justify-center flex-col gap-3">
-        <Loader2 className="w-10 h-10 animate-spin text-primary" />
-        <p className="text-sm font-medium text-text-muted">Loading your athlete dashboard...</p>
+      <div className="flex h-[65vh] items-center justify-center flex-col gap-3">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <p className="text-xs font-medium text-text-muted tracking-wide">Syncing athlete training metrics...</p>
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8 pb-12">
+    <div className="max-w-7xl mx-auto space-y-6 pb-12">
       
-      {/* 1. Athlete Hero Command Center Banner */}
-      <div className="relative overflow-hidden bg-surface border border-border p-6 md:p-8 rounded-3xl flex flex-col lg:flex-row lg:items-center justify-between gap-6 shadow-sm">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
-        
-        <div className="relative z-10 space-y-2">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-wider">
-            <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-            Athlete Daily Command Base
-          </div>
-
-          <h1 className="text-3xl md:text-4xl font-display font-bold">
-            Good {timeOfDay}, {user?.name || 'Athlete'}! ⚡
-          </h1>
-          <p className="text-text-muted text-sm md:text-base max-w-2xl">
-            Today is about disciplined execution. Fuel properly, log your sets, and stay connected with your coach.
-          </p>
-
-          <div className="flex flex-wrap items-center gap-3 pt-2 text-xs">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-background border border-border font-bold text-text-primary">
-              <Flame className="w-4 h-4 text-warning" />
-              <span>5-Day Active Streak</span>
-            </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-background border border-border font-bold text-text-primary">
-              <Award className="w-4 h-4 text-accent" />
-              <span>{profile?.fitnessGoals?.[0]?.replace('_', ' ') || 'Hypertrophy & Strength'}</span>
-            </span>
-            {profile?.weight && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-background border border-border font-bold text-text-primary">
-                <Scale className="w-4 h-4 text-primary" />
-                <span>{profile.weight} kg Fasted</span>
+      {/* 1. Header Overview Bar */}
+      <div className="bg-surface border border-border rounded-2xl p-6 md:p-7 relative overflow-hidden transition-all">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-text-muted">
+                {formattedDate} • Active Training Cycle
               </span>
-            )}
-          </div>
-        </div>
+            </div>
 
-        {/* Quick Action CTAs */}
-        <div className="relative z-10 flex flex-wrap items-center gap-3">
-          <Link href="/member/workouts/today">
-            <button className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-primary text-white font-bold text-sm hover:opacity-90 transition-all shadow-lg shadow-primary/25 active:scale-95">
-              <Dumbbell className="w-4 h-4" />
-              <span>Start Workout</span>
-            </button>
-          </Link>
+            <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-text-primary">
+              Welcome back, {user?.name?.split(' ')[0] || 'Athlete'}
+            </h1>
+            <p className="text-xs md:text-sm text-text-muted max-w-xl">
+              Track your lifts, monitor today&apos;s recovery, and align with your coach.
+            </p>
 
-          <button
-            onClick={() => handleLogWater(250)}
-            disabled={loggingWater}
-            className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-accent text-background font-bold text-sm hover:opacity-90 transition-all shadow-md shadow-accent/20 active:scale-95 disabled:opacity-50"
-          >
-            <Droplets className="w-4 h-4" />
-            <span>+250ml Water</span>
-          </button>
-
-          <Link href="/member/my-coach?tab=messages">
-            <button className="relative flex items-center gap-2 px-4 py-3 rounded-2xl bg-background border border-border hover:border-primary text-text-primary font-bold text-sm transition-all hover:bg-border/30">
-              <MessageSquare className="w-4 h-4 text-primary" />
-              <span>Message Coach</span>
-              {unreadMessages > 0 && (
-                <span className="bg-danger text-white text-[10px] font-extrabold px-1.5 py-0.5 rounded-full animate-pulse">
-                  {unreadMessages}
-                </span>
+            {/* Metric Pills */}
+            <div className="flex flex-wrap items-center gap-2.5 pt-2">
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-background border border-border text-xs">
+                <Flame className="w-3.5 h-3.5 text-warning" />
+                <span className="text-text-muted">Streak:</span>
+                <span className="font-semibold text-text-primary">5 Days Active</span>
+              </div>
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-background border border-border text-xs">
+                <Award className="w-3.5 h-3.5 text-accent" />
+                <span className="text-text-muted">Focus:</span>
+                <span className="font-semibold text-text-primary capitalize">{profile?.fitnessGoals?.[0]?.replace('_', ' ') || 'Hypertrophy'}</span>
+              </div>
+              {profile?.weight && (
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-background border border-border text-xs">
+                  <Scale className="w-3.5 h-3.5 text-primary" />
+                  <span className="text-text-muted">Fasted Weight:</span>
+                  <span className="font-semibold font-mono text-text-primary">{profile.weight} kg</span>
+                </div>
               )}
-            </button>
-          </Link>
+            </div>
+          </div>
+
+          {/* Quick Action Button Cluster */}
+          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+            <Link href="/member/workouts/today">
+              <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary hover:bg-primary-hover text-white text-xs font-semibold tracking-wide transition-all shadow-sm hover:shadow active:scale-98">
+                <Dumbbell className="w-3.5 h-3.5" />
+                <span>Start Today&apos;s Workout</span>
+              </button>
+            </Link>
+
+            <Link href="/member/my-coach?tab=messages">
+              <button className="relative flex items-center gap-2 px-4 py-2.5 rounded-xl bg-background border border-border hover:border-slate-600 text-text-primary text-xs font-semibold transition-all hover:bg-surface-hover">
+                <MessageSquare className="w-3.5 h-3.5 text-slate-400" />
+                <span>Coach Chat</span>
+                {unreadMessages > 0 && (
+                  <span className="bg-danger text-white text-[10px] font-bold px-1.5 py-0.2 rounded-full">
+                    {unreadMessages}
+                  </span>
+                )}
+              </button>
+            </Link>
+          </div>
         </div>
       </div>
 
-      {/* 2. Today's Training & Live Coach Section */}
+      {/* 2. Primary Training Split + Coach Consultation (7 cols + 5 cols) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
-        {/* Workout Hero Card (7 Cols) */}
-        <div className="lg:col-span-7 bg-surface border border-border rounded-3xl p-6 md:p-8 flex flex-col justify-between space-y-6 relative overflow-hidden group hover:border-primary/40 transition-colors">
+        {/* Workout Plan Card */}
+        <div className="lg:col-span-7 bg-surface border border-border rounded-2xl p-6 flex flex-col justify-between space-y-5 transition-all hover:border-slate-700">
           <div className="space-y-4">
-            <div className="flex items-center justify-between border-b border-border pb-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-bold">
-                  <Dumbbell className="w-5 h-5" />
+            <div className="flex items-center justify-between border-b border-border/80 pb-3.5">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                  <Dumbbell className="w-4 h-4" />
                 </div>
                 <div>
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-primary">Scheduled Training</span>
-                  <h3 className="text-xl font-display font-bold">Today&apos;s Workout Routine</h3>
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-primary block">Training Split</span>
+                  <h3 className="text-base font-semibold text-text-primary tracking-tight">Today&apos;s Scheduled Workout</h3>
                 </div>
               </div>
 
-              <span className="text-xs font-bold text-text-muted bg-background px-3 py-1.5 rounded-xl border border-border flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-accent" />
+              <span className="text-xs font-medium text-text-muted bg-background px-2.5 py-1 rounded-md border border-border flex items-center gap-1.5 font-mono">
+                <Clock className="w-3 h-3 text-text-muted" />
                 <span>45-60 min</span>
               </span>
             </div>
@@ -260,7 +258,7 @@ export default function MemberDashboard() {
             {program ? (
               <div className="space-y-3">
                 <div>
-                  <h4 className="text-lg font-bold text-text-primary">
+                  <h4 className="text-sm font-semibold text-text-primary">
                     {program.name || "Assigned Program Routine"}
                   </h4>
                   <p className="text-xs text-text-muted mt-0.5">
@@ -268,90 +266,96 @@ export default function MemberDashboard() {
                   </p>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-background border border-border/80 space-y-2">
-                  <div className="flex items-center justify-between text-xs text-text-muted">
-                    <span className="font-bold uppercase tracking-wider text-[10px]">Planned Exercises:</span>
-                    <span>{program.schedule?.[0]?.exercises?.length || 4} Movements</span>
+                <div className="p-3.5 rounded-xl bg-background border border-border/70 space-y-2.5">
+                  <div className="flex items-center justify-between text-[11px] text-text-muted font-medium">
+                    <span className="uppercase tracking-wider">Planned Exercises:</span>
+                    <span className="font-mono">{program.schedule?.[0]?.exercises?.length || 4} Movements</span>
                   </div>
-                  <div className="flex flex-wrap gap-1.5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {(program.schedule?.[0]?.exercises || [
                       { name: "Barbell Bench Press" },
                       { name: "Incline Dumbbell Press" },
-                      { name: "Tricep Pushdowns" }
+                      { name: "Tricep Pushdowns" },
+                      { name: "Lateral Raises" }
                     ]).slice(0, 4).map((ex: any, idx: number) => (
-                      <span key={idx} className="text-xs bg-surface px-2.5 py-1 rounded-lg border border-border text-text-primary font-medium">
-                        {ex.name}
-                      </span>
+                      <div key={idx} className="flex items-center justify-between p-2 rounded-lg bg-surface border border-border text-xs">
+                        <span className="font-medium text-text-primary truncate">{ex.name}</span>
+                        <span className="text-[10px] font-mono text-text-muted px-1.5 py-0.5 rounded bg-background border border-border">
+                          {ex.sets || 3}x{ex.reps || 10}
+                        </span>
+                      </div>
                     ))}
                   </div>
                 </div>
               </div>
             ) : (
-              <div className="p-6 rounded-2xl bg-background/50 border border-border/60 text-center space-y-2">
-                <p className="text-sm font-bold text-text-primary">No Program Assigned Yet</p>
-                <p className="text-xs text-text-muted max-w-sm mx-auto">
-                  Your coach will craft a tailored multi-week periodized split for your goals.
+              <div className="p-6 rounded-xl bg-background/50 border border-dashed border-border text-center space-y-1.5">
+                <p className="text-xs font-semibold text-text-primary">No Program Assigned Yet</p>
+                <p className="text-[11px] text-text-muted max-w-sm mx-auto">
+                  Your coach will assign a customized multi-week training protocol to your profile.
                 </p>
               </div>
             )}
           </div>
 
-          <div className="pt-4 border-t border-border flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div className="text-xs text-text-muted">
-              <span>Goal: <strong className="text-accent">{program?.goal || 'General Fitness'}</strong></span>
-            </div>
+          <div className="pt-3.5 border-t border-border/80 flex items-center justify-between">
+            <span className="text-xs text-text-muted">
+              Target: <strong className="text-text-primary font-medium">{program?.goal || 'General Hypertrophy'}</strong>
+            </span>
             <Link href="/member/workouts/today">
-              <button className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-primary text-white font-bold text-xs hover:opacity-90 transition-all flex items-center justify-center gap-2 shadow-md shadow-primary/20">
+              <button className="px-4 py-2 rounded-xl bg-primary hover:bg-primary-hover text-white text-xs font-semibold transition-all flex items-center gap-1.5 shadow-sm">
                 <span>Start Workout Logger</span>
-                <ChevronRight className="w-4 h-4" />
+                <ChevronRight className="w-3.5 h-3.5" />
               </button>
             </Link>
           </div>
         </div>
 
-        {/* Live Coach & Google Meet Card (5 Cols) */}
-        <div className="lg:col-span-5 bg-surface border border-border rounded-3xl p-6 md:p-8 flex flex-col justify-between space-y-6">
+        {/* Coach & Live Video Channel */}
+        <div className="lg:col-span-5 bg-surface border border-border rounded-2xl p-6 flex flex-col justify-between space-y-5 transition-all hover:border-slate-700">
           <div className="space-y-4">
-            <div className="flex items-center justify-between border-b border-border pb-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-accent/10 text-accent flex items-center justify-center font-bold">
-                  <User className="w-5 h-5" />
+            <div className="flex items-center justify-between border-b border-border/80 pb-3.5">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-accent/10 text-accent flex items-center justify-center">
+                  <User className="w-4 h-4" />
                 </div>
                 <div>
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-accent">Dedicated Coach</span>
-                  <h3 className="text-xl font-display font-bold">{coach?.coachId?.name || "Personal Coach"}</h3>
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-accent block">Personal Coaching</span>
+                  <h3 className="text-base font-semibold text-text-primary tracking-tight">
+                    {coach?.coachId?.name || "Assigned Coach"}
+                  </h3>
                 </div>
               </div>
 
               <Link href="/member/my-coach?tab=messages">
-                <button className="relative p-2 rounded-xl bg-background border border-border hover:border-primary text-text-muted hover:text-text-primary transition-colors">
-                  <MessageSquare className="w-4 h-4" />
+                <button className="relative p-2 rounded-lg bg-background border border-border hover:border-slate-600 text-text-muted hover:text-text-primary transition-colors">
+                  <MessageSquare className="w-3.5 h-3.5" />
                   {unreadMessages > 0 && (
-                    <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-danger rounded-full ring-2 ring-surface animate-pulse" />
+                    <span className="absolute -top-1 -right-1 w-2 h-2 bg-danger rounded-full ring-2 ring-surface animate-pulse" />
                   )}
                 </button>
               </Link>
             </div>
 
-            {/* Video Consultation Status */}
+            {/* Video Consultation Box */}
             {todayAppointment ? (
-              <div className="p-4 rounded-2xl bg-background border border-border space-y-3">
+              <div className="p-4 rounded-xl bg-background border border-border space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-text-primary flex items-center gap-1.5">
-                    <Video className="w-4 h-4 text-[#1a73e8]" />
+                  <span className="text-xs font-semibold text-text-primary flex items-center gap-1.5">
+                    <Video className="w-3.5 h-3.5 text-blue-400" />
                     <span>Video Consultation</span>
                   </span>
-                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
+                  <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider border ${
                     todayAppointment.meetingLink 
                       ? 'bg-accent/10 text-accent border-accent/20' 
-                      : 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20'
+                      : 'bg-warning/10 text-warning border-warning/20'
                   }`}>
-                    {todayAppointment.meetingLink ? '● Coach is Live' : 'Standby'}
+                    {todayAppointment.meetingLink ? 'Room Active' : 'Scheduled'}
                   </span>
                 </div>
 
-                <div className="text-xs text-text-muted">
-                  Time: <strong className="text-text-primary">{todayAppointment.startTime ? `${todayAppointment.startTime} - ${todayAppointment.endTime}` : (todayAppointment.timeSlot || 'Today')}</strong>
+                <div className="text-xs text-text-muted font-mono">
+                  Time: <strong className="text-text-primary font-semibold">{todayAppointment.startTime ? `${todayAppointment.startTime} - ${todayAppointment.endTime}` : (todayAppointment.timeSlot || 'Today')}</strong>
                 </div>
 
                 {todayAppointment.meetingLink ? (
@@ -359,155 +363,143 @@ export default function MemberDashboard() {
                     href={todayAppointment.meetingLink}
                     target="_blank"
                     rel="noreferrer"
-                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[#1a73e8] text-white font-bold text-xs hover:bg-[#1557b0] transition-colors shadow-lg shadow-[#1a73e8]/20"
+                    className="w-full flex items-center justify-center gap-2 py-2 rounded-lg bg-blue-600 text-white font-semibold text-xs hover:bg-blue-700 transition-colors shadow-sm"
                   >
-                    <GoogleMeetIcon className="w-4 h-4" />
-                    <span>Join Google Meet Call</span>
+                    <GoogleMeetIcon className="w-3.5 h-3.5" />
+                    <span>Join Google Meet Session</span>
                   </a>
                 ) : (
                   <button
                     disabled
-                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-border/50 text-text-muted font-bold text-xs cursor-not-allowed"
+                    className="w-full flex items-center justify-center gap-2 py-2 rounded-lg bg-surface border border-border text-text-muted font-medium text-xs cursor-not-allowed"
                   >
-                    <Clock className="w-4 h-4 animate-spin text-yellow-500" />
-                    <span>Waiting for Coach to Start Room</span>
+                    <Clock className="w-3.5 h-3.5 animate-spin text-warning" />
+                    <span>Waiting for Coach to Open Room</span>
                   </button>
                 )}
               </div>
             ) : (
-              <div className="p-5 rounded-2xl bg-background border border-border/70 text-center space-y-2">
-                <Video className="w-8 h-8 text-text-muted mx-auto opacity-30" />
-                <p className="text-xs font-bold text-text-primary">No Calls Scheduled Today</p>
+              <div className="p-5 rounded-xl bg-background border border-border text-center space-y-1.5">
+                <Video className="w-6 h-6 text-text-muted mx-auto opacity-30" />
+                <p className="text-xs font-semibold text-text-primary">No Calls Scheduled Today</p>
                 <p className="text-[11px] text-text-muted">
-                  Need a technique check or diet review? Book a 1-on-1 session with your coach.
+                  Book a 1-on-1 strategy check-in or technique review with your coach.
                 </p>
                 <Link href="/member/my-coach?tab=meetings" className="inline-block pt-1">
-                  <span className="text-xs font-bold text-primary hover:underline">Schedule 1-on-1 Consultation →</span>
+                  <span className="text-xs font-semibold text-primary hover:underline">Schedule 1-on-1 Session →</span>
                 </Link>
               </div>
             )}
           </div>
 
-          <div className="pt-3 border-t border-border flex items-center justify-between text-xs text-text-muted">
-            <span>Specialization: <strong className="text-text-primary">{coach?.coachId?.specializations?.[0] || 'Strength & Conditioning'}</strong></span>
-            <Link href="/member/my-coach" className="text-primary font-bold hover:underline flex items-center gap-0.5">
+          <div className="pt-3.5 border-t border-border/80 flex items-center justify-between text-xs text-text-muted">
+            <span>Specialization: <strong className="text-text-primary font-medium">{coach?.coachId?.specializations?.[0] || 'Strength & Conditioning'}</strong></span>
+            <Link href="/member/my-coach" className="text-primary font-semibold hover:underline flex items-center gap-0.5">
               Coaching Hub <ChevronRight className="w-3 h-3" />
             </Link>
           </div>
         </div>
       </div>
 
-      {/* 3. Nutrition, Hydration & Daily Tasks Rings */}
+      {/* 3. Performance Matrix: Daily Calories, Hydration, Habits */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         
-        {/* Calories & Macros (Col 1) */}
-        <div className="bg-surface border border-border rounded-3xl p-6 md:p-7 space-y-5 flex flex-col justify-between">
+        {/* Daily Macros Card */}
+        <div className="bg-surface border border-border rounded-2xl p-6 flex flex-col justify-between space-y-4 hover:border-slate-700 transition-all">
           <div className="space-y-4">
-            <div className="flex items-center justify-between border-b border-border pb-3">
-              <div className="flex items-center gap-2.5">
-                <Apple className="w-5 h-5 text-accent" />
-                <h3 className="font-display font-bold text-lg">Daily Calories</h3>
+            <div className="flex items-center justify-between border-b border-border/80 pb-3">
+              <div className="flex items-center gap-2">
+                <Target className="w-4 h-4 text-accent" />
+                <h3 className="font-semibold text-sm text-text-primary">Daily Energy & Macros</h3>
               </div>
-              <span className="text-xs font-bold text-accent bg-accent/10 px-2.5 py-1 rounded-full border border-accent/20">
-                {targetCalories - currentCalories} kcal left
+              <span className="text-[11px] font-mono font-medium text-accent bg-accent/10 px-2 py-0.5 rounded border border-accent/20">
+                {Math.max(0, targetCalories - currentCalories)} kcal left
               </span>
             </div>
 
+            {/* Calorie Bar */}
             <div className="space-y-1.5">
-              <div className="flex items-baseline justify-between">
-                <span className="text-2xl font-mono font-bold text-text-primary">{currentCalories}</span>
-                <span className="text-xs text-text-muted">Target: {targetCalories} kcal</span>
+              <div className="flex items-baseline justify-between font-mono text-xs">
+                <span className="text-lg font-bold text-text-primary">{currentCalories}</span>
+                <span className="text-text-muted">Goal: {targetCalories} kcal</span>
               </div>
-              <div className="w-full h-2.5 bg-background rounded-full overflow-hidden border border-border">
+              <div className="w-full h-2 bg-background rounded-full overflow-hidden border border-border">
                 <div 
-                  className="h-full bg-gradient-to-r from-primary to-accent transition-all duration-500 rounded-full"
+                  className="h-full bg-accent rounded-full transition-all duration-500"
                   style={{ width: `${Math.min(100, (currentCalories / targetCalories) * 100)}%` }}
                 />
               </div>
             </div>
 
-            {/* Macros Breakdown */}
-            <div className="space-y-2 pt-2">
-              <div className="space-y-1">
-                <div className="flex justify-between text-xs">
-                  <span className="text-text-muted font-medium">Protein</span>
-                  <span className="font-bold text-text-primary">{currentProtein}g / {targetProtein}g</span>
-                </div>
-                <div className="w-full h-1.5 bg-background rounded-full overflow-hidden">
-                  <div className="h-full bg-accent rounded-full" style={{ width: `${Math.min(100, (currentProtein / targetProtein) * 100)}%` }} />
-                </div>
+            {/* Macro Splits Grid */}
+            <div className="grid grid-cols-3 gap-2 pt-1">
+              <div className="p-2.5 rounded-lg bg-background border border-border text-center">
+                <span className="text-[10px] uppercase font-semibold text-text-muted block">Protein</span>
+                <span className="text-xs font-bold font-mono text-primary">{currentProtein}g</span>
+                <span className="text-[10px] text-text-muted block font-mono">/{targetProtein}g</span>
               </div>
-
-              <div className="space-y-1">
-                <div className="flex justify-between text-xs">
-                  <span className="text-text-muted font-medium">Carbs</span>
-                  <span className="font-bold text-text-primary">{currentCarbs}g / {targetCarbs}g</span>
-                </div>
-                <div className="w-full h-1.5 bg-background rounded-full overflow-hidden">
-                  <div className="h-full bg-primary rounded-full" style={{ width: `${Math.min(100, (currentCarbs / targetCarbs) * 100)}%` }} />
-                </div>
+              <div className="p-2.5 rounded-lg bg-background border border-border text-center">
+                <span className="text-[10px] uppercase font-semibold text-text-muted block">Carbs</span>
+                <span className="text-xs font-bold font-mono text-accent">{currentCarbs}g</span>
+                <span className="text-[10px] text-text-muted block font-mono">/{targetCarbs}g</span>
               </div>
-
-              <div className="space-y-1">
-                <div className="flex justify-between text-xs">
-                  <span className="text-text-muted font-medium">Fats</span>
-                  <span className="font-bold text-text-primary">{currentFat}g / {targetFat}g</span>
-                </div>
-                <div className="w-full h-1.5 bg-background rounded-full overflow-hidden">
-                  <div className="h-full bg-warning rounded-full" style={{ width: `${Math.min(100, (currentFat / targetFat) * 100)}%` }} />
-                </div>
+              <div className="p-2.5 rounded-lg bg-background border border-border text-center">
+                <span className="text-[10px] uppercase font-semibold text-text-muted block">Fats</span>
+                <span className="text-xs font-bold font-mono text-warning">{currentFat}g</span>
+                <span className="text-[10px] text-text-muted block font-mono">/{targetFat}g</span>
               </div>
             </div>
           </div>
 
-          <Link href="/member/diet" className="pt-2 border-t border-border block">
-            <span className="text-xs font-bold text-accent hover:underline flex items-center justify-between">
-              <span>Log Meals & View Diet Plan</span>
-              <ChevronRight className="w-4 h-4" />
+          <Link href="/member/diet" className="pt-2 border-t border-border/80 block">
+            <span className="text-xs font-semibold text-accent hover:underline flex items-center justify-between">
+              <span>Nutrition Protocol Details</span>
+              <ChevronRight className="w-3.5 h-3.5" />
             </span>
           </Link>
         </div>
 
-        {/* Hydration Tracker (Col 2) */}
-        <div className="bg-surface border border-border rounded-3xl p-6 md:p-7 space-y-5 flex flex-col justify-between">
+        {/* Daily Hydration Card */}
+        <div className="bg-surface border border-border rounded-2xl p-6 flex flex-col justify-between space-y-4 hover:border-slate-700 transition-all">
           <div className="space-y-4">
-            <div className="flex items-center justify-between border-b border-border pb-3">
-              <div className="flex items-center gap-2.5">
-                <Droplets className="w-5 h-5 text-primary" />
-                <h3 className="font-display font-bold text-lg">Hydration</h3>
+            <div className="flex items-center justify-between border-b border-border/80 pb-3">
+              <div className="flex items-center gap-2">
+                <Droplets className="w-4 h-4 text-blue-400" />
+                <h3 className="font-semibold text-sm text-text-primary">Hydration Intake</h3>
               </div>
-              <span className="text-xs font-bold text-primary bg-primary/10 px-2.5 py-1 rounded-full border border-primary/20">
+              <span className="text-[11px] font-mono font-medium text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">
                 {Math.round((currentWater / targetWater) * 100)}%
               </span>
             </div>
 
             <div className="space-y-1.5">
-              <div className="flex items-baseline justify-between">
-                <span className="text-2xl font-mono font-bold text-text-primary">{currentWater} ml</span>
-                <span className="text-xs text-text-muted">Goal: {targetWater} ml</span>
+              <div className="flex items-baseline justify-between font-mono text-xs">
+                <span className="text-lg font-bold text-text-primary">{currentWater} ml</span>
+                <span className="text-text-muted">Goal: {targetWater} ml</span>
               </div>
-              <div className="w-full h-2.5 bg-background rounded-full overflow-hidden border border-border">
+              <div className="w-full h-2 bg-background rounded-full overflow-hidden border border-border">
                 <div 
-                  className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 transition-all duration-500 rounded-full"
+                  className="h-full bg-blue-500 rounded-full transition-all duration-500"
                   style={{ width: `${Math.min(100, (currentWater / targetWater) * 100)}%` }}
                 />
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-background border border-border text-center space-y-2">
-              <span className="text-xs text-text-muted block">Quick Log Hydration:</span>
-              <div className="flex items-center justify-center gap-2">
+            {/* Quick Log Buttons */}
+            <div className="p-3 rounded-xl bg-background border border-border space-y-2">
+              <span className="text-[11px] font-medium text-text-muted block">Quick Log Water:</span>
+              <div className="flex items-center gap-2">
                 <button
                   onClick={() => handleLogWater(250)}
                   disabled={loggingWater}
-                  className="flex-1 py-2 bg-surface hover:bg-border/60 border border-border rounded-xl text-xs font-bold text-text-primary transition-colors"
+                  className="flex-1 py-1.5 bg-surface hover:bg-surface-hover border border-border rounded-lg text-xs font-semibold text-text-primary transition-colors disabled:opacity-50"
                 >
                   +250 ml
                 </button>
                 <button
                   onClick={() => handleLogWater(500)}
                   disabled={loggingWater}
-                  className="flex-1 py-2 bg-surface hover:bg-border/60 border border-border rounded-xl text-xs font-bold text-text-primary transition-colors"
+                  className="flex-1 py-1.5 bg-surface hover:bg-surface-hover border border-border rounded-lg text-xs font-semibold text-text-primary transition-colors disabled:opacity-50"
                 >
                   +500 ml
                 </button>
@@ -515,37 +507,37 @@ export default function MemberDashboard() {
             </div>
           </div>
 
-          <p className="text-[11px] text-text-muted text-center pt-2 border-t border-border">
-            Drink water consistently throughout the day for optimal muscle recovery.
-          </p>
+          <div className="pt-2 border-t border-border/80 text-[11px] text-text-muted text-center">
+            Consistent fluid intake maintains intracellular muscle volume.
+          </div>
         </div>
 
-        {/* Daily Tasks & Habits (Col 3) */}
-        <div className="bg-surface border border-border rounded-3xl p-6 md:p-7 space-y-5 flex flex-col justify-between">
+        {/* Daily Habits & Tasks Card */}
+        <div className="bg-surface border border-border rounded-2xl p-6 flex flex-col justify-between space-y-4 hover:border-slate-700 transition-all">
           <div className="space-y-4">
-            <div className="flex items-center justify-between border-b border-border pb-3">
-              <div className="flex items-center gap-2.5">
-                <CheckCircle2 className="w-5 h-5 text-accent" />
-                <h3 className="font-display font-bold text-lg">Daily Habits</h3>
+            <div className="flex items-center justify-between border-b border-border/80 pb-3">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-accent" />
+                <h3 className="font-semibold text-sm text-text-primary">Daily Habits & Tasks</h3>
               </div>
-              <span className="text-xs font-bold text-accent bg-accent/10 px-2.5 py-1 rounded-full border border-accent/20">
+              <span className="text-[11px] font-mono font-medium text-accent bg-accent/10 px-2 py-0.5 rounded border border-accent/20">
                 {completedTasksCount} / {tasks.length} Done
               </span>
             </div>
 
             {tasks.length === 0 ? (
-              <div className="p-8 text-center space-y-2 bg-background rounded-2xl border border-border">
-                <Sparkles className="w-8 h-8 text-text-muted mx-auto opacity-40" />
-                <p className="text-xs font-bold text-text-primary">No Tasks Assigned for Today</p>
-                <p className="text-[11px] text-text-muted">Enjoy your rest day or check in with your coach.</p>
+              <div className="p-6 text-center space-y-1.5 bg-background rounded-xl border border-dashed border-border">
+                <Check className="w-6 h-6 text-text-muted mx-auto opacity-30" />
+                <p className="text-xs font-semibold text-text-primary">All Clear for Today</p>
+                <p className="text-[11px] text-text-muted">No pending tasks or recovery check-ins required.</p>
               </div>
             ) : (
-              <div className="space-y-2.5 max-h-56 overflow-y-auto">
+              <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
                 {tasks.map((task) => (
                   <button
                     key={task._id}
                     onClick={() => handleToggleTask(task._id)}
-                    className="w-full flex items-center gap-3 p-3 rounded-xl bg-background border border-border hover:border-primary/40 transition-colors text-left group"
+                    className="w-full flex items-center gap-2.5 p-2.5 rounded-lg bg-background border border-border hover:border-slate-700 transition-colors text-left group"
                   >
                     {task.completed ? (
                       <CheckCircle2 className="w-4 h-4 text-accent shrink-0" />
@@ -556,7 +548,6 @@ export default function MemberDashboard() {
                       <p className={`text-xs font-medium truncate ${task.completed ? 'line-through text-text-muted' : 'text-text-primary'}`}>
                         {task.title}
                       </p>
-                      <span className="text-[10px] text-text-muted uppercase font-bold">{task.type}</span>
                     </div>
                   </button>
                 ))}
@@ -564,34 +555,34 @@ export default function MemberDashboard() {
             )}
           </div>
 
-          <Link href="/member/my-coach?tab=tasks" className="pt-2 border-t border-border block">
-            <span className="text-xs font-bold text-primary hover:underline flex items-center justify-between">
-              <span>View All Assigned Tasks</span>
-              <ChevronRight className="w-4 h-4" />
+          <Link href="/member/my-coach?tab=tasks" className="pt-2 border-t border-border/80 block">
+            <span className="text-xs font-semibold text-primary hover:underline flex items-center justify-between">
+              <span>View Tasks Checklist</span>
+              <ChevronRight className="w-3.5 h-3.5" />
             </span>
           </Link>
         </div>
 
       </div>
 
-      {/* 4. Biometrics & 3D Progress Teaser Card */}
-      <div className="bg-surface border border-border p-6 md:p-8 rounded-3xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-bold">
-            <Activity className="w-6 h-6" />
+      {/* 4. Biometrics & 3D Progress Teaser Banner */}
+      <div className="bg-surface border border-border p-5 md:p-6 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-all hover:border-slate-700">
+        <div className="flex items-center gap-3.5">
+          <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+            <Activity className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="text-lg font-display font-bold">3D Body Model & Biometrics</h3>
-            <p className="text-xs text-text-muted">
-              Track muscle measurements, weekly check-in photos, and weight progression over time.
+            <h3 className="text-sm font-semibold text-text-primary">3D Body Analysis & Weekly Check-Ins</h3>
+            <p className="text-xs text-text-muted mt-0.5">
+              Review anthropometric tape measurements, weight logs, and submitted check-in feedback.
             </p>
           </div>
         </div>
 
         <Link href="/member/progress">
-          <button className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-background border border-border hover:border-primary text-text-primary text-xs font-bold transition-all shadow-sm">
-            <span>Explore 3D Progress</span>
-            <ChevronRight className="w-4 h-4 text-primary" />
+          <button className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-background border border-border hover:border-slate-600 text-text-primary text-xs font-semibold transition-all">
+            <span>Open Progress Hub</span>
+            <ChevronRight className="w-3.5 h-3.5 text-text-muted" />
           </button>
         </Link>
       </div>
@@ -599,4 +590,3 @@ export default function MemberDashboard() {
     </div>
   );
 }
-

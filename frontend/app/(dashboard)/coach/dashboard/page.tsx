@@ -13,11 +13,8 @@ import {
   CheckCircle2, 
   Plus, 
   Clock, 
-  Sparkles, 
   Dumbbell, 
-  Apple, 
   MessageSquare, 
-  ArrowUpRight, 
   Search, 
   X, 
   Copy, 
@@ -27,7 +24,8 @@ import {
   Send,
   Loader2,
   TrendingUp,
-  Award
+  Award,
+  CircleDot
 } from "lucide-react";
 import Link from "next/link";
 import api from "@/lib/api";
@@ -177,7 +175,7 @@ export default function CoachDashboard() {
       });
 
       if (res.data?.success) {
-        toast.success("Google Meet room link published to athlete! 🎯");
+        toast.success("Google Meet room link published to athlete");
         setMeetModalOpen(false);
         fetchDashboardData();
       }
@@ -191,7 +189,7 @@ export default function CoachDashboard() {
   const handleCopyLink = (link: string, id: string) => {
     navigator.clipboard.writeText(link);
     setCopiedApptId(id);
-    toast.success("Meeting link copied to clipboard!");
+    toast.success("Meeting link copied to clipboard");
     setTimeout(() => setCopiedApptId(null), 2500);
   };
 
@@ -207,7 +205,7 @@ export default function CoachDashboard() {
     try {
       const res = await api.post('/tasks/coach', taskForm);
       if (res.data.success) {
-        toast.success("Daily task assigned to athlete!");
+        toast.success("Daily task assigned to athlete");
         setTaskModalOpen(false);
         setTaskForm({
           clientId: clients[0]?.clientId?._id || clients[0]?._id || "",
@@ -237,7 +235,7 @@ export default function CoachDashboard() {
     try {
       const res = await api.put(`/check-ins/${checkInId}/review`, { feedback });
       if (res.data?.success) {
-        toast.success("Check-in reviewed & feedback sent to athlete! 🎯");
+        toast.success("Check-in reviewed & feedback sent to athlete");
         setPendingCheckIns(prev => prev.filter(ci => ci._id !== checkInId));
         setStats(prev => ({ ...prev, actionRequired: Math.max(0, prev.actionRequired - 1) }));
       }
@@ -258,183 +256,187 @@ export default function CoachDashboard() {
 
   const completedTodayTasksCount = todayTasks.filter(t => t.completed).length;
 
+  if (isLoading) {
+    return (
+      <div className="flex h-[65vh] items-center justify-center flex-col gap-3">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <p className="text-xs font-medium text-text-muted tracking-wide">Syncing coach command center...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="max-w-7xl mx-auto space-y-8 pb-12">
+    <div className="max-w-7xl mx-auto space-y-6 pb-12">
       
-      {/* 1. Header & Live Command Bar */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 bg-surface border border-border p-6 md:p-8 rounded-3xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-72 h-72 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
-        
-        <div className="relative z-10 space-y-2">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-wider">
-            <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-            Coach Command Center
+      {/* 1. Header Overview Bar */}
+      <div className="bg-surface border border-border rounded-2xl p-6 md:p-7 relative overflow-hidden transition-all">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-text-muted">
+                Coach Operations Center
+              </span>
+            </div>
+            <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-text-primary">
+              Welcome back, Coach {user?.name?.split(' ')[0] || ''}
+            </h1>
+            <p className="text-xs md:text-sm text-text-muted max-w-xl">
+              Live coaching roster overview, video consultations, and weekly accountability feed.
+            </p>
           </div>
-          <h1 className="text-3xl md:text-4xl font-display font-bold">
-            Welcome back, {user?.name || 'Coach'} 👋
-          </h1>
-          <p className="text-text-muted text-sm md:text-base max-w-2xl">
-            Here is your live coaching overview, today&apos;s 1-on-1 consultations, and athlete accountability feed.
-          </p>
-        </div>
 
-        {/* Quick Actions Bar */}
-        <div className="relative z-10 flex flex-wrap items-center gap-3">
-          <button
-            onClick={() => window.open("https://meet.google.com/new", "_blank")}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-accent text-background font-bold text-sm hover:opacity-90 transition-all shadow-md shadow-accent/20 active:scale-95"
-          >
-            <Video className="w-4 h-4" />
-            <span>Launch Meet</span>
-            <ExternalLink className="w-3.5 h-3.5 opacity-70" />
-          </button>
-
-          <button
-            onClick={() => setTaskModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-white font-bold text-sm hover:opacity-90 transition-all shadow-md shadow-primary/20 active:scale-95"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Assign Task</span>
-          </button>
-
-          <Link href="/coach/programs">
-            <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-background border border-border hover:border-primary text-text-primary font-bold text-sm transition-all hover:bg-border/30">
-              <Dumbbell className="w-4 h-4 text-primary" />
-              <span>Library</span>
+          {/* Quick Actions Bar */}
+          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+            <button
+              onClick={() => window.open("https://meet.google.com/new", "_blank")}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold tracking-wide transition-all shadow-sm active:scale-98"
+            >
+              <Video className="w-3.5 h-3.5" />
+              <span>Launch Meet Room</span>
+              <ExternalLink className="w-3 h-3 opacity-70" />
             </button>
-          </Link>
+
+            <button
+              onClick={() => setTaskModalOpen(true)}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary hover:bg-primary-hover text-white text-xs font-semibold tracking-wide transition-all shadow-sm active:scale-98"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Assign Task</span>
+            </button>
+
+            <Link href="/coach/programs">
+              <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-background border border-border hover:border-slate-600 text-text-primary text-xs font-semibold transition-all hover:bg-surface-hover">
+                <Dumbbell className="w-3.5 h-3.5 text-slate-400" />
+                <span>Program Library</span>
+              </button>
+            </Link>
+          </div>
         </div>
       </div>
 
-      {/* 2. Key Performance Indicators */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      {/* 2. Key Performance Indicators (4 KPI Cards) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Active Clients */}
-        <div className="bg-surface border border-border p-6 rounded-3xl relative overflow-hidden group hover:border-primary/50 transition-colors">
+        <div className="bg-surface border border-border p-5 rounded-2xl hover:border-slate-700 transition-all flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-bold text-text-muted">Active Athletes</span>
-            <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-bold">
-              <Users className="w-5 h-5" />
+            <span className="text-xs font-semibold uppercase tracking-wider text-text-muted">Active Roster</span>
+            <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+              <Users className="w-4 h-4" />
             </div>
           </div>
-          <div className="mt-4 flex items-baseline gap-2">
-            <span className="text-3xl font-mono font-bold">{stats.activeClients}</span>
-            <span className="text-xs text-accent font-bold">Roster Capacity</span>
+          <div className="mt-3 flex items-baseline gap-2">
+            <span className="text-2xl font-mono font-bold text-text-primary">{stats.activeClients}</span>
+            <span className="text-[11px] font-semibold text-accent">Active Athletes</span>
           </div>
-          <div className="mt-3 flex items-center justify-between text-xs text-text-muted pt-3 border-t border-border/50">
-            <span>Retention: 98%</span>
-            <Link href="/coach/clients" className="text-primary hover:underline font-bold flex items-center gap-0.5">
-              Manage <ChevronRight className="w-3 h-3" />
+          <div className="mt-3 flex items-center justify-between text-xs text-text-muted pt-2.5 border-t border-border/80">
+            <span>Roster retention: 98%</span>
+            <Link href="/coach/clients" className="text-primary hover:underline font-semibold flex items-center gap-0.5">
+              Roster <ChevronRight className="w-3 h-3" />
             </Link>
           </div>
         </div>
 
         {/* Monthly MRR */}
-        <div className="bg-surface border border-border p-6 rounded-3xl relative overflow-hidden group hover:border-accent/50 transition-colors">
+        <div className="bg-surface border border-border p-5 rounded-2xl hover:border-slate-700 transition-all flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-bold text-text-muted">Monthly MRR</span>
-            <div className="w-10 h-10 rounded-2xl bg-accent/10 text-accent flex items-center justify-center font-bold">
-              <DollarSign className="w-5 h-5" />
+            <span className="text-xs font-semibold uppercase tracking-wider text-text-muted">Monthly Revenue</span>
+            <div className="w-8 h-8 rounded-lg bg-accent/10 text-accent flex items-center justify-center">
+              <DollarSign className="w-4 h-4" />
             </div>
           </div>
-          <div className="mt-4 flex items-baseline gap-2">
-            <span className="text-3xl font-mono font-bold">₹{stats.mrr.toLocaleString()}</span>
-            <span className="text-xs text-accent font-bold">+12% MoM</span>
+          <div className="mt-3 flex items-baseline gap-2">
+            <span className="text-2xl font-mono font-bold text-text-primary">₹{stats.mrr.toLocaleString()}</span>
+            <span className="text-[11px] font-semibold text-accent">+12% MoM</span>
           </div>
-          <div className="mt-3 flex items-center justify-between text-xs text-text-muted pt-3 border-t border-border/50">
+          <div className="mt-3 flex items-center justify-between text-xs text-text-muted pt-2.5 border-t border-border/80">
             <span>Avg ₹{Math.round(stats.mrr / Math.max(1, stats.activeClients))}/client</span>
-            <Link href="/coach/earnings" className="text-accent hover:underline font-bold flex items-center gap-0.5">
+            <Link href="/coach/earnings" className="text-accent hover:underline font-semibold flex items-center gap-0.5">
               Finances <ChevronRight className="w-3 h-3" />
             </Link>
           </div>
         </div>
 
         {/* Consultations Today */}
-        <div className="bg-surface border border-border p-6 rounded-3xl relative overflow-hidden group hover:border-[#1a73e8]/50 transition-colors">
+        <div className="bg-surface border border-border p-5 rounded-2xl hover:border-slate-700 transition-all flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-bold text-text-muted">Calls Today</span>
-            <div className="w-10 h-10 rounded-2xl bg-[#1a73e8]/10 text-[#1a73e8] flex items-center justify-center font-bold">
-              <Video className="w-5 h-5" />
+            <span className="text-xs font-semibold uppercase tracking-wider text-text-muted">Today&apos;s Calls</span>
+            <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center">
+              <Video className="w-4 h-4" />
             </div>
           </div>
-          <div className="mt-4 flex items-baseline gap-2">
-            <span className="text-3xl font-mono font-bold text-[#1a73e8]">{stats.sessionsToday}</span>
-            <span className="text-xs text-text-muted font-bold">1-on-1 Sessions</span>
+          <div className="mt-3 flex items-baseline gap-2">
+            <span className="text-2xl font-mono font-bold text-blue-400">{stats.sessionsToday}</span>
+            <span className="text-[11px] font-semibold text-text-muted">1-on-1 Sessions</span>
           </div>
-          <div className="mt-3 flex items-center justify-between text-xs text-text-muted pt-3 border-t border-border/50">
+          <div className="mt-3 flex items-center justify-between text-xs text-text-muted pt-2.5 border-t border-border/80">
             <span>Google Meet Sync</span>
-            <Link href="/coach/schedule" className="text-[#1a73e8] hover:underline font-bold flex items-center gap-0.5">
+            <Link href="/coach/schedule" className="text-blue-400 hover:underline font-semibold flex items-center gap-0.5">
               Schedule <ChevronRight className="w-3 h-3" />
             </Link>
           </div>
         </div>
 
         {/* Action Items */}
-        <div className="bg-surface border border-border p-6 rounded-3xl relative overflow-hidden group hover:border-warning/50 transition-colors">
+        <div className="bg-surface border border-border p-5 rounded-2xl hover:border-slate-700 transition-all flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-bold text-text-muted">Action Required</span>
-            <div className={`w-10 h-10 rounded-2xl flex items-center justify-center font-bold ${
-              stats.actionRequired > 0 ? 'bg-warning/20 text-warning animate-pulse' : 'bg-accent/10 text-accent'
+            <span className="text-xs font-semibold uppercase tracking-wider text-text-muted">Action Queue</span>
+            <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+              stats.actionRequired > 0 ? 'bg-amber-500/20 text-amber-400 animate-pulse' : 'bg-accent/10 text-accent'
             }`}>
-              <AlertCircle className="w-5 h-5" />
+              <AlertCircle className="w-4 h-4" />
             </div>
           </div>
-          <div className="mt-4 flex items-baseline gap-2">
-            <span className={`text-3xl font-mono font-bold ${stats.actionRequired > 0 ? 'text-warning' : 'text-accent'}`}>
+          <div className="mt-3 flex items-baseline gap-2">
+            <span className={`text-2xl font-mono font-bold ${stats.actionRequired > 0 ? 'text-amber-400' : 'text-accent'}`}>
               {stats.actionRequired}
             </span>
-            <span className="text-xs text-text-muted font-bold">Check-ins & Alerts</span>
+            <span className="text-[11px] font-semibold text-text-muted">Check-ins & Alerts</span>
           </div>
-          <div className="mt-3 flex items-center justify-between text-xs text-text-muted pt-3 border-t border-border/50">
-            <span>{pendingCheckIns.length} check-ins pending</span>
-            <span className="font-bold text-warning">Urgent</span>
+          <div className="mt-3 flex items-center justify-between text-xs text-text-muted pt-2.5 border-t border-border/80">
+            <span>{pendingCheckIns.length} pending review</span>
+            <span className="font-semibold text-amber-400">Queue Priority</span>
           </div>
         </div>
       </div>
 
-      {/* 3. Today's Consultations Hub & Google Meet Bar */}
-      <div className="bg-surface border border-border rounded-3xl p-6 md:p-8 space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-6">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-[#1a73e8]/10 text-[#1a73e8] flex items-center justify-center">
-              <Video className="w-5 h-5" />
+      {/* 3. Today's Consultations Hub */}
+      <div className="bg-surface border border-border rounded-2xl p-6 space-y-5 hover:border-slate-700 transition-all">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border/80 pb-4">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center">
+              <Video className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-xl font-display font-bold">Today&apos;s Video Consultations</h2>
-              <p className="text-xs md:text-sm text-text-muted">Synchronized Google Meet video rooms for your booked athletes.</p>
+              <h2 className="text-base font-semibold text-text-primary tracking-tight">Today&apos;s Video Consultations</h2>
+              <p className="text-xs text-text-muted">Direct Google Meet video consultation rooms for booked athletes.</p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
             <button
               onClick={() => window.open("https://meet.google.com/new", "_blank")}
-              className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-background border border-border hover:border-primary text-text-primary text-xs font-bold transition-all"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-background border border-border hover:border-slate-600 text-text-primary text-xs font-semibold transition-all"
             >
-              <ExternalLink className="w-3.5 h-3.5 text-primary" />
+              <ExternalLink className="w-3 h-3 text-primary" />
               <span>Open Google Meet</span>
             </button>
-            <Link href="/coach/schedule">
-              <button className="text-xs font-bold text-primary hover:underline">
-                View Full Calendar →
-              </button>
+            <Link href="/coach/schedule" className="text-xs font-semibold text-primary hover:underline">
+              Calendar →
             </Link>
           </div>
         </div>
 
         {todayAppointments.length === 0 ? (
-          <div className="p-8 rounded-2xl bg-background/50 border border-border/60 text-center space-y-3">
-            <div className="w-12 h-12 rounded-full bg-border/40 text-text-muted flex items-center justify-center mx-auto">
-              <Calendar className="w-6 h-6" />
-            </div>
-            <p className="text-sm font-bold text-text-primary">No Video Consultations Scheduled Today</p>
-            <p className="text-xs text-text-muted max-w-md mx-auto">
-              You are all caught up on calls for today. Check your upcoming sessions or update your available working hours in the schedule.
+          <div className="p-8 rounded-xl bg-background/50 border border-dashed border-border text-center space-y-2">
+            <Calendar className="w-6 h-6 text-text-muted mx-auto opacity-30" />
+            <p className="text-xs font-semibold text-text-primary">No Consultations Scheduled Today</p>
+            <p className="text-[11px] text-text-muted max-w-md mx-auto">
+              Your calendar is clear today. You can check upcoming athlete check-ins or update available hours.
             </p>
-            <Link href="/coach/schedule" className="inline-block pt-2">
-              <span className="text-xs font-bold text-primary hover:underline">Manage Availability & Calendar →</span>
-            </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
             {todayAppointments.map((appt) => {
               const attendeeName = appt.memberId?.name || "Athlete";
               const attendeeAvatar = appt.memberId?.avatar;
@@ -443,11 +445,11 @@ export default function CoachDashboard() {
               return (
                 <div 
                   key={appt._id}
-                  className="p-5 rounded-2xl bg-background border border-border hover:border-primary/40 transition-all flex flex-col justify-between gap-4"
+                  className="p-4 rounded-xl bg-background border border-border hover:border-slate-700 transition-all flex flex-col justify-between gap-3"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-11 h-11 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-sm overflow-hidden shrink-0">
+                      <div className="w-9 h-9 rounded-lg bg-primary/20 text-primary flex items-center justify-center font-bold text-xs overflow-hidden shrink-0">
                         {attendeeAvatar ? (
                           <img src={attendeeAvatar} alt={attendeeName} className="w-full h-full object-cover" />
                         ) : (
@@ -455,46 +457,46 @@ export default function CoachDashboard() {
                         )}
                       </div>
                       <div>
-                        <h4 className="font-bold text-text-primary text-base">{attendeeName}</h4>
-                        <div className="flex items-center gap-2 text-xs text-text-muted mt-0.5">
-                          <Clock className="w-3.5 h-3.5 text-accent" />
-                          <span className="font-mono">{appt.startTime ? `${appt.startTime} - ${appt.endTime}` : (appt.timeSlot || 'Scheduled Session')}</span>
+                        <h4 className="font-semibold text-text-primary text-sm">{attendeeName}</h4>
+                        <div className="flex items-center gap-1.5 text-xs text-text-muted font-mono mt-0.5">
+                          <Clock className="w-3 h-3 text-text-muted" />
+                          <span>{appt.startTime ? `${appt.startTime} - ${appt.endTime}` : (appt.timeSlot || 'Scheduled Session')}</span>
                         </div>
                       </div>
                     </div>
 
-                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
+                    <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider border ${
                       hasMeetingLink 
                         ? 'bg-accent/10 text-accent border-accent/20' 
-                        : 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20'
+                        : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
                     }`}>
-                      {hasMeetingLink ? '● Room Live' : 'Pending Room'}
+                      {hasMeetingLink ? 'Room Active' : 'Standby'}
                     </span>
                   </div>
 
                   {/* Actions Bar */}
-                  <div className="flex items-center justify-between gap-2 pt-2 border-t border-border/40">
+                  <div className="flex items-center justify-between gap-2 pt-2 border-t border-border/80">
                     {hasMeetingLink ? (
                       <div className="flex items-center gap-2 w-full">
                         <a
                           href={appt.meetingLink}
                           target="_blank"
                           rel="noreferrer"
-                          className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#1a73e8] text-white text-xs font-bold hover:bg-[#1557b0] transition-colors shadow-md shadow-[#1a73e8]/20"
+                          className="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold transition-colors shadow-sm"
                         >
-                          <Video className="w-4 h-4" />
-                          <span>Join Google Meet</span>
+                          <Video className="w-3.5 h-3.5" />
+                          <span>Join Meet Room</span>
                         </a>
                         <button
                           onClick={() => handleCopyLink(appt.meetingLink, appt._id)}
-                          className="p-2.5 rounded-xl bg-surface border border-border hover:border-primary text-text-muted hover:text-text-primary transition-colors"
+                          className="p-2 rounded-lg bg-surface border border-border hover:border-slate-600 text-text-muted hover:text-text-primary transition-colors"
                           title="Copy Link"
                         >
-                          {copiedApptId === appt._id ? <Check className="w-4 h-4 text-accent" /> : <Copy className="w-4 h-4" />}
+                          {copiedApptId === appt._id ? <Check className="w-3.5 h-3.5 text-accent" /> : <Copy className="w-3.5 h-3.5" />}
                         </button>
                         <button
                           onClick={() => handleOpenMeetModal(appt)}
-                          className="px-3 py-2 rounded-xl bg-surface border border-border text-xs text-text-muted hover:text-text-primary transition-colors"
+                          className="px-2.5 py-1.5 rounded-lg bg-surface border border-border text-xs text-text-muted hover:text-text-primary transition-colors"
                         >
                           Edit
                         </button>
@@ -503,14 +505,14 @@ export default function CoachDashboard() {
                       <div className="flex items-center gap-2 w-full">
                         <button
                           onClick={() => handleStartGoogleMeetRoom(appt)}
-                          className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#1a73e8] text-white text-xs font-bold hover:bg-[#1557b0] transition-colors shadow-md shadow-[#1a73e8]/20"
+                          className="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold transition-colors shadow-sm"
                         >
-                          <Video className="w-4 h-4" />
-                          <span>Start Google Meet Call</span>
+                          <Video className="w-3.5 h-3.5" />
+                          <span>Start Meet Call</span>
                         </button>
                         <button
                           onClick={() => handleOpenMeetModal(appt)}
-                          className="px-3 py-2 rounded-xl bg-surface border border-border text-xs text-text-muted hover:text-text-primary transition-colors"
+                          className="px-2.5 py-1.5 rounded-lg bg-surface border border-border text-xs text-text-muted hover:text-text-primary transition-colors"
                         >
                           Paste Link
                         </button>
@@ -528,65 +530,61 @@ export default function CoachDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Pending Check-Ins (2 Columns) */}
-        <div className="lg:col-span-2 bg-surface border border-border rounded-3xl p-6 md:p-8 space-y-6">
-          <div className="flex items-center justify-between border-b border-border pb-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-warning/10 text-warning flex items-center justify-center font-bold">
-                <AlertCircle className="w-5 h-5" />
+        <div className="lg:col-span-2 bg-surface border border-border rounded-2xl p-6 space-y-5 hover:border-slate-700 transition-all">
+          <div className="flex items-center justify-between border-b border-border/80 pb-4">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center">
+                <AlertCircle className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="text-xl font-display font-bold">Athlete Weekly Check-Ins</h3>
-                <p className="text-xs text-text-muted">Review athlete metrics and deliver weekly feedback.</p>
+                <h3 className="text-base font-semibold text-text-primary tracking-tight">Athlete Weekly Check-Ins</h3>
+                <p className="text-xs text-text-muted">Review progress submissions and deliver coach feedback.</p>
               </div>
             </div>
-            <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-warning/10 text-warning border border-warning/20">
+            <span className="px-2.5 py-0.5 rounded-md text-xs font-mono font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
               {pendingCheckIns.length} Pending
             </span>
           </div>
 
           {pendingCheckIns.length === 0 ? (
-            <div className="p-8 rounded-2xl bg-background/50 border border-border/60 text-center space-y-2">
-              <div className="w-12 h-12 rounded-full bg-accent/10 text-accent flex items-center justify-center mx-auto">
-                <CheckCircle2 className="w-6 h-6" />
-              </div>
-              <p className="text-sm font-bold text-text-primary">All Check-Ins Are Reviewed!</p>
-              <p className="text-xs text-text-muted max-w-sm mx-auto">
-                Your athletes are on track. When an athlete submits their Sunday check-in, it will appear here for 1-click review.
+            <div className="p-8 rounded-xl bg-background/50 border border-dashed border-border text-center space-y-1.5">
+              <CheckCircle2 className="w-6 h-6 text-accent mx-auto opacity-70" />
+              <p className="text-xs font-semibold text-text-primary">All Check-Ins Reviewed</p>
+              <p className="text-[11px] text-text-muted max-w-sm mx-auto">
+                All athlete check-ins have been addressed. New check-in submissions will appear here automatically.
               </p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {pendingCheckIns.slice(0, 3).map((ci) => {
                 const athleteName = ci.memberId?.name || "Athlete";
                 const isSubmitting = submittingFeedback[ci._id];
 
                 return (
-                  <div key={ci._id} className="p-5 rounded-2xl bg-background border border-border space-y-4">
+                  <div key={ci._id} className="p-4 rounded-xl bg-background border border-border space-y-3">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-xs">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-lg bg-primary/20 text-primary flex items-center justify-center font-bold text-xs">
                           {athleteName.charAt(0)}
                         </div>
                         <div>
-                          <h4 className="font-bold text-sm text-text-primary">{athleteName}</h4>
-                          <span className="text-[11px] text-text-muted">
-                            Submitted {new Date(ci.date || ci.createdAt).toLocaleDateString()}
+                          <h4 className="font-semibold text-xs text-text-primary">{athleteName}</h4>
+                          <span className="text-[10px] text-text-muted font-mono">
+                            {new Date(ci.date || ci.createdAt).toLocaleDateString()}
                           </span>
                         </div>
                       </div>
 
                       {/* Vitals Summary Pill */}
-                      <div className="flex items-center gap-3 text-xs bg-surface border border-border px-3 py-1.5 rounded-xl font-medium">
+                      <div className="flex items-center gap-2.5 text-xs bg-surface border border-border px-3 py-1 rounded-lg font-mono">
                         <span>Weight: <strong className="text-text-primary">{ci.weight} kg</strong></span>
                         <span className="text-border">|</span>
                         <span>Energy: <strong className="text-accent">{ci.energyLevel || 4}/5</strong></span>
-                        <span className="text-border">|</span>
-                        <span>Adherence: <strong className="text-primary">{ci.dietAdherence || 'On Plan'}</strong></span>
                       </div>
                     </div>
 
                     {ci.notes && (
-                      <div className="p-3 bg-surface border border-border/60 rounded-xl text-xs text-text-muted italic">
+                      <div className="p-2.5 bg-surface border border-border/70 rounded-lg text-xs text-text-muted italic">
                         &ldquo;{ci.notes}&rdquo;
                       </div>
                     )}
@@ -595,17 +593,17 @@ export default function CoachDashboard() {
                     <div className="flex items-center gap-2 pt-1">
                       <input 
                         type="text"
-                        placeholder="Add quick feedback (e.g. Great progress, increase bench weight by 2.5kg!)..."
+                        placeholder="Add quick coach feedback (e.g. Solid week, increase squat weight by 2.5kg)..."
                         value={feedbackInputs[ci._id] || ""}
                         onChange={(e) => setFeedbackInputs(prev => ({ ...prev, [ci._id]: e.target.value }))}
-                        className="flex-1 bg-surface border border-border rounded-xl px-4 py-2 text-xs text-text-primary focus:outline-none focus:border-primary transition-colors"
+                        className="flex-1 bg-surface border border-border rounded-lg px-3 py-1.5 text-xs text-text-primary focus:outline-none focus:border-primary transition-colors"
                       />
                       <button
                         onClick={() => handleSendFeedback(ci._id)}
                         disabled={isSubmitting}
-                        className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primary text-white text-xs font-bold hover:opacity-90 transition-all disabled:opacity-50 shrink-0"
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary hover:bg-primary-hover text-white text-xs font-semibold transition-all disabled:opacity-50 shrink-0"
                       >
-                        {isSubmitting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
+                        {isSubmitting ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
                         <span>Send</span>
                       </button>
                     </div>
@@ -617,44 +615,44 @@ export default function CoachDashboard() {
         </div>
 
         {/* Today's Tasks & Accountability (1 Column) */}
-        <div className="bg-surface border border-border rounded-3xl p-6 md:p-8 space-y-6 flex flex-col justify-between">
+        <div className="bg-surface border border-border rounded-2xl p-6 space-y-5 flex flex-col justify-between hover:border-slate-700 transition-all">
           <div className="space-y-4">
-            <div className="flex items-center justify-between border-b border-border pb-4">
-              <div className="flex items-center gap-2.5">
-                <CheckCircle2 className="w-5 h-5 text-accent" />
-                <h3 className="text-lg font-display font-bold">Daily Tasks</h3>
+            <div className="flex items-center justify-between border-b border-border/80 pb-4">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-accent" />
+                <h3 className="text-base font-semibold text-text-primary tracking-tight">Assigned Tasks</h3>
               </div>
-              <span className="text-xs font-mono font-bold text-accent bg-accent/10 px-2.5 py-1 rounded-full border border-accent/20">
-                {completedTodayTasksCount}/{todayTasks.length} Completed
+              <span className="text-xs font-mono font-semibold text-accent bg-accent/10 px-2 py-0.5 rounded border border-accent/20">
+                {completedTodayTasksCount}/{todayTasks.length}
               </span>
             </div>
 
             {todayTasks.length === 0 ? (
-              <div className="py-8 text-center space-y-2">
-                <Flame className="w-8 h-8 text-text-muted mx-auto opacity-40" />
-                <p className="text-xs text-text-muted">No daily tasks scheduled for today.</p>
+              <div className="py-8 text-center space-y-1.5">
+                <Check className="w-6 h-6 text-text-muted mx-auto opacity-30" />
+                <p className="text-xs font-semibold text-text-primary">No Tasks Assigned Today</p>
                 <button
                   onClick={() => setTaskModalOpen(true)}
-                  className="text-xs font-bold text-primary hover:underline"
+                  className="text-xs font-semibold text-primary hover:underline block mx-auto pt-1"
                 >
                   + Assign a Task Now
                 </button>
               </div>
             ) : (
-              <div className="space-y-2.5">
+              <div className="space-y-2">
                 {todayTasks.slice(0, 5).map((task) => (
                   <div 
                     key={task._id} 
-                    className="flex items-center justify-between p-3 rounded-xl bg-background border border-border text-xs"
+                    className="flex items-center justify-between p-2.5 rounded-lg bg-background border border-border text-xs"
                   >
-                    <div className="flex items-center gap-2.5">
-                      <span className={`w-2 h-2 rounded-full ${task.completed ? 'bg-accent' : 'bg-warning animate-pulse'}`} />
-                      <span className={`font-medium ${task.completed ? 'line-through text-text-muted' : 'text-text-primary'}`}>
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${task.completed ? 'bg-accent' : 'bg-slate-500'}`} />
+                      <span className={`truncate font-medium ${task.completed ? 'line-through text-text-muted' : 'text-text-primary'}`}>
                         {task.title}
                       </span>
                     </div>
-                    <span className="text-[10px] text-text-muted uppercase font-bold bg-surface px-2 py-0.5 rounded border border-border">
-                      {task.clientId?.name || 'Athlete'}
+                    <span className="text-[10px] font-mono uppercase text-text-muted px-1.5 py-0.5 rounded bg-surface border border-border shrink-0">
+                      {task.type}
                     </span>
                   </div>
                 ))}
@@ -662,225 +660,184 @@ export default function CoachDashboard() {
             )}
           </div>
 
-          <div className="pt-4 border-t border-border">
-            <button
-              onClick={() => setTaskModalOpen(true)}
-              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-background hover:bg-border/40 border border-border text-xs font-bold text-text-primary transition-colors"
-            >
-              <Plus className="w-3.5 h-3.5 text-primary" />
-              <span>Assign New Task</span>
-            </button>
-          </div>
+          <button
+            onClick={() => setTaskModalOpen(true)}
+            className="w-full py-2 bg-background hover:bg-surface-hover border border-border hover:border-slate-600 rounded-xl text-xs font-semibold text-text-primary transition-all flex items-center justify-center gap-1.5"
+          >
+            <Plus className="w-3.5 h-3.5 text-primary" />
+            <span>Assign New Task</span>
+          </button>
         </div>
+
       </div>
 
-      {/* 5. Client Roster & Management */}
-      <div className="bg-surface border border-border rounded-3xl overflow-hidden space-y-6 p-6 md:p-8">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border pb-6">
+      {/* 5. Athlete Roster & Activity Table */}
+      <div className="bg-surface border border-border rounded-2xl p-6 space-y-5 hover:border-slate-700 transition-all">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/80 pb-4">
           <div>
-            <h2 className="text-xl font-display font-bold">Client Roster & Status</h2>
-            <p className="text-xs md:text-sm text-text-muted">View active client goals, compliance, and quick action dossiers.</p>
+            <h2 className="text-base font-semibold text-text-primary tracking-tight">Athlete Client Roster</h2>
+            <p className="text-xs text-text-muted">Manage your active clients, current workout goals, and direct channels.</p>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="relative w-full sm:w-64">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+            <div className="relative">
+              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
               <input 
-                type="text"
-                placeholder="Search athlete..."
+                type="text" 
+                placeholder="Search athlete by name..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-background border border-border rounded-xl pl-9 pr-3 py-1.5 text-xs text-text-primary focus:outline-none focus:border-primary transition-colors"
+                className="w-full sm:w-56 bg-background border border-border rounded-xl pl-8 pr-3 py-1.5 text-xs text-text-primary focus:outline-none focus:border-primary transition-colors"
               />
             </div>
 
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="bg-background border border-border rounded-xl px-3 py-1.5 text-xs text-text-muted focus:outline-none focus:border-primary font-medium"
+              className="bg-background border border-border rounded-xl px-3 py-1.5 text-xs font-semibold text-text-primary focus:outline-none focus:border-primary"
             >
-              <option value="all">All Status</option>
-              <option value="active">Active</option>
+              <option value="all">All Statuses</option>
+              <option value="active">Active Only</option>
               <option value="needs_attention">Needs Attention</option>
             </select>
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-background/50 border-b border-border text-xs font-bold text-text-muted uppercase tracking-wider">
-                <th className="p-4">Athlete</th>
-                <th className="p-4">Target Goal</th>
-                <th className="p-4">Status</th>
-                <th className="p-4">Last Check-In</th>
-                <th className="p-4 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border text-sm">
-              {filteredClients.map((client) => {
-                const cId = client.clientId?._id || client._id;
-                const cName = client.clientId?.name || client.name || "Athlete";
-                const cEmail = client.clientId?.email || client.email || "";
-                const cAvatar = client.clientId?.avatar;
+        {/* Client Roster Grid */}
+        {filteredClients.length === 0 ? (
+          <div className="p-8 text-center text-xs text-text-muted">
+            No athletes found matching your search.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+            {filteredClients.map((client) => {
+              const c = client.clientId || client;
+              const hasAlert = client.status === 'needs_attention';
 
-                return (
-                  <tr key={client._id} className="hover:bg-background/40 transition-colors group">
-                    <td className="p-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-xs overflow-hidden shrink-0">
-                          {cAvatar ? (
-                            <img src={cAvatar} alt={cName} className="w-full h-full object-cover" />
-                          ) : (
-                            cName.charAt(0)
-                          )}
-                        </div>
-                        <div>
-                          <p className="font-bold text-text-primary text-sm">{cName}</p>
-                          <p className="text-xs text-text-muted">{cEmail}</p>
-                        </div>
+              return (
+                <div 
+                  key={c._id}
+                  className="p-4 rounded-xl bg-background border border-border hover:border-slate-700 transition-all flex flex-col justify-between space-y-3"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-9 h-9 rounded-lg bg-indigo-500/10 text-indigo-400 font-bold text-xs flex items-center justify-center overflow-hidden shrink-0">
+                        {c.avatar ? (
+                          <img src={c.avatar} alt={c.name} className="w-full h-full object-cover" />
+                        ) : (
+                          c.name?.charAt(0) || 'U'
+                        )}
                       </div>
-                    </td>
-
-                    <td className="p-4 text-xs text-text-muted font-medium">
-                      {client.currentGoal || 'General Fitness'}
-                    </td>
-
-                    <td className="p-4">
-                      {client.status === 'active' || client.status === 'on_track' ? (
-                        <span className="inline-flex items-center gap-1.5 bg-accent/10 text-accent px-2.5 py-1 rounded-full text-xs font-bold border border-accent/20">
-                          <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" /> Active
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1.5 bg-yellow-500/10 text-yellow-500 px-2.5 py-1 rounded-full text-xs font-bold border border-yellow-500/20">
-                          <AlertCircle className="w-3 h-3" /> Needs Attention
-                        </span>
-                      )}
-                    </td>
-
-                    <td className="p-4 text-xs text-text-muted">
-                      {client.lastCheckInDate ? new Date(client.lastCheckInDate).toLocaleDateString() : 'No Check-ins'}
-                    </td>
-
-                    <td className="p-4 text-right">
-                      <div className="flex items-center justify-end gap-1.5">
-                        <Link href={`/coach/clients/${cId}`}>
-                          <button className="px-3 py-1.5 rounded-lg bg-background hover:bg-border/60 border border-border text-xs font-bold text-text-primary transition-colors">
-                            Dossier
-                          </button>
-                        </Link>
-                        <Link href={`/coach/clients?tab=progress&client=${cId}`}>
-                          <button className="p-1.5 rounded-lg text-text-muted hover:text-accent hover:bg-accent/10 transition-colors" title="3D Progress">
-                            <Activity className="w-4 h-4" />
-                          </button>
-                        </Link>
-                        <Link href={`/coach/inbox?client=${cId}`}>
-                          <button className="p-1.5 rounded-lg text-text-muted hover:text-primary hover:bg-primary/10 transition-colors" title="Message">
-                            <MessageSquare className="w-4 h-4" />
-                          </button>
-                        </Link>
+                      <div className="min-w-0">
+                        <h4 className="font-semibold text-xs text-text-primary truncate">{c.name}</h4>
+                        <p className="text-[11px] text-text-muted truncate">{c.email}</p>
                       </div>
-                    </td>
-                  </tr>
-                );
-              })}
-              {filteredClients.length === 0 && (
-                <tr>
-                  <td colSpan={5} className="p-8 text-center text-xs text-text-muted">
-                    No clients found matching search criteria.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+                    </div>
+
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider border shrink-0 ${
+                      hasAlert 
+                        ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' 
+                        : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                    }`}>
+                      {hasAlert ? 'Alert' : 'Active'}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-xs pt-2 border-t border-border/80">
+                    <span className="text-[11px] text-text-muted capitalize">
+                      Goal: <strong className="text-text-primary">{client.currentGoal?.replace('_', ' ') || 'Strength'}</strong>
+                    </span>
+
+                    <div className="flex items-center gap-2">
+                      <Link href={`/coach/inbox?client=${c._id}`}>
+                        <button className="p-1.5 rounded-lg bg-surface hover:bg-surface-hover text-text-muted hover:text-text-primary transition-colors" title="Message Athlete">
+                          <MessageSquare className="w-3.5 h-3.5" />
+                        </button>
+                      </Link>
+                      <Link href={`/coach/clients/${c._id}`}>
+                        <button className="px-2.5 py-1 rounded-lg bg-primary/10 hover:bg-primary text-primary hover:text-white text-xs font-semibold transition-all">
+                          Profile
+                        </button>
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
-      {/* MODAL: Sync Google Meet Link */}
+      {/* Modal: Google Meet Room Configuration */}
       <AnimatePresence>
         {meetModalOpen && selectedAppt && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setMeetModalOpen(false)}
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-surface border border-border rounded-3xl p-6 md:p-8 max-w-lg w-full space-y-6 shadow-2xl relative"
+              exit={{ opacity: 0, scale: 0.96 }}
+              className="relative bg-[#12141C] border border-[#1C202C] rounded-2xl w-full max-w-md p-6 shadow-2xl z-10"
+              onClick={(e) => e.stopPropagation()}
             >
-              <button 
-                onClick={() => setMeetModalOpen(false)}
-                className="absolute top-6 right-6 p-2 rounded-xl text-text-muted hover:text-text-primary hover:bg-border/40 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-[#1a73e8]/10 text-[#1a73e8] flex items-center justify-center font-bold">
-                  <Video className="w-6 h-6" />
+              <div className="flex items-center justify-between pb-3 border-b border-[#1C202C]">
+                <div className="flex items-center gap-2">
+                  <Video className="w-4 h-4 text-blue-400" />
+                  <h3 className="text-sm font-semibold text-white">Google Meet Video Room</h3>
                 </div>
+                <button onClick={() => setMeetModalOpen(false)} className="p-1 text-slate-400 hover:text-white">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <form onSubmit={handleSaveMeetLink} className="space-y-4 pt-4">
                 <div>
-                  <h3 className="text-xl font-display font-bold">Sync Google Meet Room</h3>
-                  <p className="text-xs text-text-muted">
-                    Consultation with {selectedAppt.memberId?.name || "Athlete"}
-                  </p>
-                </div>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-background border border-border/80 space-y-3">
-                <div className="flex items-center justify-between text-xs text-text-muted">
-                  <span>1. Generate host meeting room:</span>
-                  <a
-                    href="https://meet.google.com/new"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-1 font-bold text-[#1a73e8] hover:underline"
-                  >
-                    <span>meet.google.com/new</span>
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
-                </div>
-                <p className="text-xs text-text-muted">
-                  2. Copy the meeting link or code (e.g. <code>xxx-yyyy-zzz</code>) and paste below. The athlete will unlock their join button immediately.
-                </p>
-              </div>
-
-              <form onSubmit={handleSaveMeetLink} className="space-y-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold uppercase tracking-wider text-text-muted">Google Meet Link / Code</label>
-                  <input 
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                    Meeting URL or Room Code
+                  </label>
+                  <input
                     type="text"
-                    required
-                    placeholder="https://meet.google.com/xxx-yyyy-zzz or code"
+                    placeholder="https://meet.google.com/abc-defg-hij"
                     value={meetLinkInput}
                     onChange={(e) => setMeetLinkInput(e.target.value)}
-                    className="w-full bg-background border border-border rounded-xl px-4 py-3 text-sm text-text-primary focus:outline-none focus:border-[#1a73e8] transition-colors"
+                    className="w-full bg-[#0B0C10] border border-[#1C202C] rounded-xl px-3.5 py-2 text-xs text-white font-mono focus:outline-none focus:border-indigo-500"
+                    required
                   />
                 </div>
 
-                <label className="flex items-center gap-2.5 text-xs text-text-muted cursor-pointer select-none">
-                  <input 
+                <div className="flex items-center gap-2">
+                  <input
                     type="checkbox"
+                    id="saveDefault"
                     checked={saveAsDefault}
                     onChange={(e) => setSaveAsDefault(e.target.checked)}
-                    className="rounded border-border text-primary focus:ring-0"
+                    className="w-3.5 h-3.5 rounded border-slate-700 bg-[#0B0C10] text-indigo-600 focus:ring-0"
                   />
-                  <span>Save as my default meeting room for future calls</span>
-                </label>
+                  <label htmlFor="saveDefault" className="text-xs text-slate-400 select-none">
+                    Save as my recurring Google Meet room link
+                  </label>
+                </div>
 
-                <div className="flex items-center justify-end gap-3 pt-2">
+                <div className="flex gap-2 pt-2">
                   <button
                     type="button"
                     onClick={() => setMeetModalOpen(false)}
-                    className="px-4 py-2.5 rounded-xl text-xs font-bold text-text-muted hover:text-text-primary transition-colors"
+                    className="flex-1 py-2 bg-surface hover:bg-surface-hover border border-border rounded-xl text-xs font-semibold text-slate-300 transition-colors"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    disabled={isUpdatingLink || !meetLinkInput.trim()}
-                    className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#1a73e8] text-white text-xs font-bold hover:bg-[#1557b0] transition-colors shadow-lg shadow-[#1a73e8]/20 disabled:opacity-50"
+                    disabled={isUpdatingLink}
+                    className="flex-1 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-semibold transition-colors shadow-sm disabled:opacity-50"
                   >
-                    {isUpdatingLink ? <Loader2 className="w-4 h-4 animate-spin" /> : <Video className="w-4 h-4" />}
-                    <span>Publish & Sync Room</span>
+                    {isUpdatingLink ? "Publishing..." : "Publish to Athlete"}
                   </button>
                 </div>
               </form>
@@ -889,113 +846,103 @@ export default function CoachDashboard() {
         )}
       </AnimatePresence>
 
-      {/* MODAL: Assign Task */}
+      {/* Modal: Quick Task Assignment */}
       <AnimatePresence>
         {taskModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setTaskModalOpen(false)}
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-surface border border-border rounded-3xl p-6 md:p-8 max-w-lg w-full space-y-6 shadow-2xl relative"
+              exit={{ opacity: 0, scale: 0.96 }}
+              className="relative bg-[#12141C] border border-[#1C202C] rounded-2xl w-full max-w-md p-6 shadow-2xl z-10"
+              onClick={(e) => e.stopPropagation()}
             >
-              <button 
-                onClick={() => setTaskModalOpen(false)}
-                className="absolute top-6 right-6 p-2 rounded-xl text-text-muted hover:text-text-primary hover:bg-border/40 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-bold">
-                  <Plus className="w-6 h-6" />
+              <div className="flex items-center justify-between pb-3 border-b border-[#1C202C]">
+                <div className="flex items-center gap-2">
+                  <Plus className="w-4 h-4 text-indigo-400" />
+                  <h3 className="text-sm font-semibold text-white">Assign Athlete Task</h3>
                 </div>
-                <div>
-                  <h3 className="text-xl font-display font-bold">Assign Daily Athlete Task</h3>
-                  <p className="text-xs text-text-muted">Create a goal, habit, or recovery task for your athlete.</p>
-                </div>
+                <button onClick={() => setTaskModalOpen(false)} className="p-1 text-slate-400 hover:text-white">
+                  <X className="w-4 h-4" />
+                </button>
               </div>
 
-              <form onSubmit={handleCreateTask} className="space-y-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-text-muted">Select Athlete</label>
+              <form onSubmit={handleCreateTask} className="space-y-3.5 pt-4">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Select Athlete</label>
                   <select
                     value={taskForm.clientId}
                     onChange={(e) => setTaskForm({ ...taskForm, clientId: e.target.value })}
-                    className="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-xs text-text-primary focus:outline-none focus:border-primary"
+                    className="w-full bg-[#0B0C10] border border-[#1C202C] rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 font-medium"
+                    required
                   >
                     {clients.map(c => (
                       <option key={c._id} value={c.clientId?._id || c._id}>
-                        {c.clientId?.name || c.name} ({c.currentGoal || 'Fitness'})
+                        {c.clientId?.name || c.name} ({c.clientId?.email || c.email})
                       </option>
                     ))}
                   </select>
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-text-muted">Task Title</label>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Task Title</label>
                   <input
                     type="text"
-                    required
-                    placeholder="e.g. 10,000 Steps + 15 min Post-Workout Stretch"
+                    placeholder="e.g. 10,000 steps + 4L hydration check"
                     value={taskForm.title}
                     onChange={(e) => setTaskForm({ ...taskForm, title: e.target.value })}
-                    className="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-xs text-text-primary focus:outline-none focus:border-primary"
+                    className="w-full bg-[#0B0C10] border border-[#1C202C] rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
+                    required
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-text-muted">Date</label>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Task Category</label>
+                    <select
+                      value={taskForm.type}
+                      onChange={(e) => setTaskForm({ ...taskForm, type: e.target.value })}
+                      className="w-full bg-[#0B0C10] border border-[#1C202C] rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 font-medium"
+                    >
+                      <option value="general">General</option>
+                      <option value="cardio">Cardio</option>
+                      <option value="nutrition">Nutrition</option>
+                      <option value="recovery">Recovery</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1">Target Date</label>
                     <input
                       type="date"
                       value={taskForm.date}
                       onChange={(e) => setTaskForm({ ...taskForm, date: e.target.value })}
-                      className="w-full bg-background border border-border rounded-xl px-4 py-2 text-xs text-text-primary focus:outline-none focus:border-primary"
+                      className="w-full bg-[#0B0C10] border border-[#1C202C] rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 font-mono"
+                      required
                     />
                   </div>
-
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-text-muted">Category</label>
-                    <select
-                      value={taskForm.type}
-                      onChange={(e) => setTaskForm({ ...taskForm, type: e.target.value })}
-                      className="w-full bg-background border border-border rounded-xl px-4 py-2 text-xs text-text-primary focus:outline-none focus:border-primary"
-                    >
-                      <option value="workout">Workout</option>
-                      <option value="diet">Diet & Nutrition</option>
-                      <option value="habit">Habit & Recovery</option>
-                      <option value="general">General Check-In</option>
-                    </select>
-                  </div>
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-text-muted">Description (Optional)</label>
-                  <textarea
-                    rows={2}
-                    placeholder="Specific notes or instructions..."
-                    value={taskForm.description}
-                    onChange={(e) => setTaskForm({ ...taskForm, description: e.target.value })}
-                    className="w-full bg-background border border-border rounded-xl px-4 py-2 text-xs text-text-primary focus:outline-none focus:border-primary"
-                  />
-                </div>
-
-                <div className="flex items-center justify-end gap-3 pt-2">
+                <div className="flex gap-2 pt-2">
                   <button
                     type="button"
                     onClick={() => setTaskModalOpen(false)}
-                    className="px-4 py-2 rounded-xl text-xs font-bold text-text-muted hover:text-text-primary"
+                    className="flex-1 py-2 bg-surface hover:bg-surface-hover border border-border rounded-xl text-xs font-semibold text-slate-300 transition-colors"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={isSubmittingTask}
-                    className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary text-white text-xs font-bold hover:opacity-90 disabled:opacity-50"
+                    className="flex-1 py-2 bg-primary hover:bg-primary-hover text-white rounded-xl text-xs font-semibold transition-colors shadow-sm disabled:opacity-50"
                   >
-                    {isSubmittingTask ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
-                    <span>Assign Task</span>
+                    {isSubmittingTask ? "Assigning..." : "Assign Task"}
                   </button>
                 </div>
               </form>

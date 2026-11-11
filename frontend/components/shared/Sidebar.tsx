@@ -25,7 +25,8 @@ import {
   X,
   Sparkles,
   MessageSquare,
-  CheckCircle2
+  CheckCircle2,
+  Shield
 } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { useRouter } from "next/navigation";
@@ -101,28 +102,40 @@ export function Sidebar() {
   const navItems = user?.role === 'admin' ? ADMIN_NAV : user?.role === 'coach' ? COACH_NAV : MEMBER_NAV;
 
   const sidebarContent = (
-    <div className="flex flex-col h-full bg-surface border-r border-border overflow-hidden">
-      {/* Header */}
-      <div className="p-6 flex items-center justify-between">
-        {!collapsed && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2">
-            <svg width="28" height="28" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M20 2L35.5885 11V29L20 38L4.41154 29V11L20 2Z" fill="#6C63FF" stroke="#00F5A0" strokeWidth="2" strokeLinejoin="round" />
-            </svg>
-            <span className="text-xl font-display font-bold">FitCore</span>
-          </motion.div>
-        )}
-        {collapsed && (
+    <div className="flex flex-col h-full bg-[#10121A] border-r border-[#1C202C] overflow-hidden select-none">
+      {/* Brand Header */}
+      <div className="h-16 px-5 border-b border-[#1C202C] flex items-center justify-between">
+        {!collapsed ? (
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 via-indigo-600 to-emerald-500 p-[1px] shadow-sm">
+              <div className="w-full h-full bg-[#10121A] rounded-[7px] flex items-center justify-center">
+                <span className="font-mono text-sm font-black text-white tracking-tighter">FC</span>
+              </div>
+            </div>
+            <div className="flex items-baseline gap-1">
+              <span className="text-base font-semibold tracking-tight text-white">FitCore</span>
+              <span className="text-[10px] font-mono font-medium text-slate-400 uppercase tracking-widest">PRO</span>
+            </div>
+          </Link>
+        ) : (
           <div className="mx-auto">
-            <svg width="28" height="28" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M20 2L35.5885 11V29L20 38L4.41154 29V11L20 2Z" fill="#6C63FF" stroke="#00F5A0" strokeWidth="2" strokeLinejoin="round" />
-            </svg>
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 via-indigo-600 to-emerald-500 p-[1px] shadow-sm">
+              <div className="w-full h-full bg-[#10121A] rounded-[7px] flex items-center justify-center">
+                <span className="font-mono text-sm font-black text-white tracking-tighter">FC</span>
+              </div>
+            </div>
           </div>
         )}
       </div>
 
       {/* Nav Links */}
-      <nav className="flex-1 px-4 py-4 space-y-2 overflow-y-auto">
+      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        {!collapsed && (
+          <div className="px-3 pb-2 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+            {user?.role === 'coach' ? 'Coach Navigation' : user?.role === 'admin' ? 'Administration' : 'Athlete Portal'}
+          </div>
+        )}
+
         {navItems.map((item) => {
           const isActive = pathname.startsWith(item.href);
           const isChatTab = (user?.role === 'coach' && item.name === 'Inbox') || (user?.role === 'member' && item.name === 'My Coach');
@@ -130,18 +143,25 @@ export function Sidebar() {
 
           return (
             <Link key={item.name} href={item.href}>
-              <span className={`relative flex items-center gap-3 px-3 py-3 rounded-xl transition-all group ${isActive ? 'bg-primary/10 text-primary' : 'text-text-muted hover:bg-border/50 hover:text-text-primary'}`}>
+              <span className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all group ${
+                isActive 
+                  ? 'bg-white/[0.08] text-white shadow-sm border border-white/[0.08]' 
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'
+              }`}>
                 <div className="relative shrink-0 flex items-center justify-center">
-                  <item.icon className={`w-5 h-5 ${isActive ? 'text-primary' : 'text-text-muted group-hover:text-text-primary'}`} />
+                  <item.icon className={`w-4 h-4 transition-colors ${
+                    isActive ? 'text-indigo-400' : 'text-slate-400 group-hover:text-slate-200'
+                  }`} />
                   {collapsed && showBadge && (
-                    <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-danger rounded-full ring-2 ring-surface animate-pulse" />
+                    <span className="absolute -top-1 -right-1 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-[#10121A] animate-pulse" />
                   )}
                 </div>
+
                 {!collapsed && (
                   <div className="flex-1 flex items-center justify-between min-w-0">
-                    <span className="font-medium whitespace-nowrap">{item.name}</span>
+                    <span className="tracking-wide">{item.name}</span>
                     {showBadge && (
-                      <span className="ml-auto bg-danger text-white text-[11px] font-extrabold px-2 py-0.5 rounded-full shadow-md shadow-danger/40 animate-pulse">
+                      <span className="ml-auto bg-rose-500 text-white text-[10px] font-bold font-mono px-1.5 py-0.2 rounded-full shadow-sm animate-pulse">
                         {unreadCount > 99 ? '99+' : unreadCount}
                       </span>
                     )}
@@ -153,14 +173,16 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* Footer / Logout */}
-      <div className="p-4 border-t border-border">
+      {/* User Footer / Logout */}
+      <div className="p-3 border-t border-[#1C202C] space-y-2">
         <button
           onClick={() => setShowLogoutModal(true)}
-          className={`flex items-center gap-3 px-3 py-3 rounded-xl w-full text-danger hover:bg-danger/10 transition-colors ${collapsed ? 'justify-center' : ''}`}
+          className={`flex items-center gap-2.5 px-3 py-2 rounded-xl w-full text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 text-xs font-medium transition-colors ${
+            collapsed ? 'justify-center' : ''
+          }`}
         >
-          <LogOut className="w-5 h-5" />
-          {!collapsed && <span className="font-medium whitespace-nowrap">Logout</span>}
+          <LogOut className="w-4 h-4" />
+          {!collapsed && <span>Sign Out</span>}
         </button>
       </div>
     </div>
@@ -170,8 +192,8 @@ export function Sidebar() {
     <>
       {/* Desktop Sidebar */}
       <motion.aside
-        initial={{ width: 260 }}
-        animate={{ width: collapsed ? 80 : 260 }}
+        initial={{ width: 250 }}
+        animate={{ width: collapsed ? 76 : 250 }}
         className="hidden md:block h-screen sticky top-0 z-20 shrink-0 relative"
       >
         {sidebarContent}
@@ -179,9 +201,10 @@ export function Sidebar() {
         {/* Collapse Toggle */}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="absolute -right-3 top-1/2 transform -translate-y-1/2 bg-surface border border-border rounded-full p-1 text-text-muted hover:text-primary z-30 shadow-lg"
+          className="absolute -right-3 top-1/2 transform -translate-y-1/2 bg-[#12141C] border border-[#1C202C] rounded-full p-1 text-slate-400 hover:text-white z-30 shadow-md transition-colors"
+          title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
-          {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+          {collapsed ? <ChevronRight className="w-3.5 h-3.5" /> : <ChevronLeft className="w-3.5 h-3.5" />}
         </button>
       </motion.aside>
 
@@ -189,9 +212,9 @@ export function Sidebar() {
       <div className="md:hidden fixed top-4 left-4 z-50">
         <button
           onClick={() => setMobileOpen(true)}
-          className="bg-surface p-2 rounded-lg border border-border shadow-lg"
+          className="bg-[#12141C] p-2 rounded-lg border border-[#1C202C] shadow-lg text-slate-200"
         >
-          <Menu className="w-6 h-6" />
+          <Menu className="w-5 h-5" />
         </button>
       </div>
 
@@ -204,13 +227,13 @@ export function Sidebar() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setMobileOpen(false)}
-              className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 md:hidden"
+              className="fixed inset-0 bg-black/80 backdrop-blur-sm z-40 md:hidden"
             />
             <motion.aside
               initial={{ x: "-100%" }}
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
-              transition={{ type: "spring", damping: 20 }}
+              transition={{ type: "spring", damping: 22 }}
               className="fixed inset-y-0 left-0 w-64 z-50 md:hidden"
             >
               {sidebarContent}
@@ -222,43 +245,52 @@ export function Sidebar() {
       {/* Logout Confirmation Modal */}
       <AnimatePresence>
         {showLogoutModal && (
-          <>
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setShowLogoutModal(false)}
-              className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50"
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
             />
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0, scale: 0.96 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none"
+              exit={{ opacity: 0, scale: 0.96 }}
+              className="relative bg-[#12141C] border border-[#1C202C] rounded-2xl w-full max-w-sm p-6 shadow-2xl z-10"
+              onClick={(e) => e.stopPropagation()}
             >
-              <div className="bg-surface border border-border rounded-3xl w-full max-w-sm p-6 shadow-2xl pointer-events-auto" onClick={(e) => e.stopPropagation()}>
-                <div className="flex items-center justify-between mb-4">
-                  <div className="w-12 h-12 rounded-2xl bg-danger/10 flex items-center justify-center">
-                    <AlertTriangle className="w-6 h-6 text-danger" />
-                  </div>
-                  <button onClick={() => setShowLogoutModal(false)} className="p-1 text-text-muted hover:text-text-primary">
-                    <X className="w-5 h-5" />
-                  </button>
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-400">
+                  <AlertTriangle className="w-5 h-5" />
                 </div>
-                <h3 className="text-xl font-bold mb-2">Logout</h3>
-                <p className="text-text-muted text-sm mb-6">Are you sure you want to sign out? You'll need to log in again to access your dashboard.</p>
-                <div className="flex gap-3">
-                  <button onClick={() => setShowLogoutModal(false)} className="flex-1 py-3 border border-border rounded-xl font-bold hover:bg-background transition-colors text-sm">
-                    Cancel
-                  </button>
-                  <button onClick={() => { setShowLogoutModal(false); logout(); router.push("/login"); }}
-                    className="flex-1 py-3 bg-danger hover:bg-danger/90 text-white rounded-xl font-bold transition-colors text-sm">
-                    Sign Out
-                  </button>
-                </div>
+                <button 
+                  onClick={() => setShowLogoutModal(false)} 
+                  className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.06] transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <h3 className="text-lg font-semibold tracking-tight text-white mb-1.5">Sign Out of FitCore</h3>
+              <p className="text-slate-400 text-xs leading-relaxed mb-6">
+                Are you sure you want to end your active session? You will need to log back in to access your coach and training programs.
+              </p>
+              <div className="flex gap-2.5">
+                <button 
+                  onClick={() => setShowLogoutModal(false)} 
+                  className="flex-1 py-2 bg-surface hover:bg-surface-hover border border-border rounded-xl text-xs font-semibold text-slate-300 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={() => { setShowLogoutModal(false); logout(); router.push("/login"); }}
+                  className="flex-1 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-semibold transition-colors shadow-sm"
+                >
+                  Sign Out
+                </button>
               </div>
             </motion.div>
-          </>
+          </div>
         )}
       </AnimatePresence>
     </>

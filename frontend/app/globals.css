@@ -1,27 +1,32 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-background: #0A0A0F;
-  --color-surface: #111118;
-  --color-border: #1E1E2E;
-  --color-primary: #6C63FF;
-  --color-primary-hover: #5a52d4;
-  --color-accent: #00F5A0;
-  --color-danger: #FF4C6A;
-  --color-text-primary: #F0F0FF;
-  --color-text-muted: #6B6B8A;
+  --color-background: #0B0C10;
+  --color-surface: #12141C;
+  --color-surface-hover: #181B26;
+  --color-border: #1E2230;
+  --color-border-subtle: rgba(255, 255, 255, 0.06);
+  --color-primary: #4F46E5;
+  --color-primary-hover: #4338CA;
+  --color-accent: #10B981;
+  --color-accent-hover: #059669;
+  --color-warning: #F59E0B;
+  --color-danger: #EF4444;
+  --color-text-primary: #F8FAFC;
+  --color-text-muted: #94A3B8;
+  --color-text-subtle: #64748B;
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-syne), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
   /* Custom animations */
-  --animate-fade-slide-up: fade-slide-up 0.4s ease forwards;
+  --animate-fade-slide-up: fade-slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   
   @keyframes fade-slide-up {
     from {
       opacity: 0;
-      transform: translateY(20px);
+      transform: translateY(12px);
     }
     to {
       opacity: 1;
@@ -37,6 +42,9 @@
 body {
   background-color: var(--color-background);
   color: var(--color-text-primary);
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
@@ -48,4 +56,23 @@ body {
 .scrollbar-hide {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
+}
+
+/* Glass panel utility */
+.glass-panel {
+  background: rgba(18, 20, 28, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.glass-card {
+  background: #12141C;
+  border: 1px solid #1E2230;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card:hover {
+  border-color: rgba(99, 102, 241, 0.35);
+  background: #141722;
 }
