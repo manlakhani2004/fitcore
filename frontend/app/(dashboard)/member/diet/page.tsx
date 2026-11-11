@@ -377,58 +377,60 @@ export default function DietDashboard() {
             )}
           </div>
 
-          {/* Recommended Clean Fitness Staples */}
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="text-xl font-display font-bold flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-accent" /> Clean Fitness Staples
-                </h2>
-                <p className="text-xs text-text-muted">Quick 1-click logging for high-protein athlete staples</p>
-              </div>
-              <span className="text-xs font-mono font-bold text-text-muted bg-surface px-3 py-1 rounded-full border border-border">
-                {meals.length} Staples
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {meals.map((meal) => (
-                <div key={meal._id} className="group bg-surface border border-border rounded-2xl p-4 flex flex-col justify-between hover:border-primary/50 transition-colors relative overflow-hidden">
-                  <div className="flex items-start gap-3">
-                    <div className="w-12 h-12 bg-background rounded-xl flex items-center justify-center text-primary group-hover:bg-primary/10 transition-colors shrink-0">
-                      {meal.type === 'breakfast' ? <Coffee className="w-5 h-5" /> : <Apple className="w-5 h-5" />}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] uppercase font-bold text-text-muted tracking-wider">{meal.type}</span>
-                        <span className="text-xs font-mono font-bold text-accent">{meal.calories} kcal</span>
-                      </div>
-                      <h4 className="font-bold text-sm text-text-primary truncate mt-0.5">{meal.name}</h4>
-                      {meal.recipe && (
-                        <p className="text-[11px] text-text-muted line-clamp-1 mt-1">{meal.recipe}</p>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="pt-3 mt-3 border-t border-border flex items-center justify-between">
-                    <div className="flex gap-2 text-[11px] font-mono">
-                      <span className="text-primary font-bold">P:{meal.protein}g</span>
-                      <span className="text-accent font-bold">C:{meal.carbs}g</span>
-                      <span className="text-danger font-bold">F:{meal.fat}g</span>
-                    </div>
-
-                    <button
-                      onClick={() => addMeal(meal)}
-                      disabled={submittingMeal}
-                      className="px-3 py-1 rounded-xl bg-primary/10 hover:bg-primary hover:text-white text-primary text-xs font-bold transition-all flex items-center gap-1 shadow-sm"
-                    >
-                      <Plus className="w-3 h-3" /> Quick Log
-                    </button>
-                  </div>
+          {/* Recommended Clean Fitness Staples (Only if meals exist) */}
+          {meals.length > 0 && (
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h2 className="text-xl font-display font-bold flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-accent" /> Clean Fitness Staples
+                  </h2>
+                  <p className="text-xs text-text-muted">Quick 1-click logging for high-protein athlete staples</p>
                 </div>
-              ))}
+                <span className="text-xs font-mono font-bold text-text-muted bg-surface px-3 py-1 rounded-full border border-border">
+                  {meals.length} Staples
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {meals.map((meal) => (
+                  <div key={meal._id} className="group bg-surface border border-border rounded-2xl p-4 flex flex-col justify-between hover:border-primary/50 transition-colors relative overflow-hidden">
+                    <div className="flex items-start gap-3">
+                      <div className="w-12 h-12 bg-background rounded-xl flex items-center justify-center text-primary group-hover:bg-primary/10 transition-colors shrink-0">
+                        {meal.type === 'breakfast' ? <Coffee className="w-5 h-5" /> : <Apple className="w-5 h-5" />}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] uppercase font-bold text-text-muted tracking-wider">{meal.type}</span>
+                          <span className="text-xs font-mono font-bold text-accent">{meal.calories} kcal</span>
+                        </div>
+                        <h4 className="font-bold text-sm text-text-primary truncate mt-0.5">{meal.name}</h4>
+                        {meal.recipe && (
+                          <p className="text-[11px] text-text-muted line-clamp-1 mt-1">{meal.recipe}</p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="pt-3 mt-3 border-t border-border flex items-center justify-between">
+                      <div className="flex gap-2 text-[11px] font-mono">
+                        <span className="text-primary font-bold">P:{meal.protein}g</span>
+                        <span className="text-accent font-bold">C:{meal.carbs}g</span>
+                        <span className="text-danger font-bold">F:{meal.fat}g</span>
+                      </div>
+
+                      <button
+                        onClick={() => addMeal(meal)}
+                        disabled={submittingMeal}
+                        className="px-3 py-1 rounded-xl bg-primary/10 hover:bg-primary hover:text-white text-primary text-xs font-bold transition-all flex items-center gap-1 shadow-sm"
+                      >
+                        <Plus className="w-3 h-3" /> Quick Log
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Right Col: Hydration Tracker */}
@@ -500,7 +502,7 @@ export default function DietDashboard() {
               <div className="flex items-center justify-between pb-4 border-b border-border">
                 <div>
                   <h2 className="text-xl font-display font-bold">Log a Meal</h2>
-                  <p className="text-xs text-text-muted">Record custom macros or pick a fitness staple</p>
+                  <p className="text-xs text-text-muted">Record custom calories and macronutrients</p>
                 </div>
                 <button
                   onClick={() => setIsDrawerOpen(false)}
@@ -510,27 +512,29 @@ export default function DietDashboard() {
                 </button>
               </div>
 
-              {/* Tab Selector in Drawer */}
-              <div className="flex bg-background p-1 rounded-xl border border-border my-4">
-                <button
-                  type="button"
-                  onClick={() => setDrawerTab('custom')}
-                  className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
-                    drawerTab === 'custom' ? 'bg-primary text-white shadow-sm' : 'text-text-muted hover:text-text-primary'
-                  }`}
-                >
-                  ✍️ Custom Food
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setDrawerTab('staples')}
-                  className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
-                    drawerTab === 'staples' ? 'bg-primary text-white shadow-sm' : 'text-text-muted hover:text-text-primary'
-                  }`}
-                >
-                  ⚡ Quick Staples ({meals.length})
-                </button>
-              </div>
+              {/* Tab Selector in Drawer (only if staples exist) */}
+              {meals.length > 0 && (
+                <div className="flex bg-background p-1 rounded-xl border border-border my-4">
+                  <button
+                    type="button"
+                    onClick={() => setDrawerTab('custom')}
+                    className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
+                      drawerTab === 'custom' ? 'bg-primary text-white shadow-sm' : 'text-text-muted hover:text-text-primary'
+                    }`}
+                  >
+                    ✍️ Custom Food
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDrawerTab('staples')}
+                    className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
+                      drawerTab === 'staples' ? 'bg-primary text-white shadow-sm' : 'text-text-muted hover:text-text-primary'
+                    }`}
+                  >
+                    ⚡ Quick Staples ({meals.length})
+                  </button>
+                </div>
+              )}
 
               {/* Drawer Tab 1: Custom Meal Form */}
               {drawerTab === 'custom' && (
