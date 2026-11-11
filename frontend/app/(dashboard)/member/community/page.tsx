@@ -363,12 +363,6 @@ export default function CommunityPage() {
       {/* Top Section: Hero Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-1">
         <div>
-          <div className="flex items-center gap-2 mb-1.5">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold tracking-wider uppercase bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 shadow-2xs">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Live Athlete Network
-            </span>
-          </div>
           <h1 className="text-3xl sm:text-4xl font-display font-extrabold tracking-tight text-text-primary">
             Community Feed
           </h1>
