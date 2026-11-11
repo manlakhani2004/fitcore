@@ -301,7 +301,9 @@ function MembershipContent() {
                   transition={{ delay: 0.1 * i }}
                   whileHover={{ y: -5, scale: 1.02 }}
                   className={`rounded-2xl p-6 flex flex-col relative border transition-all ${
-                    plan.isPopular ? 'border-indigo-500/80 bg-[#151824]' : 'border-[#1E2230] hover:border-slate-700 bg-[#12141C]'
+                    plan.isPopular 
+                      ? 'border-indigo-500 bg-indigo-50/40 dark:bg-[#151824] shadow-md dark:shadow-none' 
+                      : 'border-slate-200 dark:border-[#1E2230] hover:border-slate-300 dark:hover:border-slate-700 bg-white dark:bg-[#12141C] shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-none'
                   }`}
                 >
                   {plan.isPopular && (

@@ -29,7 +29,7 @@ export function CircularProgress({
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          stroke="#1E2230"
+          className="stroke-slate-200 dark:stroke-[#1E2230]"
           strokeWidth={strokeWidth}
           fill="transparent"
         />
@@ -49,8 +49,8 @@ export function CircularProgress({
         />
       </svg>
       <div className="absolute flex flex-col items-center justify-center text-center">
-        <span className="text-3xl md:text-4xl font-mono font-bold text-white tracking-tight">{label}</span>
-        <span className="text-xs font-medium text-slate-400 mt-0.5">{sublabel}</span>
+        <span className="text-3xl md:text-4xl font-mono font-bold text-slate-900 dark:text-white tracking-tight">{label}</span>
+        <span className="text-xs font-medium text-slate-500 dark:text-slate-400 mt-0.5">{sublabel}</span>
       </div>
     </div>
   );

@@ -35,7 +35,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     return () => media.removeEventListener("change", handleSystemChange);
   }, []);
 
-  const applyTheme = (t: Theme) => {
+  const applyTheme = (t: Theme, animate = false) => {
     let effective: "light" | "dark" = "dark";
     if (t === "system") {
       effective = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
@@ -43,8 +43,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       effective = t;
     }
 
-    setResolvedTheme(effective);
     const root = document.documentElement;
+    if (animate) {
+      root.classList.add("theme-transitioning");
+    }
+
+    setResolvedTheme(effective);
     if (effective === "dark") {
       root.classList.add("dark");
       root.classList.remove("light");
@@ -53,12 +57,18 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       root.classList.add("light");
     }
     root.style.colorScheme = effective;
+
+    if (animate) {
+      setTimeout(() => {
+        root.classList.remove("theme-transitioning");
+      }, 300);
+    }
   };
 
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme);
     localStorage.setItem("fitcore-theme", newTheme);
-    applyTheme(newTheme);
+    applyTheme(newTheme, true);
   };
 
   const toggleTheme = () => {

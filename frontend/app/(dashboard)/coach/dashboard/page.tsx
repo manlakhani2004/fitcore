@@ -279,19 +279,19 @@ export default function CoachDashboard() {
     <div className="max-w-7xl mx-auto space-y-6 pb-12">
       
       {/* 1. Header Overview Bar */}
-      <div className="bg-[#12141C] border border-[#1E2230] rounded-2xl p-6 md:p-7 relative overflow-hidden">
+      <div className="bg-white dark:bg-[#12141C] border border-slate-200/80 dark:border-[#1E2230] shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-none rounded-2xl p-6 md:p-7 relative overflow-hidden transition-all">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="space-y-1.5">
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-500" />
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 Coach Operations Center
               </span>
             </div>
-            <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-white">
+            <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">
               Welcome back, Coach {user?.name?.split(' ')[0] || ''}
             </h1>
-            <p className="text-xs md:text-sm text-slate-400 max-w-xl">
+            <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 max-w-xl">
               Live coaching roster overview, video consultations, and weekly accountability feed.
             </p>
           </div>
@@ -309,15 +309,15 @@ export default function CoachDashboard() {
 
             <button
               onClick={() => setTaskModalOpen(true)}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/[0.05] hover:bg-white/[0.08] border border-[#1E2230] text-slate-200 text-xs font-semibold tracking-wide transition-all active:scale-98"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-white/[0.05] dark:hover:bg-white/[0.08] border border-slate-200 dark:border-[#1E2230] text-slate-700 dark:text-slate-200 text-xs font-semibold tracking-wide transition-all shadow-sm active:scale-98"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Assign Task</span>
             </button>
 
             <Link href="/coach/programs">
-              <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/[0.05] hover:bg-white/[0.08] border border-[#1E2230] text-slate-300 text-xs font-semibold transition-all">
-                <Dumbbell className="w-3.5 h-3.5 text-slate-400" />
+              <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-white/[0.05] dark:hover:bg-white/[0.08] border border-slate-200 dark:border-[#1E2230] text-slate-700 dark:text-slate-300 text-xs font-semibold transition-all shadow-sm">
+                <Dumbbell className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
                 <span>Program Library</span>
               </button>
             </Link>
@@ -325,125 +325,125 @@ export default function CoachDashboard() {
         </div>
       </div>
 
-      {/* 2. Key Performance Indicators (4 KPI Cards - Consistent Obsidian Surfaces) */}
+      {/* 2. Key Performance Indicators (4 KPI Cards) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Active Clients */}
-        <div className="bg-[#12141C] border border-[#1E2230] p-5 rounded-2xl hover:border-slate-700 transition-all flex flex-col justify-between">
+        <div className="bg-white dark:bg-[#12141C] border border-slate-200/80 dark:border-[#1E2230] shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-none p-5 rounded-2xl hover:border-slate-300 dark:hover:border-slate-700 transition-all flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">Active Roster</span>
-            <div className="w-8 h-8 rounded-lg bg-white/[0.05] border border-white/[0.08] text-slate-300 flex items-center justify-center">
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Active Roster</span>
+            <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-white/[0.05] border border-slate-200 dark:border-white/[0.08] text-slate-700 dark:text-slate-300 flex items-center justify-center">
               <Users className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-2xl font-mono font-bold text-white">{stats.activeClients}</span>
-            <span className="text-[11px] font-semibold text-slate-400">Athletes</span>
+            <span className="text-2xl font-mono font-bold text-slate-900 dark:text-white">{stats.activeClients}</span>
+            <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Athletes</span>
           </div>
-          <div className="mt-3 flex items-center justify-between text-xs text-slate-400 pt-2.5 border-t border-[#1E2230]">
+          <div className="mt-3 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 pt-2.5 border-t border-slate-100 dark:border-[#1E2230]">
             <span>Retention: 98%</span>
-            <Link href="/coach/clients" className="text-indigo-400 hover:underline font-semibold flex items-center gap-0.5">
+            <Link href="/coach/clients" className="text-indigo-600 dark:text-indigo-400 hover:underline font-semibold flex items-center gap-0.5">
               Roster <ChevronRight className="w-3 h-3" />
             </Link>
           </div>
         </div>
 
         {/* Monthly MRR */}
-        <div className="bg-[#12141C] border border-[#1E2230] p-5 rounded-2xl hover:border-slate-700 transition-all flex flex-col justify-between">
+        <div className="bg-white dark:bg-[#12141C] border border-slate-200/80 dark:border-[#1E2230] shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-none p-5 rounded-2xl hover:border-slate-300 dark:hover:border-slate-700 transition-all flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">Monthly Revenue</span>
-            <div className="w-8 h-8 rounded-lg bg-white/[0.05] border border-white/[0.08] text-slate-300 flex items-center justify-center">
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Monthly Revenue</span>
+            <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-white/[0.05] border border-slate-200 dark:border-white/[0.08] text-slate-700 dark:text-slate-300 flex items-center justify-center">
               <DollarSign className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-2xl font-mono font-bold text-white">₹{stats.mrr.toLocaleString()}</span>
-            <span className="text-[11px] font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.2 rounded font-mono">+12%</span>
+            <span className="text-2xl font-mono font-bold text-slate-900 dark:text-white">₹{stats.mrr.toLocaleString()}</span>
+            <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.2 rounded font-mono">+12%</span>
           </div>
-          <div className="mt-3 flex items-center justify-between text-xs text-slate-400 pt-2.5 border-t border-[#1E2230]">
+          <div className="mt-3 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 pt-2.5 border-t border-slate-100 dark:border-[#1E2230]">
             <span>Avg ₹{Math.round(stats.mrr / Math.max(1, stats.activeClients))}/client</span>
-            <Link href="/coach/earnings" className="text-indigo-400 hover:underline font-semibold flex items-center gap-0.5">
+            <Link href="/coach/earnings" className="text-indigo-600 dark:text-indigo-400 hover:underline font-semibold flex items-center gap-0.5">
               Finances <ChevronRight className="w-3 h-3" />
             </Link>
           </div>
         </div>
 
         {/* Consultations Today */}
-        <div className="bg-[#12141C] border border-[#1E2230] p-5 rounded-2xl hover:border-slate-700 transition-all flex flex-col justify-between">
+        <div className="bg-white dark:bg-[#12141C] border border-slate-200/80 dark:border-[#1E2230] shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-none p-5 rounded-2xl hover:border-slate-300 dark:hover:border-slate-700 transition-all flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">Today&apos;s Calls</span>
-            <div className="w-8 h-8 rounded-lg bg-white/[0.05] border border-white/[0.08] text-slate-300 flex items-center justify-center">
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Today&apos;s Calls</span>
+            <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-white/[0.05] border border-slate-200 dark:border-white/[0.08] text-slate-700 dark:text-slate-300 flex items-center justify-center">
               <Video className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-2xl font-mono font-bold text-white">{stats.sessionsToday}</span>
-            <span className="text-[11px] font-semibold text-slate-400">1-on-1 Sessions</span>
+            <span className="text-2xl font-mono font-bold text-slate-900 dark:text-white">{stats.sessionsToday}</span>
+            <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">1-on-1 Sessions</span>
           </div>
-          <div className="mt-3 flex items-center justify-between text-xs text-slate-400 pt-2.5 border-t border-[#1E2230]">
+          <div className="mt-3 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 pt-2.5 border-t border-slate-100 dark:border-[#1E2230]">
             <span>Google Meet Sync</span>
-            <Link href="/coach/schedule" className="text-indigo-400 hover:underline font-semibold flex items-center gap-0.5">
+            <Link href="/coach/schedule" className="text-indigo-600 dark:text-indigo-400 hover:underline font-semibold flex items-center gap-0.5">
               Schedule <ChevronRight className="w-3 h-3" />
             </Link>
           </div>
         </div>
 
         {/* Action Items */}
-        <div className="bg-[#12141C] border border-[#1E2230] p-5 rounded-2xl hover:border-slate-700 transition-all flex flex-col justify-between">
+        <div className="bg-white dark:bg-[#12141C] border border-slate-200/80 dark:border-[#1E2230] shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-none p-5 rounded-2xl hover:border-slate-300 dark:hover:border-slate-700 transition-all flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">Action Queue</span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Action Queue</span>
             <div className={`w-8 h-8 rounded-lg flex items-center justify-center border ${
               stats.actionRequired > 0 
-                ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' 
-                : 'bg-white/[0.05] text-slate-300 border-white/[0.08]'
+                ? 'bg-amber-500/10 text-amber-500 dark:text-amber-400 border-amber-500/20' 
+                : 'bg-slate-100 dark:bg-white/[0.05] text-slate-600 dark:text-slate-300 border-slate-200 dark:border-white/[0.08]'
             }`}>
               <AlertCircle className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className={`text-2xl font-mono font-bold ${stats.actionRequired > 0 ? 'text-amber-400' : 'text-white'}`}>
+            <span className={`text-2xl font-mono font-bold ${stats.actionRequired > 0 ? 'text-amber-500 dark:text-amber-400' : 'text-slate-900 dark:text-white'}`}>
               {stats.actionRequired}
             </span>
-            <span className="text-[11px] font-semibold text-slate-400">Pending Review</span>
+            <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Pending Review</span>
           </div>
-          <div className="mt-3 flex items-center justify-between text-xs text-slate-400 pt-2.5 border-t border-[#1E2230]">
+          <div className="mt-3 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 pt-2.5 border-t border-slate-100 dark:border-[#1E2230]">
             <span>{pendingCheckIns.length} check-ins</span>
-            <span className="font-semibold text-amber-400">Priority</span>
+            <span className="font-semibold text-amber-500 dark:text-amber-400">Priority</span>
           </div>
         </div>
       </div>
 
       {/* 3. Today's Consultations Hub */}
-      <div className="bg-[#12141C] border border-[#1E2230] rounded-2xl p-6 space-y-5 hover:border-slate-700 transition-all">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#1E2230] pb-4">
+      <div className="bg-white dark:bg-[#12141C] border border-slate-200/80 dark:border-[#1E2230] shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-none rounded-2xl p-6 space-y-5 hover:border-slate-300 dark:hover:border-slate-700 transition-all">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-[#1E2230] pb-4">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-white/[0.05] border border-white/[0.08] text-slate-200 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-white/[0.05] border border-slate-200 dark:border-white/[0.08] text-slate-700 dark:text-slate-200 flex items-center justify-center">
               <Video className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-base font-semibold text-white tracking-tight">Today&apos;s Video Consultations</h2>
-              <p className="text-xs text-slate-400">Direct Google Meet video consultation rooms for booked athletes.</p>
+              <h2 className="text-base font-semibold text-slate-900 dark:text-white tracking-tight">Today&apos;s Video Consultations</h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Direct Google Meet video consultation rooms for booked athletes.</p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
             <button
               onClick={() => window.open("https://meet.google.com/new", "_blank")}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0E1017] border border-[#1E2230] hover:border-slate-600 text-slate-200 text-xs font-semibold transition-all"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 dark:bg-[#0E1017] border border-slate-200 dark:border-[#1E2230] hover:border-slate-300 dark:hover:border-slate-600 text-slate-700 dark:text-slate-200 text-xs font-semibold transition-all shadow-sm"
             >
-              <ExternalLink className="w-3 h-3 text-indigo-400" />
+              <ExternalLink className="w-3 h-3 text-indigo-600 dark:text-indigo-400" />
               <span>Open Google Meet</span>
             </button>
-            <Link href="/coach/schedule" className="text-xs font-semibold text-indigo-400 hover:underline">
+            <Link href="/coach/schedule" className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">
               Calendar →
             </Link>
           </div>
         </div>
 
         {todayAppointments.length === 0 ? (
-          <div className="p-8 rounded-xl bg-[#0E1017] border border-dashed border-[#1E2230] text-center space-y-2">
-            <Calendar className="w-6 h-6 text-slate-600 mx-auto" />
-            <p className="text-xs font-semibold text-white">No Consultations Scheduled Today</p>
-            <p className="text-[11px] text-slate-400 max-w-md mx-auto">
+          <div className="p-8 rounded-xl bg-slate-50 dark:bg-[#0E1017] border border-dashed border-slate-200 dark:border-[#1E2230] text-center space-y-2">
+            <Calendar className="w-6 h-6 text-slate-400 dark:text-slate-600 mx-auto" />
+            <p className="text-xs font-semibold text-slate-900 dark:text-white">No Consultations Scheduled Today</p>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 max-w-md mx-auto">
               Your calendar is clear today. You can check upcoming athlete check-ins or update available hours.
             </p>
           </div>
@@ -457,11 +457,11 @@ export default function CoachDashboard() {
               return (
                 <div 
                   key={appt._id}
-                  className="p-4 rounded-xl bg-[#0E1017] border border-[#1E2230] hover:border-slate-700 transition-all flex flex-col justify-between gap-3"
+                  className="p-4 rounded-xl bg-slate-50 dark:bg-[#0E1017] border border-slate-200/80 dark:border-[#1E2230] hover:border-slate-300 dark:hover:border-slate-700 transition-all flex flex-col justify-between gap-3 shadow-sm dark:shadow-none"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-lg bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 flex items-center justify-center font-bold text-xs overflow-hidden shrink-0">
+                      <div className="w-9 h-9 rounded-lg bg-indigo-500/10 dark:bg-indigo-500/20 border border-indigo-500/20 dark:border-indigo-500/30 text-indigo-600 dark:text-indigo-300 flex items-center justify-center font-bold text-xs overflow-hidden shrink-0">
                         {attendeeAvatar ? (
                           <img src={attendeeAvatar} alt={attendeeName} className="w-full h-full object-cover" />
                         ) : (
@@ -469,9 +469,9 @@ export default function CoachDashboard() {
                         )}
                       </div>
                       <div>
-                        <h4 className="font-semibold text-white text-sm">{attendeeName}</h4>
-                        <div className="flex items-center gap-1.5 text-xs text-slate-400 font-mono mt-0.5">
-                          <Clock className="w-3 h-3 text-slate-500" />
+                        <h4 className="font-semibold text-slate-900 dark:text-white text-sm">{attendeeName}</h4>
+                        <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 font-mono mt-0.5">
+                          <Clock className="w-3 h-3 text-slate-400 dark:text-slate-500" />
                           <span>{appt.startTime ? `${appt.startTime} - ${appt.endTime}` : (appt.timeSlot || 'Scheduled Session')}</span>
                         </div>
                       </div>
@@ -479,36 +479,36 @@ export default function CoachDashboard() {
 
                     <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider border ${
                       hasMeetingLink 
-                        ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
-                        : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                        ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20' 
+                        : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'
                     }`}>
                       {hasMeetingLink ? 'Room Active' : 'Standby'}
                     </span>
                   </div>
 
                   {/* Actions Bar */}
-                  <div className="flex items-center justify-between gap-2 pt-2 border-t border-[#1E2230]">
+                  <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-200/80 dark:border-[#1E2230]">
                     {hasMeetingLink ? (
                       <div className="flex items-center gap-2 w-full">
                         <a
                           href={appt.meetingLink}
                           target="_blank"
                           rel="noreferrer"
-                          className="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg bg-white hover:bg-slate-100 text-zinc-950 text-xs font-semibold transition-colors shadow-sm"
+                          className="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition-colors shadow-sm"
                         >
                           <GoogleMeetIcon className="w-3.5 h-3.5" />
                           <span>Join Meet Room</span>
                         </a>
                         <button
                           onClick={() => handleCopyLink(appt.meetingLink, appt._id)}
-                          className="p-2 rounded-lg bg-surface border border-[#1E2230] hover:border-slate-600 text-slate-400 hover:text-white transition-colors"
+                          className="p-2 rounded-lg bg-white dark:bg-[#12141C] border border-slate-200 dark:border-[#1E2230] hover:border-slate-300 dark:hover:border-slate-600 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors shadow-sm dark:shadow-none"
                           title="Copy Link"
                         >
-                          {copiedApptId === appt._id ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                          {copiedApptId === appt._id ? <Check className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                         </button>
                         <button
                           onClick={() => handleOpenMeetModal(appt)}
-                          className="px-2.5 py-1.5 rounded-lg bg-surface border border-[#1E2230] text-xs text-slate-400 hover:text-white transition-colors"
+                          className="px-2.5 py-1.5 rounded-lg bg-white dark:bg-[#12141C] border border-slate-200 dark:border-[#1E2230] text-xs text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors shadow-sm dark:shadow-none"
                         >
                           Edit
                         </button>
@@ -524,7 +524,7 @@ export default function CoachDashboard() {
                         </button>
                         <button
                           onClick={() => handleOpenMeetModal(appt)}
-                          className="px-2.5 py-1.5 rounded-lg bg-surface border border-[#1E2230] text-xs text-slate-400 hover:text-white transition-colors"
+                          className="px-2.5 py-1.5 rounded-lg bg-white dark:bg-[#12141C] border border-slate-200 dark:border-[#1E2230] text-xs text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors shadow-sm dark:shadow-none"
                         >
                           Paste Link
                         </button>
@@ -542,27 +542,27 @@ export default function CoachDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Pending Check-Ins (2 Columns) */}
-        <div className="lg:col-span-2 bg-[#12141C] border border-[#1E2230] rounded-2xl p-6 space-y-5 hover:border-slate-700 transition-all">
-          <div className="flex items-center justify-between border-b border-[#1E2230] pb-4">
+        <div className="lg:col-span-2 bg-white dark:bg-[#12141C] border border-slate-200/80 dark:border-[#1E2230] shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-none rounded-2xl p-6 space-y-5 hover:border-slate-300 dark:hover:border-slate-700 transition-all">
+          <div className="flex items-center justify-between border-b border-slate-100 dark:border-[#1E2230] pb-4">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-500 dark:text-amber-400 flex items-center justify-center">
                 <AlertCircle className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="text-base font-semibold text-white tracking-tight">Athlete Weekly Check-Ins</h3>
-                <p className="text-xs text-slate-400">Review progress submissions and deliver coach feedback.</p>
+                <h3 className="text-base font-semibold text-slate-900 dark:text-white tracking-tight">Athlete Weekly Check-Ins</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Review progress submissions and deliver coach feedback.</p>
               </div>
             </div>
-            <span className="px-2.5 py-0.5 rounded-md text-xs font-mono font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+            <span className="px-2.5 py-0.5 rounded-md text-xs font-mono font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
               {pendingCheckIns.length} Pending
             </span>
           </div>
 
           {pendingCheckIns.length === 0 ? (
-            <div className="p-8 rounded-xl bg-[#0E1017] border border-dashed border-[#1E2230] text-center space-y-1.5">
-              <CheckCircle2 className="w-6 h-6 text-emerald-400 mx-auto opacity-70" />
-              <p className="text-xs font-semibold text-white">All Check-Ins Reviewed</p>
-              <p className="text-[11px] text-slate-400 max-w-sm mx-auto">
+            <div className="p-8 rounded-xl bg-slate-50 dark:bg-[#0E1017] border border-dashed border-slate-200 dark:border-[#1E2230] text-center space-y-1.5">
+              <CheckCircle2 className="w-6 h-6 text-emerald-500 dark:text-emerald-400 mx-auto opacity-70" />
+              <p className="text-xs font-semibold text-slate-900 dark:text-white">All Check-Ins Reviewed</p>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
                 All athlete check-ins have been addressed. New check-in submissions will appear here automatically.
               </p>
             </div>
@@ -573,30 +573,30 @@ export default function CoachDashboard() {
                 const isSubmitting = submittingFeedback[ci._id];
 
                 return (
-                  <div key={ci._id} className="p-4 rounded-xl bg-[#0E1017] border border-[#1E2230] space-y-3">
+                  <div key={ci._id} className="p-4 rounded-xl bg-slate-50 dark:bg-[#0E1017] border border-slate-200/80 dark:border-[#1E2230] space-y-3 shadow-sm dark:shadow-none">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                       <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-lg bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 flex items-center justify-center font-bold text-xs">
+                        <div className="w-8 h-8 rounded-lg bg-indigo-500/10 dark:bg-indigo-500/20 border border-indigo-500/20 dark:border-indigo-500/30 text-indigo-600 dark:text-indigo-300 flex items-center justify-center font-bold text-xs">
                           {athleteName.charAt(0)}
                         </div>
                         <div>
-                          <h4 className="font-semibold text-xs text-white">{athleteName}</h4>
-                          <span className="text-[10px] text-slate-400 font-mono">
+                          <h4 className="font-semibold text-xs text-slate-900 dark:text-white">{athleteName}</h4>
+                          <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono">
                             {new Date(ci.date || ci.createdAt).toLocaleDateString()}
                           </span>
                         </div>
                       </div>
 
                       {/* Vitals Summary Pill */}
-                      <div className="flex items-center gap-2.5 text-xs bg-[#12141C] border border-[#1E2230] px-3 py-1 rounded-lg font-mono">
-                        <span>Weight: <strong className="text-white">{ci.weight} kg</strong></span>
-                        <span className="text-[#1E2230]">|</span>
-                        <span>Energy: <strong className="text-emerald-400">{ci.energyLevel || 4}/5</strong></span>
+                      <div className="flex items-center gap-2.5 text-xs bg-white dark:bg-[#12141C] border border-slate-200 dark:border-[#1E2230] px-3 py-1 rounded-lg font-mono shadow-sm dark:shadow-none">
+                        <span>Weight: <strong className="text-slate-900 dark:text-white">{ci.weight} kg</strong></span>
+                        <span className="text-slate-300 dark:text-[#1E2230]">|</span>
+                        <span>Energy: <strong className="text-emerald-600 dark:text-emerald-400">{ci.energyLevel || 4}/5</strong></span>
                       </div>
                     </div>
 
                     {ci.notes && (
-                      <div className="p-2.5 bg-[#12141C] border border-[#1E2230] rounded-lg text-xs text-slate-400 italic">
+                      <div className="p-2.5 bg-white dark:bg-[#12141C] border border-slate-200 dark:border-[#1E2230] rounded-lg text-xs text-slate-600 dark:text-slate-400 italic shadow-sm dark:shadow-none">
                         &ldquo;{ci.notes}&rdquo;
                       </div>
                     )}
@@ -608,12 +608,12 @@ export default function CoachDashboard() {
                         placeholder="Add quick coach feedback (e.g. Solid week, increase squat weight by 2.5kg)..."
                         value={feedbackInputs[ci._id] || ""}
                         onChange={(e) => setFeedbackInputs(prev => ({ ...prev, [ci._id]: e.target.value }))}
-                        className="flex-1 bg-[#12141C] border border-[#1E2230] rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500 transition-colors"
+                        className="flex-1 bg-white dark:bg-[#12141C] border border-slate-200 dark:border-[#1E2230] rounded-lg px-3 py-1.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 transition-colors shadow-sm dark:shadow-none"
                       />
                       <button
                         onClick={() => handleSendFeedback(ci._id)}
                         disabled={isSubmitting}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition-all disabled:opacity-50 shrink-0"
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition-all disabled:opacity-50 shrink-0 shadow-sm"
                       >
                         {isSubmitting ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
                         <span>Send</span>
@@ -627,25 +627,25 @@ export default function CoachDashboard() {
         </div>
 
         {/* Today's Tasks & Accountability (1 Column) */}
-        <div className="bg-[#12141C] border border-[#1E2230] rounded-2xl p-6 space-y-5 flex flex-col justify-between hover:border-slate-700 transition-all">
+        <div className="bg-white dark:bg-[#12141C] border border-slate-200/80 dark:border-[#1E2230] shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-none rounded-2xl p-6 space-y-5 flex flex-col justify-between hover:border-slate-300 dark:hover:border-slate-700 transition-all">
           <div className="space-y-4">
-            <div className="flex items-center justify-between border-b border-[#1E2230] pb-4">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-[#1E2230] pb-4">
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-slate-300" />
-                <h3 className="text-base font-semibold text-white tracking-tight">Assigned Tasks</h3>
+                <CheckCircle2 className="w-4 h-4 text-slate-600 dark:text-slate-300" />
+                <h3 className="text-base font-semibold text-slate-900 dark:text-white tracking-tight">Assigned Tasks</h3>
               </div>
-              <span className="text-xs font-mono font-semibold text-slate-300 bg-white/[0.05] px-2 py-0.5 rounded border border-white/[0.08]">
+              <span className="text-xs font-mono font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-white/[0.05] px-2 py-0.5 rounded border border-slate-200 dark:border-white/[0.08]">
                 {completedTodayTasksCount}/{todayTasks.length}
               </span>
             </div>
 
             {todayTasks.length === 0 ? (
               <div className="py-8 text-center space-y-1.5">
-                <Check className="w-6 h-6 text-slate-600 mx-auto" />
-                <p className="text-xs font-semibold text-white">No Tasks Assigned Today</p>
+                <Check className="w-6 h-6 text-slate-400 dark:text-slate-600 mx-auto" />
+                <p className="text-xs font-semibold text-slate-900 dark:text-white">No Tasks Assigned Today</p>
                 <button
                   onClick={() => setTaskModalOpen(true)}
-                  className="text-xs font-semibold text-indigo-400 hover:underline block mx-auto pt-1"
+                  className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline block mx-auto pt-1"
                 >
                   + Assign a Task Now
                 </button>
@@ -655,15 +655,15 @@ export default function CoachDashboard() {
                 {todayTasks.slice(0, 5).map((task) => (
                   <div 
                     key={task._id} 
-                    className="flex items-center justify-between p-2.5 rounded-lg bg-[#0E1017] border border-[#1E2230] text-xs"
+                    className="flex items-center justify-between p-2.5 rounded-lg bg-slate-50 dark:bg-[#0E1017] border border-slate-200/80 dark:border-[#1E2230] text-xs shadow-sm dark:shadow-none"
                   >
                     <div className="flex items-center gap-2 min-w-0">
-                      <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${task.completed ? 'bg-emerald-400' : 'bg-slate-600'}`} />
-                      <span className={`truncate font-medium ${task.completed ? 'line-through text-slate-500' : 'text-slate-200'}`}>
+                      <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${task.completed ? 'bg-emerald-500' : 'bg-slate-400 dark:bg-slate-600'}`} />
+                      <span className={`truncate font-medium ${task.completed ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-800 dark:text-slate-200'}`}>
                         {task.title}
                       </span>
                     </div>
-                    <span className="text-[10px] font-mono uppercase text-slate-400 px-1.5 py-0.5 rounded bg-[#12141C] border border-[#1E2230] shrink-0">
+                    <span className="text-[10px] font-mono uppercase text-slate-500 dark:text-slate-400 px-1.5 py-0.5 rounded bg-white dark:bg-[#12141C] border border-slate-200 dark:border-[#1E2230] shrink-0">
                       {task.type}
                     </span>
                   </div>
@@ -674,9 +674,9 @@ export default function CoachDashboard() {
 
           <button
             onClick={() => setTaskModalOpen(true)}
-            className="w-full py-2 bg-[#0E1017] hover:bg-white/[0.05] border border-[#1E2230] hover:border-slate-600 rounded-xl text-xs font-semibold text-slate-200 transition-all flex items-center justify-center gap-1.5"
+            className="w-full py-2 bg-slate-50 hover:bg-slate-100 dark:bg-[#0E1017] dark:hover:bg-white/[0.05] border border-slate-200 dark:border-[#1E2230] hover:border-slate-300 dark:hover:border-slate-600 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 transition-all flex items-center justify-center gap-1.5 shadow-sm"
           >
-            <Plus className="w-3.5 h-3.5 text-indigo-400" />
+            <Plus className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
             <span>Assign New Task</span>
           </button>
         </div>
@@ -684,11 +684,11 @@ export default function CoachDashboard() {
       </div>
 
       {/* 5. Athlete Roster & Activity Table */}
-      <div className="bg-[#12141C] border border-[#1E2230] rounded-2xl p-6 space-y-5 hover:border-slate-700 transition-all">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#1E2230] pb-4">
+      <div className="bg-white dark:bg-[#12141C] border border-slate-200/80 dark:border-[#1E2230] shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-none rounded-2xl p-6 space-y-5 hover:border-slate-300 dark:hover:border-slate-700 transition-all">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-[#1E2230] pb-4">
           <div>
-            <h2 className="text-base font-semibold text-white tracking-tight">Athlete Client Roster</h2>
-            <p className="text-xs text-slate-400">Manage your active clients, current workout goals, and direct channels.</p>
+            <h2 className="text-base font-semibold text-slate-900 dark:text-white tracking-tight">Athlete Client Roster</h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Manage your active clients, current workout goals, and direct channels.</p>
           </div>
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
@@ -699,14 +699,14 @@ export default function CoachDashboard() {
                 placeholder="Search athlete by name..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full sm:w-56 bg-[#0E1017] border border-[#1E2230] rounded-xl pl-8 pr-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500 transition-colors"
+                className="w-full sm:w-56 bg-slate-50 dark:bg-[#0E1017] border border-slate-200 dark:border-[#1E2230] rounded-xl pl-8 pr-3 py-1.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 transition-colors"
               />
             </div>
 
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="bg-[#0E1017] border border-[#1E2230] rounded-xl px-3 py-1.5 text-xs font-semibold text-white focus:outline-none focus:border-indigo-500"
+              className="bg-slate-50 dark:bg-[#0E1017] border border-slate-200 dark:border-[#1E2230] rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500"
             >
               <option value="all">All Statuses</option>
               <option value="active">Active Only</option>
@@ -717,7 +717,7 @@ export default function CoachDashboard() {
 
         {/* Client Roster Grid */}
         {filteredClients.length === 0 ? (
-          <div className="p-8 text-center text-xs text-slate-400">
+          <div className="p-8 text-center text-xs text-slate-500 dark:text-slate-400">
             No athletes found matching your search.
           </div>
         ) : (
@@ -729,11 +729,11 @@ export default function CoachDashboard() {
               return (
                 <div 
                   key={c._id}
-                  className="p-4 rounded-xl bg-[#0E1017] border border-[#1E2230] hover:border-slate-700 transition-all flex flex-col justify-between space-y-3"
+                  className="p-4 rounded-xl bg-slate-50 dark:bg-[#0E1017] border border-slate-200/80 dark:border-[#1E2230] hover:border-slate-300 dark:hover:border-slate-700 transition-all flex flex-col justify-between space-y-3 shadow-sm dark:shadow-none"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-9 h-9 rounded-lg bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 font-bold text-xs flex items-center justify-center overflow-hidden shrink-0">
+                      <div className="w-9 h-9 rounded-lg bg-indigo-500/10 dark:bg-indigo-500/20 border border-indigo-500/20 dark:border-indigo-500/30 text-indigo-600 dark:text-indigo-300 font-bold text-xs flex items-center justify-center overflow-hidden shrink-0">
                         {c.avatar ? (
                           <img src={c.avatar} alt={c.name} className="w-full h-full object-cover" />
                         ) : (
@@ -741,33 +741,33 @@ export default function CoachDashboard() {
                         )}
                       </div>
                       <div className="min-w-0">
-                        <h4 className="font-semibold text-xs text-white truncate">{c.name}</h4>
-                        <p className="text-[11px] text-slate-400 truncate">{c.email}</p>
+                        <h4 className="font-semibold text-xs text-slate-900 dark:text-white truncate">{c.name}</h4>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">{c.email}</p>
                       </div>
                     </div>
 
                     <span className={`px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider border shrink-0 ${
                       hasAlert 
-                        ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' 
-                        : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                        ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20' 
+                        : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
                     }`}>
                       {hasAlert ? 'Alert' : 'Active'}
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between text-xs pt-2 border-t border-[#1E2230]">
-                    <span className="text-[11px] text-slate-400 capitalize">
-                      Goal: <strong className="text-white">{client.currentGoal?.replace('_', ' ') || 'Strength'}</strong>
+                  <div className="flex items-center justify-between text-xs pt-2 border-t border-slate-200/80 dark:border-[#1E2230]">
+                    <span className="text-[11px] text-slate-500 dark:text-slate-400 capitalize">
+                      Goal: <strong className="text-slate-900 dark:text-white">{client.currentGoal?.replace('_', ' ') || 'Strength'}</strong>
                     </span>
 
                     <div className="flex items-center gap-2">
                       <Link href={`/coach/inbox?client=${c._id}`}>
-                        <button className="p-1.5 rounded-lg bg-[#12141C] hover:bg-white/[0.08] text-slate-400 hover:text-white transition-colors" title="Message Athlete">
+                        <button className="p-1.5 rounded-lg bg-white dark:bg-[#12141C] hover:bg-slate-100 dark:hover:bg-white/[0.08] text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-[#1E2230] transition-colors shadow-sm dark:shadow-none" title="Message Athlete">
                           <MessageSquare className="w-3.5 h-3.5" />
                         </button>
                       </Link>
                       <Link href={`/coach/clients/${c._id}`}>
-                        <button className="px-2.5 py-1 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] border border-[#1E2230] text-slate-200 hover:text-white text-xs font-semibold transition-all">
+                        <button className="px-2.5 py-1 rounded-lg bg-white dark:bg-white/[0.05] hover:bg-slate-100 dark:hover:bg-white/[0.1] border border-slate-200 dark:border-[#1E2230] text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white text-xs font-semibold transition-all shadow-sm dark:shadow-none">
                           Profile
                         </button>
                       </Link>
@@ -789,28 +789,28 @@ export default function CoachDashboard() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setMeetModalOpen(false)}
-              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+              className="absolute inset-0 bg-black/60 dark:bg-black/80 backdrop-blur-sm"
             />
             <motion.div
               initial={{ opacity: 0, scale: 0.96 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.96 }}
-              className="relative bg-[#12141C] border border-[#1E2230] rounded-2xl w-full max-w-md p-6 shadow-2xl z-10"
+              className="relative bg-white dark:bg-[#12141C] border border-slate-200 dark:border-[#1E2230] rounded-2xl w-full max-w-md p-6 shadow-2xl z-10"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex items-center justify-between pb-3 border-b border-[#1E2230]">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-[#1E2230]">
                 <div className="flex items-center gap-2">
-                  <Video className="w-4 h-4 text-slate-300" />
-                  <h3 className="text-sm font-semibold text-white">Google Meet Video Room</h3>
+                  <Video className="w-4 h-4 text-slate-700 dark:text-slate-300" />
+                  <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Google Meet Video Room</h3>
                 </div>
-                <button onClick={() => setMeetModalOpen(false)} className="p-1 text-slate-400 hover:text-white">
+                <button onClick={() => setMeetModalOpen(false)} className="p-1 text-slate-400 hover:text-slate-700 dark:hover:text-white">
                   <X className="w-4 h-4" />
                 </button>
               </div>
 
               <form onSubmit={handleSaveMeetLink} className="space-y-4 pt-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     Meeting URL or Room Code
                   </label>
                   <input
@@ -818,7 +818,7 @@ export default function CoachDashboard() {
                     placeholder="https://meet.google.com/abc-defg-hij"
                     value={meetLinkInput}
                     onChange={(e) => setMeetLinkInput(e.target.value)}
-                    className="w-full bg-[#0B0C10] border border-[#1E2230] rounded-xl px-3.5 py-2 text-xs text-white font-mono focus:outline-none focus:border-indigo-500"
+                    className="w-full bg-slate-50 dark:bg-[#0B0C10] border border-slate-200 dark:border-[#1E2230] rounded-xl px-3.5 py-2 text-xs text-slate-900 dark:text-white font-mono focus:outline-none focus:border-indigo-500"
                     required
                   />
                 </div>
@@ -829,9 +829,9 @@ export default function CoachDashboard() {
                     id="saveDefault"
                     checked={saveAsDefault}
                     onChange={(e) => setSaveAsDefault(e.target.checked)}
-                    className="w-3.5 h-3.5 rounded border-slate-700 bg-[#0B0C10] text-indigo-600 focus:ring-0"
+                    className="w-3.5 h-3.5 rounded border-slate-300 dark:border-slate-700 bg-white dark:bg-[#0B0C10] text-indigo-600 focus:ring-0"
                   />
-                  <label htmlFor="saveDefault" className="text-xs text-slate-400 select-none">
+                  <label htmlFor="saveDefault" className="text-xs text-slate-500 dark:text-slate-400 select-none">
                     Save as my recurring Google Meet room link
                   </label>
                 </div>
@@ -840,7 +840,7 @@ export default function CoachDashboard() {
                   <button
                     type="button"
                     onClick={() => setMeetModalOpen(false)}
-                    className="flex-1 py-2 bg-[#0E1017] hover:bg-white/[0.05] border border-[#1E2230] rounded-xl text-xs font-semibold text-slate-300 transition-colors"
+                    className="flex-1 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-[#0E1017] dark:hover:bg-white/[0.05] border border-slate-200 dark:border-[#1E2230] rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 transition-colors"
                   >
                     Cancel
                   </button>
@@ -867,32 +867,32 @@ export default function CoachDashboard() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setTaskModalOpen(false)}
-              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+              className="absolute inset-0 bg-black/60 dark:bg-black/80 backdrop-blur-sm"
             />
             <motion.div
               initial={{ opacity: 0, scale: 0.96 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.96 }}
-              className="relative bg-[#12141C] border border-[#1E2230] rounded-2xl w-full max-w-md p-6 shadow-2xl z-10"
+              className="relative bg-white dark:bg-[#12141C] border border-slate-200 dark:border-[#1E2230] rounded-2xl w-full max-w-md p-6 shadow-2xl z-10"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex items-center justify-between pb-3 border-b border-[#1E2230]">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-[#1E2230]">
                 <div className="flex items-center gap-2">
-                  <Plus className="w-4 h-4 text-indigo-400" />
-                  <h3 className="text-sm font-semibold text-white">Assign Athlete Task</h3>
+                  <Plus className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                  <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Assign Athlete Task</h3>
                 </div>
-                <button onClick={() => setTaskModalOpen(false)} className="p-1 text-slate-400 hover:text-white">
+                <button onClick={() => setTaskModalOpen(false)} className="p-1 text-slate-400 hover:text-slate-700 dark:hover:text-white">
                   <X className="w-4 h-4" />
                 </button>
               </div>
 
               <form onSubmit={handleCreateTask} className="space-y-3.5 pt-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Select Athlete</label>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Select Athlete</label>
                   <select
                     value={taskForm.clientId}
                     onChange={(e) => setTaskForm({ ...taskForm, clientId: e.target.value })}
-                    className="w-full bg-[#0B0C10] border border-[#1E2230] rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 font-medium"
+                    className="w-full bg-slate-50 dark:bg-[#0B0C10] border border-slate-200 dark:border-[#1E2230] rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500 font-medium"
                     required
                   >
                     {clients.map(c => (
@@ -904,24 +904,24 @@ export default function CoachDashboard() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Task Title</label>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Task Title</label>
                   <input
                     type="text"
                     placeholder="e.g. 10,000 steps + 4L hydration check"
                     value={taskForm.title}
                     onChange={(e) => setTaskForm({ ...taskForm, title: e.target.value })}
-                    className="w-full bg-[#0B0C10] border border-[#1E2230] rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
+                    className="w-full bg-slate-50 dark:bg-[#0B0C10] border border-slate-200 dark:border-[#1E2230] rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500"
                     required
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">Task Category</label>
+                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Task Category</label>
                     <select
                       value={taskForm.type}
                       onChange={(e) => setTaskForm({ ...taskForm, type: e.target.value })}
-                      className="w-full bg-[#0B0C10] border border-[#1E2230] rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 font-medium"
+                      className="w-full bg-slate-50 dark:bg-[#0B0C10] border border-slate-200 dark:border-[#1E2230] rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500 font-medium"
                     >
                       <option value="general">General</option>
                       <option value="cardio">Cardio</option>
@@ -930,12 +930,12 @@ export default function CoachDashboard() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">Target Date</label>
+                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Target Date</label>
                     <input
                       type="date"
                       value={taskForm.date}
                       onChange={(e) => setTaskForm({ ...taskForm, date: e.target.value })}
-                      className="w-full bg-[#0B0C10] border border-[#1E2230] rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 font-mono"
+                      className="w-full bg-slate-50 dark:bg-[#0B0C10] border border-slate-200 dark:border-[#1E2230] rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500 font-mono"
                       required
                     />
                   </div>
@@ -945,7 +945,7 @@ export default function CoachDashboard() {
                   <button
                     type="button"
                     onClick={() => setTaskModalOpen(false)}
-                    className="flex-1 py-2 bg-[#0E1017] hover:bg-white/[0.05] border border-[#1E2230] rounded-xl text-xs font-semibold text-slate-300 transition-colors"
+                    className="flex-1 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-[#0E1017] dark:hover:bg-white/[0.05] border border-slate-200 dark:border-[#1E2230] rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 transition-colors"
                   >
                     Cancel
                   </button>

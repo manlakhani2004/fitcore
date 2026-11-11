@@ -231,18 +231,18 @@ function MyCoachContent() {
       {/* Coach Info Header */}
       {coach ? (
         <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }}
-          className="bg-[#12141C] rounded-2xl p-6 md:p-7 border border-[#1E2230] flex flex-col md:flex-row items-start md:items-center gap-6 shadow-sm">
-          <div className="w-14 h-14 rounded-full bg-white/[0.05] flex items-center justify-center text-xl font-bold text-white shrink-0 border border-white/[0.08]">
+          className="bg-white dark:bg-[#12141C] rounded-2xl p-6 md:p-7 border border-slate-200/80 dark:border-[#1E2230] shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-none flex flex-col md:flex-row items-start md:items-center gap-6">
+          <div className="w-14 h-14 rounded-full bg-slate-100 dark:bg-white/[0.05] flex items-center justify-center text-xl font-bold text-slate-900 dark:text-white shrink-0 border border-slate-200 dark:border-white/[0.08]">
             {coach.coachId?.name?.charAt(0) || 'C'}
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2">
-              <h1 className="text-xl md:text-2xl font-semibold text-white tracking-tight">{coach.coachId?.name || 'My Coach'}</h1>
-              <span className="px-2.5 py-0.5 rounded-md text-[10px] font-semibold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              <h1 className="text-xl md:text-2xl font-semibold text-slate-900 dark:text-white tracking-tight">{coach.coachId?.name || 'My Coach'}</h1>
+              <span className="px-2.5 py-0.5 rounded-md text-[10px] font-semibold uppercase tracking-wider bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                 Assigned
               </span>
             </div>
-            <p className="text-slate-400 text-xs md:text-sm mt-1">Your dedicated coach — assigned training programs, nutrition protocols, daily habits, and live consultations.</p>
+            <p className="text-slate-500 dark:text-slate-400 text-xs md:text-sm mt-1">Your dedicated coach — assigned training programs, nutrition protocols, daily habits, and live consultations.</p>
           </div>
           <button 
             onClick={() => {
@@ -255,14 +255,14 @@ function MyCoachContent() {
           </button>
         </motion.div>
       ) : (
-        <div className="bg-[#12141C] rounded-2xl p-6 md:p-7 border border-[#1E2230] flex flex-col sm:flex-row items-center justify-between gap-6">
+        <div className="bg-white dark:bg-[#12141C] rounded-2xl p-6 md:p-7 border border-slate-200/80 dark:border-[#1E2230] shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-none flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-white/[0.05] border border-white/[0.08] flex items-center justify-center text-slate-200">
+            <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-white/[0.05] border border-slate-200 dark:border-white/[0.08] flex items-center justify-center text-slate-700 dark:text-slate-200">
               <User className="w-6 h-6" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-white">No Coach Assigned Yet</h2>
-              <p className="text-xs text-slate-400 mt-0.5">Select a certified coach below to unlock custom programming and 1-on-1 consultations.</p>
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-white">No Coach Assigned Yet</h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Select a certified coach below to unlock custom programming and 1-on-1 consultations.</p>
             </div>
           </div>
           <button
@@ -275,7 +275,7 @@ function MyCoachContent() {
       )}
 
       {/* Tab Navigation */}
-      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide border-b border-[#1E2230]">
+      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide border-b border-slate-200 dark:border-[#1E2230]">
         {TABS.map(tab => (
           <button key={tab.key} onClick={() => {
             setActiveTab(tab.key);
@@ -430,33 +430,33 @@ function MyCoachContent() {
 
         {/* 4. Messages */}
         {activeTab === "messages" && (
-          <div className="bg-[#12141C] rounded-2xl border border-[#1E2230] flex flex-col h-[560px] overflow-hidden">
-            <div className="p-4 border-b border-[#1E2230] bg-[#0E1017] flex items-center justify-between">
+          <div className="bg-white dark:bg-[#12141C] rounded-2xl border border-slate-200/80 dark:border-[#1E2230] shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-none flex flex-col h-[560px] overflow-hidden">
+            <div className="p-4 border-b border-slate-100 dark:border-[#1E2230] bg-slate-50 dark:bg-[#0E1017] flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full bg-white/[0.05] border border-white/[0.08] flex items-center justify-center font-semibold text-slate-200 text-xs">
+                <div className="w-9 h-9 rounded-full bg-slate-100 dark:bg-white/[0.05] border border-slate-200 dark:border-white/[0.08] flex items-center justify-center font-semibold text-slate-800 dark:text-slate-200 text-xs">
                   {coach?.coachId?.name?.charAt(0) || 'C'}
                 </div>
                 <div>
-                  <h4 className="font-semibold text-xs text-white">{coach?.coachId?.name || 'Coach'}</h4>
-                  <span className="text-[11px] text-emerald-400 flex items-center gap-1">● Online</span>
+                  <h4 className="font-semibold text-xs text-slate-900 dark:text-white">{coach?.coachId?.name || 'Coach'}</h4>
+                  <span className="text-[11px] text-emerald-600 dark:text-emerald-400 flex items-center gap-1 font-medium">● Online</span>
                 </div>
               </div>
             </div>
 
             <div className="flex-1 overflow-y-auto p-4 space-y-3">
               {messages.length === 0 ? (
-                <div className="text-center py-12 text-slate-500 text-xs">Send your first message to your coach!</div>
+                <div className="text-center py-12 text-slate-400 dark:text-slate-500 text-xs">Send your first message to your coach!</div>
               ) : (
                 messages.map((m: any, i: number) => {
                   const isMe = m.senderRole === 'member';
                   return (
                     <div key={m._id || i} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
                       <div className={`max-w-[75%] rounded-xl px-3.5 py-2 text-xs leading-relaxed ${
-                        isMe ? 'bg-indigo-600 text-white rounded-br-none' : 'bg-[#0E1017] border border-[#1E2230] text-slate-200 rounded-bl-none'
+                        isMe ? 'bg-indigo-600 text-white rounded-br-none shadow-sm' : 'bg-slate-100 dark:bg-[#0E1017] border border-slate-200 dark:border-[#1E2230] text-slate-800 dark:text-slate-200 rounded-bl-none shadow-sm dark:shadow-none'
                       }`}>
                         {m.content}
                       </div>
-                      <span className="text-[10px] text-slate-500 px-1 mt-0.5">
+                      <span className="text-[10px] text-slate-400 dark:text-slate-500 px-1 mt-0.5">
                         {new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </div>
@@ -466,10 +466,10 @@ function MyCoachContent() {
               <div ref={messagesEndRef} />
             </div>
 
-            <form onSubmit={sendMessage} className="p-3 border-t border-[#1E2230] bg-[#0E1017] flex gap-2">
+            <form onSubmit={sendMessage} className="p-3 border-t border-slate-100 dark:border-[#1E2230] bg-slate-50 dark:bg-[#0E1017] flex gap-2">
               <input type="text" value={msgInput} onChange={(e) => setMsgInput(e.target.value)}
                 placeholder="Type a message to your coach..."
-                className="flex-1 bg-[#12141C] border border-[#1E2230] rounded-xl px-3.5 py-2 focus:outline-none focus:border-indigo-500 transition-colors text-xs text-white placeholder-slate-500" />
+                className="flex-1 bg-white dark:bg-[#12141C] border border-slate-200 dark:border-[#1E2230] rounded-xl px-3.5 py-2 focus:outline-none focus:border-indigo-500 transition-colors text-xs text-slate-900 dark:text-white placeholder-slate-400" />
               <button type="submit" disabled={!msgInput.trim() || sending}
                 className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white p-2.5 rounded-xl transition-all shadow-sm">
                 {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}

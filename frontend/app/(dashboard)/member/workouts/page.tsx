@@ -88,19 +88,19 @@ export default function WorkoutsDashboard() {
     <div className="max-w-7xl mx-auto space-y-6 pb-12">
       
       {/* 1. Header Overview Bar */}
-      <div className="bg-[#12141C] border border-[#1E2230] rounded-2xl p-6 md:p-7 relative overflow-hidden">
+      <div className="bg-white dark:bg-[#12141C] border border-slate-200/80 dark:border-[#1E2230] shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-none rounded-2xl p-6 md:p-7 relative overflow-hidden transition-all">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="space-y-1.5">
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-500" />
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 Training Command & Library
               </span>
             </div>
-            <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-white">
+            <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">
               Workouts & Exercise Library
             </h1>
-            <p className="text-xs md:text-sm text-slate-400 max-w-xl">
+            <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 max-w-xl">
               Verified movement biomechanics, form technique guides, and training history logs.
             </p>
           </div>
@@ -114,15 +114,15 @@ export default function WorkoutsDashboard() {
             </Link>
 
             <Link href="/member/workouts/live">
-              <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0E1017] hover:bg-white/[0.05] border border-[#1E2230] text-slate-200 text-xs font-semibold transition-all">
-                <Activity className="w-3.5 h-3.5 text-slate-400" />
+              <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-[#0E1017] dark:hover:bg-white/[0.05] border border-slate-200 dark:border-[#1E2230] text-slate-700 dark:text-slate-200 text-xs font-semibold transition-all shadow-sm">
+                <Activity className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
                 <span>Live Interval Timer</span>
               </button>
             </Link>
 
             <Link href="/member/workouts/programs">
-              <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0E1017] hover:bg-white/[0.05] border border-[#1E2230] text-slate-200 text-xs font-semibold transition-all">
-                <LayoutList className="w-3.5 h-3.5 text-slate-400" />
+              <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-[#0E1017] dark:hover:bg-white/[0.05] border border-slate-200 dark:border-[#1E2230] text-slate-700 dark:text-slate-200 text-xs font-semibold transition-all shadow-sm">
+                <LayoutList className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
                 <span>Assigned Programs</span>
               </button>
             </Link>
@@ -136,19 +136,19 @@ export default function WorkoutsDashboard() {
         <div className="lg:col-span-8 space-y-4">
           
           {/* Controls Bar */}
-          <div className="bg-[#12141C] border border-[#1E2230] rounded-2xl p-4 space-y-3">
+          <div className="bg-white dark:bg-[#12141C] border border-slate-200/80 dark:border-[#1E2230] shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-none rounded-2xl p-4 space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-white/[0.05] border border-white/[0.08] text-slate-200 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-white/[0.05] border border-slate-200 dark:border-white/[0.08] text-slate-700 dark:text-slate-200 flex items-center justify-center">
                   <Dumbbell className="w-4 h-4" />
                 </div>
                 <div>
-                  <h2 className="text-base font-semibold text-white tracking-tight">Exercise Library</h2>
-                  <p className="text-[11px] text-slate-400">Filter by target muscle group or equipment</p>
+                  <h2 className="text-base font-semibold text-slate-900 dark:text-white tracking-tight">Exercise Library</h2>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">Filter by target muscle group or equipment</p>
                 </div>
               </div>
               
-              <span className="text-xs font-mono font-medium text-slate-400 bg-[#0E1017] px-2.5 py-1 rounded-md border border-[#1E2230]">
+              <span className="text-xs font-mono font-medium text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-[#0E1017] px-2.5 py-1 rounded-md border border-slate-200 dark:border-[#1E2230]">
                 {isLoading ? "Loading..." : `${filteredExercises.length} Movements`}
               </span>
             </div>
@@ -165,7 +165,7 @@ export default function WorkoutsDashboard() {
                       className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors whitespace-nowrap border ${
                         isActive 
                           ? 'bg-indigo-600 border-indigo-500 text-white shadow-sm' 
-                          : 'bg-[#0E1017] border-[#1E2230] text-slate-400 hover:text-white hover:border-slate-700'
+                          : 'bg-slate-50 dark:bg-[#0E1017] border-slate-200 dark:border-[#1E2230] text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:border-slate-300 dark:hover:border-slate-700'
                       }`}
                     >
                       {group}
@@ -182,7 +182,7 @@ export default function WorkoutsDashboard() {
                   placeholder="Search exercise, muscle, gear..." 
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-[#0E1017] border border-[#1E2230] rounded-lg pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
+                  className="w-full bg-slate-50 dark:bg-[#0E1017] border border-slate-200 dark:border-[#1E2230] rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 transition-colors"
                 />
               </div>
             </div>
@@ -192,30 +192,30 @@ export default function WorkoutsDashboard() {
           {isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
               {Array(6).fill(0).map((_, i) => (
-                <div key={i} className="bg-[#12141C] border border-[#1E2230] rounded-xl p-3.5 flex gap-3.5 animate-pulse">
-                  <div className="w-20 h-20 bg-[#181B26] rounded-lg shrink-0" />
+                <div key={i} className="bg-white dark:bg-[#12141C] border border-slate-200 dark:border-[#1E2230] rounded-xl p-3.5 flex gap-3.5 animate-pulse shadow-sm">
+                  <div className="w-20 h-20 bg-slate-100 dark:bg-[#181B26] rounded-lg shrink-0" />
                   <div className="flex-1 space-y-2 py-1">
-                    <div className="h-4 bg-[#181B26] rounded w-3/4" />
-                    <div className="h-3 bg-[#181B26] rounded w-1/2" />
-                    <div className="h-3 bg-[#181B26] rounded w-1/3" />
+                    <div className="h-4 bg-slate-100 dark:bg-[#181B26] rounded w-3/4" />
+                    <div className="h-3 bg-slate-100 dark:bg-[#181B26] rounded w-1/2" />
+                    <div className="h-3 bg-slate-100 dark:bg-[#181B26] rounded w-1/3" />
                   </div>
                 </div>
               ))}
             </div>
           ) : filteredExercises.length === 0 ? (
-            <div className="bg-[#12141C] border border-dashed border-[#1E2230] rounded-2xl p-10 text-center space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center mx-auto text-slate-500">
+            <div className="bg-white dark:bg-[#12141C] border border-dashed border-slate-200 dark:border-[#1E2230] rounded-2xl p-10 text-center space-y-3 shadow-sm">
+              <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.08] flex items-center justify-center mx-auto text-slate-400 dark:text-slate-500">
                 <Dumbbell className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-white">No exercises match your filter</p>
-                <p className="text-xs text-slate-400 mt-1">
+                <p className="text-sm font-semibold text-slate-900 dark:text-white">No exercises match your filter</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                   Try switching muscle group tabs or clearing your search term.
                 </p>
               </div>
               <button
                 onClick={() => { setActiveTab('All'); setSearchQuery(''); }}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0E1017] border border-[#1E2230] text-slate-300 hover:text-white text-xs font-semibold transition-colors"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-50 dark:bg-[#0E1017] border border-slate-200 dark:border-[#1E2230] text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white text-xs font-semibold transition-colors shadow-sm"
               >
                 <RotateCcw className="w-3 h-3 text-slate-400" />
                 <span>Reset Filters</span>
@@ -227,9 +227,9 @@ export default function WorkoutsDashboard() {
                 <div
                   key={ex._id || i}
                   onClick={() => setSelectedExercise(ex)}
-                  className="group bg-[#12141C] border border-[#1E2230] hover:border-indigo-500/40 hover:bg-[#151824] rounded-xl p-3.5 flex gap-3.5 transition-all cursor-pointer"
+                  className="group bg-white dark:bg-[#12141C] border border-slate-200/80 dark:border-[#1E2230] hover:border-indigo-500/40 hover:bg-slate-50 dark:hover:bg-[#151824] rounded-xl p-3.5 flex gap-3.5 transition-all cursor-pointer shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-none"
                 >
-                  <div className="w-20 h-20 bg-[#0B0C10] border border-[#1E2230] rounded-lg flex items-center justify-center overflow-hidden shrink-0 p-1">
+                  <div className="w-20 h-20 bg-slate-100 dark:bg-[#0B0C10] border border-slate-200 dark:border-[#1E2230] rounded-lg flex items-center justify-center overflow-hidden shrink-0 p-1">
                     {ex.thumbnailUrl ? (
                       <img 
                         src={ex.thumbnailUrl} 
@@ -238,28 +238,28 @@ export default function WorkoutsDashboard() {
                         loading="lazy"
                       />
                     ) : (
-                      <Play className="w-6 h-6 text-slate-600 group-hover:text-indigo-400 transition-colors" />
+                      <Play className="w-6 h-6 text-slate-400 dark:text-slate-600 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors" />
                     )}
                   </div>
                   
                   <div className="flex-1 flex flex-col justify-center min-w-0">
-                    <h3 className="font-semibold text-sm leading-tight text-white group-hover:text-indigo-300 transition-colors truncate">
+                    <h3 className="font-semibold text-sm leading-tight text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-300 transition-colors truncate">
                       {ex.name}
                     </h3>
                     <div className="flex flex-wrap gap-1.5 text-[11px] my-1.5">
-                      <span className="bg-[#0E1017] px-2 py-0.5 rounded text-slate-400 border border-[#1E2230]">
+                      <span className="bg-slate-100 dark:bg-[#0E1017] px-2 py-0.5 rounded text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-[#1E2230]">
                         {ex.muscleGroups?.[0] || 'General'}
                       </span>
-                      <span className="bg-[#0E1017] px-2 py-0.5 rounded text-slate-400 border border-[#1E2230] capitalize">
+                      <span className="bg-slate-100 dark:bg-[#0E1017] px-2 py-0.5 rounded text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-[#1E2230] capitalize">
                         {ex.difficulty || 'beginner'}
                       </span>
                       {ex.equipment?.[0] && (
-                        <span className="bg-[#0E1017] px-2 py-0.5 rounded text-slate-300 border border-[#1E2230]">
+                        <span className="bg-slate-100 dark:bg-[#0E1017] px-2 py-0.5 rounded text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-[#1E2230]">
                           {ex.equipment[0]}
                         </span>
                       )}
                     </div>
-                    <span className="text-[11px] text-slate-400 font-mono">
+                    <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
                       {ex.duration ? `${ex.duration}s hold` : `${ex.sets || 3} Sets × ${ex.reps || 10} Reps`}
                     </span>
                   </div>
@@ -273,7 +273,7 @@ export default function WorkoutsDashboard() {
             <div className="pt-2 text-center">
               <button 
                 onClick={() => setDisplayLimit(prev => prev + 24)}
-                className="px-5 py-2.5 rounded-xl bg-[#12141C] border border-[#1E2230] hover:border-slate-700 text-slate-200 text-xs font-semibold transition-all shadow-sm"
+                className="px-5 py-2.5 rounded-xl bg-white dark:bg-[#12141C] border border-slate-200 dark:border-[#1E2230] hover:border-slate-300 dark:hover:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold transition-all shadow-sm"
               >
                 Load More Exercises ({Math.min(displayLimit, filteredExercises.length)} of {filteredExercises.length})
               </button>
@@ -285,23 +285,23 @@ export default function WorkoutsDashboard() {
         <div className="lg:col-span-4 space-y-4">
           
           {/* Consistency Heatmap Card */}
-          <div className="bg-[#12141C] border border-[#1E2230] rounded-2xl p-5 space-y-4">
-            <div className="flex items-center justify-between border-b border-[#1E2230] pb-3">
+          <div className="bg-white dark:bg-[#12141C] border border-slate-200/80 dark:border-[#1E2230] shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-none rounded-2xl p-5 space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-[#1E2230] pb-3">
               <div className="flex items-center gap-2">
-                <CalendarIcon className="w-4 h-4 text-slate-400" />
-                <h3 className="text-sm font-semibold text-white">Consistency (35 Days)</h3>
+                <CalendarIcon className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+                <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Consistency (35 Days)</h3>
               </div>
-              <span className="text-xs font-mono font-medium text-slate-400">
+              <span className="text-xs font-mono font-medium text-slate-500 dark:text-slate-400">
                 {history.length} Workouts
               </span>
             </div>
 
             <div className="grid grid-cols-7 gap-1.5">
               {heatmap.map((level, i) => {
-                let cellClass = 'bg-[#0E1017] border border-[#1E2230]';
-                if (level === 1) cellClass = 'bg-indigo-950/80 border border-indigo-900/60';
-                if (level === 2) cellClass = 'bg-indigo-700 border border-indigo-600';
-                if (level === 3) cellClass = 'bg-indigo-500 border border-indigo-400';
+                let cellClass = 'bg-slate-100 dark:bg-[#0E1017] border border-slate-200 dark:border-[#1E2230]';
+                if (level === 1) cellClass = 'bg-indigo-100 dark:bg-indigo-950/80 border border-indigo-200 dark:border-indigo-900/60';
+                if (level === 2) cellClass = 'bg-indigo-300 dark:bg-indigo-700 border border-indigo-400 dark:border-indigo-600';
+                if (level === 3) cellClass = 'bg-indigo-600 dark:bg-indigo-500 border border-indigo-500 dark:border-indigo-400';
                 return (
                   <div key={i} className={`aspect-square rounded-md ${cellClass} transition-colors`} title={`${level} sessions logged`} />
                 );
@@ -311,10 +311,10 @@ export default function WorkoutsDashboard() {
             <div className="flex justify-between items-center text-[11px] text-slate-500 pt-1">
               <span>Less active</span>
               <div className="flex items-center gap-1.5">
-                <div className="w-2.5 h-2.5 bg-[#0E1017] border border-[#1E2230] rounded-sm" />
-                <div className="w-2.5 h-2.5 bg-indigo-950/80 border border-indigo-900/60 rounded-sm" />
-                <div className="w-2.5 h-2.5 bg-indigo-700 border border-indigo-600 rounded-sm" />
-                <div className="w-2.5 h-2.5 bg-indigo-500 border border-indigo-400 rounded-sm" />
+                <div className="w-2.5 h-2.5 bg-slate-100 dark:bg-[#0E1017] border border-slate-200 dark:border-[#1E2230] rounded-sm" />
+                <div className="w-2.5 h-2.5 bg-indigo-100 dark:bg-indigo-950/80 border border-indigo-200 dark:border-indigo-900/60 rounded-sm" />
+                <div className="w-2.5 h-2.5 bg-indigo-300 dark:bg-indigo-700 border border-indigo-400 dark:border-indigo-600 rounded-sm" />
+                <div className="w-2.5 h-2.5 bg-indigo-600 dark:bg-indigo-500 border border-indigo-500 dark:border-indigo-400 rounded-sm" />
               </div>
               <span>More</span>
             </div>
@@ -322,25 +322,25 @@ export default function WorkoutsDashboard() {
 
           {/* Quick Metrics */}
           <div className="grid grid-cols-2 gap-3">
-            <div className="bg-[#12141C] border border-[#1E2230] rounded-xl p-4 text-center">
-              <span className="text-[10px] uppercase font-semibold text-slate-400 tracking-wider block">Logged Sessions</span>
-              <span className="text-2xl font-bold font-mono text-white mt-1 block">{history.length}</span>
-              <span className="text-[11px] text-slate-500 mt-0.5 block">All-time</span>
+            <div className="bg-white dark:bg-[#12141C] border border-slate-200/80 dark:border-[#1E2230] shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-none rounded-xl p-4 text-center">
+              <span className="text-[10px] uppercase font-semibold text-slate-500 dark:text-slate-400 tracking-wider block">Logged Sessions</span>
+              <span className="text-2xl font-bold font-mono text-slate-900 dark:text-white mt-1 block">{history.length}</span>
+              <span className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 block">All-time</span>
             </div>
-            <div className="bg-[#12141C] border border-[#1E2230] rounded-xl p-4 text-center">
-              <span className="text-[10px] uppercase font-semibold text-slate-400 tracking-wider block">Active Streak</span>
-              <span className="text-2xl font-bold font-mono text-white mt-1 block">5</span>
-              <span className="text-[11px] text-emerald-400 mt-0.5 block">● On Track</span>
+            <div className="bg-white dark:bg-[#12141C] border border-slate-200/80 dark:border-[#1E2230] shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-none rounded-xl p-4 text-center">
+              <span className="text-[10px] uppercase font-semibold text-slate-500 dark:text-slate-400 tracking-wider block">Active Streak</span>
+              <span className="text-2xl font-bold font-mono text-slate-900 dark:text-white mt-1 block">5</span>
+              <span className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-0.5 block font-medium">● On Track</span>
             </div>
           </div>
 
           {/* Training Guidance Tip */}
-          <div className="bg-[#12141C] border border-[#1E2230] rounded-xl p-4 space-y-2">
-            <div className="flex items-center gap-2 text-slate-300">
-              <Target className="w-4 h-4 text-indigo-400" />
+          <div className="bg-white dark:bg-[#12141C] border border-slate-200/80 dark:border-[#1E2230] shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-none rounded-xl p-4 space-y-2">
+            <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
+              <Target className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
               <span className="text-xs font-semibold">Progressive Overload</span>
             </div>
-            <p className="text-[11px] text-slate-400 leading-relaxed">
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
               Log each set with accurate weight and reps. FitCore automatically graphs your volume overload trajectory for your coach.
             </p>
           </div>
@@ -352,23 +352,23 @@ export default function WorkoutsDashboard() {
       {/* Exercise Detail Modal with Animated Movement GIF */}
       <AnimatePresence>
         {selectedExercise && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 dark:bg-black/75 backdrop-blur-sm">
             <motion.div 
               initial={{ opacity: 0, scale: 0.96 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.96 }}
-              className="bg-[#12141C] border border-[#1E2230] rounded-2xl p-6 md:p-7 w-full max-w-xl shadow-2xl relative max-h-[90vh] overflow-y-auto space-y-5"
+              className="bg-white dark:bg-[#12141C] border border-slate-200 dark:border-[#1E2230] rounded-2xl p-6 md:p-7 w-full max-w-xl shadow-2xl relative max-h-[90vh] overflow-y-auto space-y-5"
             >
               <button 
                 onClick={() => setSelectedExercise(null)}
-                className="absolute top-5 right-5 p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.05] border border-transparent hover:border-[#1E2230] transition-colors z-20"
+                className="absolute top-5 right-5 p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/[0.05] border border-transparent hover:border-slate-200 dark:hover:border-[#1E2230] transition-colors z-20"
               >
                 <X className="w-4 h-4" />
               </button>
 
               {/* Movement GIF Preview */}
               {(selectedExercise.videoUrl || selectedExercise.thumbnailUrl) && (
-                <div className="w-full h-64 bg-[#0B0C10] rounded-xl overflow-hidden border border-[#1E2230] flex items-center justify-center relative p-3">
+                <div className="w-full h-64 bg-slate-50 dark:bg-[#0B0C10] rounded-xl overflow-hidden border border-slate-200 dark:border-[#1E2230] flex items-center justify-center relative p-3">
                   <img 
                     src={selectedExercise.videoUrl || selectedExercise.thumbnailUrl} 
                     alt={selectedExercise.name} 
@@ -379,42 +379,42 @@ export default function WorkoutsDashboard() {
 
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                  <span className="px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
                     {selectedExercise.muscleGroups?.join(', ') || 'General'}
                   </span>
-                  <span className="px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-[#0E1017] text-slate-300 border border-[#1E2230] capitalize">
+                  <span className="px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-slate-100 dark:bg-[#0E1017] text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-[#1E2230] capitalize">
                     {selectedExercise.difficulty || 'beginner'}
                   </span>
                 </div>
-                <h3 className="text-xl font-semibold text-white tracking-tight">{selectedExercise.name}</h3>
-                <p className="text-xs text-slate-400 mt-1 leading-relaxed">{selectedExercise.description}</p>
+                <h3 className="text-xl font-semibold text-slate-900 dark:text-white tracking-tight">{selectedExercise.name}</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">{selectedExercise.description}</p>
               </div>
 
               {/* Specs Box */}
-              <div className="grid grid-cols-3 gap-3 bg-[#0E1017] p-3.5 rounded-xl border border-[#1E2230]">
+              <div className="grid grid-cols-3 gap-3 bg-slate-50 dark:bg-[#0E1017] p-3.5 rounded-xl border border-slate-200 dark:border-[#1E2230]">
                 <div className="text-center">
                   <span className="text-[10px] text-slate-500 uppercase font-semibold block">Target Sets</span>
-                  <span className="font-mono font-bold text-base text-white mt-0.5">{selectedExercise.sets || 3}</span>
+                  <span className="font-mono font-bold text-base text-slate-900 dark:text-white mt-0.5">{selectedExercise.sets || 3}</span>
                 </div>
-                <div className="text-center border-x border-[#1E2230]">
+                <div className="text-center border-x border-slate-200 dark:border-[#1E2230]">
                   <span className="text-[10px] text-slate-500 uppercase font-semibold block">Target Reps</span>
-                  <span className="font-mono font-bold text-base text-white mt-0.5">
+                  <span className="font-mono font-bold text-base text-slate-900 dark:text-white mt-0.5">
                     {selectedExercise.duration ? `${selectedExercise.duration}s` : (selectedExercise.reps || 10)}
                   </span>
                 </div>
                 <div className="text-center">
                   <span className="text-[10px] text-slate-500 uppercase font-semibold block">Rest Interval</span>
-                  <span className="font-mono font-bold text-base text-white mt-0.5">{selectedExercise.restTime || 60}s</span>
+                  <span className="font-mono font-bold text-base text-slate-900 dark:text-white mt-0.5">{selectedExercise.restTime || 60}s</span>
                 </div>
               </div>
 
               {/* Equipment */}
               {selectedExercise.equipment && selectedExercise.equipment.length > 0 && (
                 <div>
-                  <h4 className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2">Required Equipment</h4>
+                  <h4 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Required Equipment</h4>
                   <div className="flex flex-wrap gap-1.5">
                     {selectedExercise.equipment.map((eq: string, idx: number) => (
-                      <span key={idx} className="bg-[#0E1017] px-2.5 py-1 rounded-lg text-xs font-medium text-slate-300 border border-[#1E2230]">
+                      <span key={idx} className="bg-slate-100 dark:bg-[#0E1017] px-2.5 py-1 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-[#1E2230]">
                         {eq}
                       </span>
                     ))}
@@ -425,14 +425,14 @@ export default function WorkoutsDashboard() {
               {/* Instructions */}
               {selectedExercise.instructions && selectedExercise.instructions.length > 0 && (
                 <div>
-                  <h4 className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2.5">Form & Execution Technique</h4>
+                  <h4 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2.5">Form & Execution Technique</h4>
                   <div className="space-y-2">
                     {selectedExercise.instructions.map((step: string, idx: number) => (
-                      <div key={idx} className="flex items-start gap-2.5 p-2.5 rounded-lg bg-[#0E1017] border border-[#1E2230] text-xs">
-                        <span className="w-5 h-5 rounded-md bg-white/[0.05] border border-white/[0.08] text-slate-300 font-mono font-bold flex items-center justify-center shrink-0 text-[10px]">
+                      <div key={idx} className="flex items-start gap-2.5 p-2.5 rounded-lg bg-slate-50 dark:bg-[#0E1017] border border-slate-200 dark:border-[#1E2230] text-xs">
+                        <span className="w-5 h-5 rounded-md bg-slate-200 dark:bg-white/[0.05] border border-slate-300 dark:border-white/[0.08] text-slate-700 dark:text-slate-300 font-mono font-bold flex items-center justify-center shrink-0 text-[10px]">
                           {idx + 1}
                         </span>
-                        <p className="text-slate-300 leading-relaxed">{step}</p>
+                        <p className="text-slate-700 dark:text-slate-300 leading-relaxed">{step}</p>
                       </div>
                     ))}
                   </div>
@@ -443,7 +443,7 @@ export default function WorkoutsDashboard() {
               <div className="pt-2 flex gap-2.5">
                 <button 
                   onClick={() => setSelectedExercise(null)}
-                  className="flex-1 py-2.5 rounded-xl border border-[#1E2230] text-xs font-semibold text-slate-400 hover:text-white hover:bg-white/[0.04] transition-colors"
+                  className="flex-1 py-2.5 rounded-xl border border-slate-200 dark:border-[#1E2230] text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors"
                 >
                   Close Preview
                 </button>

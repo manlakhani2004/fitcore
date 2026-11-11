@@ -192,27 +192,27 @@ export default function DietDashboard() {
     <div className="max-w-7xl mx-auto space-y-6 pb-12 relative">
       
       {/* 1. Header Overview Bar */}
-      <div className="bg-[#12141C] border border-[#1E2230] rounded-2xl p-6 md:p-7 relative overflow-hidden">
+      <div className="bg-white dark:bg-[#12141C] border border-slate-200/80 dark:border-[#1E2230] shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-none rounded-2xl p-6 md:p-7 relative overflow-hidden transition-all">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="space-y-1.5">
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-500" />
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 Nutritional Telemetry & Fueling
               </span>
             </div>
-            <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-white">
+            <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">
               Nutrition & Macro Targets
             </h1>
-            <p className="text-xs md:text-sm text-slate-400 max-w-xl">
+            <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 max-w-xl">
               Track daily caloric burn, hit protein targets, and log hydration intake.
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2.5 shrink-0">
             <Link href="/member/diet/plans">
-              <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0E1017] hover:bg-white/[0.05] border border-[#1E2230] text-slate-200 text-xs font-semibold transition-all">
-                <LayoutList className="w-3.5 h-3.5 text-slate-400" />
+              <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-[#0E1017] dark:hover:bg-white/[0.05] border border-slate-200 dark:border-[#1E2230] text-slate-700 dark:text-slate-200 text-xs font-semibold transition-all shadow-sm">
+                <LayoutList className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
                 <span>Coach Diet Plans</span>
               </button>
             </Link>
@@ -229,27 +229,27 @@ export default function DietDashboard() {
       </div>
 
       {assignedPlan && (
-        <div className="bg-[#12141C] border border-[#1E2230] p-5 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="bg-white dark:bg-[#12141C] border border-slate-200/80 dark:border-[#1E2230] shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-none p-5 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
-            <div className="w-10 h-10 rounded-xl bg-white/[0.05] border border-white/[0.08] text-slate-300 flex items-center justify-center shrink-0">
-              <Apple className="w-5 h-5 text-indigo-400" />
+            <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-white/[0.05] border border-slate-200 dark:border-white/[0.08] text-slate-700 dark:text-slate-300 flex items-center justify-center shrink-0">
+              <Apple className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] uppercase font-semibold tracking-wider px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                <span className="text-[10px] uppercase font-semibold tracking-wider px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                   Active Protocol
                 </span>
                 {assignedPlan.coachId?.name && (
-                  <span className="text-xs text-slate-400">Coach {assignedPlan.coachId.name}</span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">Coach {assignedPlan.coachId.name}</span>
                 )}
               </div>
-              <h3 className="font-semibold text-sm text-white mt-1">{assignedPlan.name}</h3>
-              <p className="text-xs text-slate-400 mt-0.5 font-mono">
+              <h3 className="font-semibold text-sm text-slate-900 dark:text-white mt-1">{assignedPlan.name}</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-mono">
                 Target: {assignedPlan.caloriesTarget} kcal • P: {assignedPlan.macrosTarget?.protein || 0}g • C: {assignedPlan.macrosTarget?.carbs || 0}g • F: {assignedPlan.macrosTarget?.fat || 0}g
               </p>
             </div>
           </div>
-          <Link href="/member/diet/plans" className="text-xs font-semibold text-slate-300 hover:text-white px-3.5 py-1.5 rounded-lg bg-[#0E1017] border border-[#1E2230] shrink-0 transition-colors">
+          <Link href="/member/diet/plans" className="text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white px-3.5 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 dark:bg-[#0E1017] border border-slate-200 dark:border-[#1E2230] shrink-0 transition-colors shadow-sm">
             View Details ↗
           </Link>
         </div>
@@ -261,20 +261,20 @@ export default function DietDashboard() {
         <div className="lg:col-span-8 space-y-6">
           
           {/* Daily Macros Card */}
-          <div className="bg-[#12141C] rounded-2xl p-6 border border-[#1E2230] space-y-6">
-            <div className="flex justify-between items-center border-b border-[#1E2230] pb-4">
+          <div className="bg-white dark:bg-[#12141C] rounded-2xl p-6 border border-slate-200/80 dark:border-[#1E2230] shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-none space-y-6">
+            <div className="flex justify-between items-center border-b border-slate-100 dark:border-[#1E2230] pb-4">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-white/[0.05] border border-white/[0.08] text-slate-200 flex items-center justify-center">
-                  <Flame className="w-4 h-4 text-amber-400" />
+                <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-white/[0.05] border border-slate-200 dark:border-white/[0.08] text-slate-700 dark:text-slate-200 flex items-center justify-center">
+                  <Flame className="w-4 h-4 text-amber-500 dark:text-amber-400" />
                 </div>
                 <div>
-                  <h2 className="text-base font-semibold text-white tracking-tight">Daily Macronutrient Targets</h2>
-                  <p className="text-[11px] text-slate-400">Energy balance and macro distribution</p>
+                  <h2 className="text-base font-semibold text-slate-900 dark:text-white tracking-tight">Daily Macronutrient Targets</h2>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">Energy balance and macro distribution</p>
                 </div>
               </div>
               <button 
                 onClick={() => setIsTargetsModalOpen(true)}
-                className="text-xs font-semibold text-slate-300 hover:text-white px-3 py-1.5 border border-[#1E2230] rounded-lg bg-[#0E1017] hover:bg-white/[0.05] transition-colors"
+                className="text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white px-3 py-1.5 border border-slate-200 dark:border-[#1E2230] rounded-lg bg-slate-50 hover:bg-slate-100 dark:bg-[#0E1017] dark:hover:bg-white/[0.05] transition-colors shadow-sm"
               >
                 Edit Targets
               </button>
@@ -292,7 +292,7 @@ export default function DietDashboard() {
                 />
                 <div className="mt-3 text-center">
                   <span className="text-[11px] text-slate-500 uppercase font-semibold">Remaining</span>
-                  <p className="font-mono font-bold text-sm text-slate-200">
+                  <p className="font-mono font-bold text-sm text-slate-800 dark:text-slate-200">
                     {Math.max(0, targets.calories - consumed.calories)} kcal
                   </p>
                 </div>
@@ -308,7 +308,7 @@ export default function DietDashboard() {
                   <div key={macro.label} className="flex flex-col items-center">
                     <div className="relative flex items-center justify-center" style={{ width: 76, height: 76 }}>
                       <svg width="76" height="76" className="transform -rotate-90">
-                        <circle cx="38" cy="38" r="32" stroke="#1E2230" strokeWidth="5" fill="transparent" />
+                        <circle cx="38" cy="38" r="32" className="stroke-slate-200 dark:stroke-[#1E2230]" strokeWidth="5" fill="transparent" />
                         <motion.circle
                           cx="38" cy="38" r="32" stroke={macro.color} strokeWidth="5" fill="transparent" strokeLinecap="round"
                           strokeDasharray={201}
@@ -318,11 +318,11 @@ export default function DietDashboard() {
                         />
                       </svg>
                       <div className="absolute flex flex-col items-center">
-                        <span className="text-xs font-bold font-mono text-white">{macro.consumed}g</span>
+                        <span className="text-xs font-bold font-mono text-slate-900 dark:text-white">{macro.consumed}g</span>
                       </div>
                     </div>
-                    <span className="text-[11px] text-slate-400 mt-2 uppercase tracking-wide font-medium">{macro.label}</span>
-                    <span className="text-[10px] text-slate-500 font-mono">/ {macro.target}g</span>
+                    <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-2 uppercase tracking-wide font-medium">{macro.label}</span>
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono">/ {macro.target}g</span>
                   </div>
                 ))}
               </div>
@@ -330,15 +330,15 @@ export default function DietDashboard() {
           </div>
 
           {/* Today's Food Diary */}
-          <div className="bg-[#12141C] rounded-2xl p-6 border border-[#1E2230] space-y-4">
-            <div className="flex items-center justify-between border-b border-[#1E2230] pb-3.5">
+          <div className="bg-white dark:bg-[#12141C] rounded-2xl p-6 border border-slate-200/80 dark:border-[#1E2230] shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-none space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-[#1E2230] pb-3.5">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-white/[0.05] border border-white/[0.08] text-slate-200 flex items-center justify-center">
-                  <Utensils className="w-4 h-4 text-indigo-400" />
+                <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-white/[0.05] border border-slate-200 dark:border-white/[0.08] text-slate-700 dark:text-slate-200 flex items-center justify-center">
+                  <Utensils className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                 </div>
                 <div>
-                  <h3 className="text-base font-semibold text-white tracking-tight">Today&apos;s Food Diary</h3>
-                  <p className="text-[11px] text-slate-400">Chronological logs of nutrition consumed</p>
+                  <h3 className="text-base font-semibold text-slate-900 dark:text-white tracking-tight">Today&apos;s Food Diary</h3>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">Chronological logs of nutrition consumed</p>
                 </div>
               </div>
               <button
@@ -354,17 +354,17 @@ export default function DietDashboard() {
             </div>
 
             {loggedMeals.length === 0 ? (
-              <div className="text-center py-10 border border-dashed border-[#1E2230] rounded-xl bg-[#0E1017] space-y-2 p-6">
-                <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center mx-auto text-slate-500">
+              <div className="text-center py-10 border border-dashed border-slate-200 dark:border-[#1E2230] rounded-xl bg-slate-50 dark:bg-[#0E1017] space-y-2 p-6">
+                <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.08] flex items-center justify-center mx-auto text-slate-400 dark:text-slate-500">
                   <Coffee className="w-5 h-5" />
                 </div>
-                <p className="text-xs font-semibold text-white">No Meals Logged Today</p>
-                <p className="text-[11px] text-slate-400 max-w-sm mx-auto">
+                <p className="text-xs font-semibold text-slate-900 dark:text-white">No Meals Logged Today</p>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
                   Fueling your body with adequate protein and clean calories is key to hitting your performance goals.
                 </p>
                 <button
                   onClick={() => setIsDrawerOpen(true)}
-                  className="mt-2 inline-flex items-center gap-1.5 bg-white/[0.05] hover:bg-white/[0.08] border border-[#1E2230] text-slate-200 text-xs font-semibold px-3.5 py-1.5 rounded-lg transition-all"
+                  className="mt-2 inline-flex items-center gap-1.5 bg-white dark:bg-white/[0.05] hover:bg-slate-50 dark:hover:bg-white/[0.08] border border-slate-200 dark:border-[#1E2230] text-slate-700 dark:text-slate-200 text-xs font-semibold px-3.5 py-1.5 rounded-lg transition-all shadow-sm"
                 >
                   <Plus className="w-3.5 h-3.5" /> Log First Meal
                 </button>
@@ -377,29 +377,29 @@ export default function DietDashboard() {
                   return (
                     <div
                       key={item._id || idx}
-                      className="bg-[#0E1017] border border-[#1E2230] rounded-xl p-3.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 hover:border-slate-700 transition-colors"
+                      className="bg-slate-50 dark:bg-[#0E1017] border border-slate-200/80 dark:border-[#1E2230] rounded-xl p-3.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 hover:border-slate-300 dark:hover:border-slate-700 transition-colors shadow-sm dark:shadow-none"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-white/[0.05] border border-white/[0.08] text-slate-300 flex items-center justify-center shrink-0">
+                        <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-white/[0.05] border border-slate-200 dark:border-white/[0.08] text-slate-700 dark:text-slate-300 flex items-center justify-center shrink-0">
                           {mealType === 'breakfast' ? <Coffee className="w-4 h-4" /> : <Apple className="w-4 h-4" />}
                         </div>
                         <div>
                           <div className="flex items-center gap-2">
-                            <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded bg-[#12141C] border border-[#1E2230] text-slate-400">
+                            <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded bg-white dark:bg-[#12141C] border border-slate-200 dark:border-[#1E2230] text-slate-600 dark:text-slate-400">
                               {mealType}
                             </span>
-                            <h4 className="font-semibold text-xs text-white">{m.name || 'Logged Meal'}</h4>
+                            <h4 className="font-semibold text-xs text-slate-900 dark:text-white">{m.name || 'Logged Meal'}</h4>
                           </div>
-                          <span className="text-xs text-slate-400 font-mono mt-0.5 block">
+                          <span className="text-xs text-slate-500 dark:text-slate-400 font-mono mt-0.5 block">
                             {m.calories} kcal
                           </span>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-3 text-xs font-mono bg-[#12141C] border border-[#1E2230] px-3 py-1 rounded-lg">
-                        <span className="text-indigo-400 font-semibold">P: {m.protein || 0}g</span>
-                        <span className="text-emerald-400 font-semibold">C: {m.carbs || 0}g</span>
-                        <span className="text-amber-400 font-semibold">F: {m.fat || 0}g</span>
+                      <div className="flex items-center gap-3 text-xs font-mono bg-white dark:bg-[#12141C] border border-slate-200 dark:border-[#1E2230] px-3 py-1 rounded-lg shadow-sm dark:shadow-none">
+                        <span className="text-indigo-600 dark:text-indigo-400 font-semibold">P: {m.protein || 0}g</span>
+                        <span className="text-emerald-600 dark:text-emerald-400 font-semibold">C: {m.carbs || 0}g</span>
+                        <span className="text-amber-600 dark:text-amber-400 font-semibold">F: {m.fat || 0}g</span>
                       </div>
                     </div>
                   );
@@ -411,18 +411,18 @@ export default function DietDashboard() {
 
         {/* Right Col: Hydration Tracker (4 cols) */}
         <div className="lg:col-span-4 space-y-4">
-          <div className="bg-[#12141C] rounded-2xl p-6 border border-[#1E2230] text-center space-y-5">
-            <div className="flex items-center justify-between border-b border-[#1E2230] pb-3">
+          <div className="bg-white dark:bg-[#12141C] rounded-2xl p-6 border border-slate-200/80 dark:border-[#1E2230] shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-none text-center space-y-5">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-[#1E2230] pb-3">
               <div className="flex items-center gap-2">
-                <Droplet className="w-4 h-4 text-sky-400" />
-                <h3 className="text-sm font-semibold text-white">Hydration Tracker</h3>
+                <Droplet className="w-4 h-4 text-sky-500 dark:text-sky-400" />
+                <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Hydration Tracker</h3>
               </div>
-              <span className="text-xs font-mono font-medium text-slate-400">
+              <span className="text-xs font-mono font-medium text-slate-500 dark:text-slate-400">
                 {waterGlasses * 250} ml
               </span>
             </div>
             
-            <div className="relative w-28 h-40 mx-auto border-2 border-[#1E2230] rounded-b-2xl rounded-t-md overflow-hidden bg-[#0B0C10]">
+            <div className="relative w-28 h-40 mx-auto border-2 border-slate-200 dark:border-[#1E2230] rounded-b-2xl rounded-t-md overflow-hidden bg-slate-50 dark:bg-[#0B0C10]">
               {/* Animated Water Fill */}
               <motion.div 
                 className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-sky-600 to-sky-400 opacity-80"
@@ -435,15 +435,15 @@ export default function DietDashboard() {
             </div>
 
             <div>
-              <div className="text-2xl font-mono font-bold text-white">{waterGlasses} <span className="text-sm text-slate-500">/ 8</span></div>
-              <p className="text-xs text-slate-400 mt-0.5">Glasses of water today</p>
+              <div className="text-2xl font-mono font-bold text-slate-900 dark:text-white">{waterGlasses} <span className="text-sm text-slate-400 dark:text-slate-500">/ 8</span></div>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Glasses of water today</p>
             </div>
             
             <div className="flex gap-2">
               <button 
                 onClick={removeWater}
                 disabled={waterGlasses <= 0}
-                className="flex-1 bg-[#0E1017] border border-[#1E2230] hover:bg-white/[0.05] text-slate-400 hover:text-white py-2 rounded-lg font-semibold transition-all disabled:opacity-40 text-xs"
+                className="flex-1 bg-slate-100 dark:bg-[#0E1017] border border-slate-200 dark:border-[#1E2230] hover:bg-slate-200 dark:hover:bg-white/[0.05] text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white py-2 rounded-lg font-semibold transition-all disabled:opacity-40 text-xs shadow-sm"
               >
                 - 1 Glass
               </button>
@@ -456,9 +456,9 @@ export default function DietDashboard() {
               </button>
             </div>
 
-            <div className="p-3.5 rounded-xl bg-[#0E1017] border border-[#1E2230] text-left">
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 block mb-1">Hydration Guidance</span>
-              <p className="text-[11px] text-slate-400 leading-relaxed">
+            <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-[#0E1017] border border-slate-200/80 dark:border-[#1E2230] text-left">
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">Hydration Guidance</span>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
                 Aim for 2.5 - 3.5 liters daily to maximize muscle protein synthesis and optimize workout recovery.
               </p>
             </div>
@@ -472,22 +472,22 @@ export default function DietDashboard() {
           <>
             <motion.div 
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/75 backdrop-blur-sm z-40"
+              className="fixed inset-0 bg-black/60 dark:bg-black/75 backdrop-blur-sm z-40"
               onClick={() => setIsDrawerOpen(false)}
             />
             <motion.div 
               initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 bottom-0 w-full sm:w-[420px] bg-[#12141C] border-l border-[#1E2230] z-50 p-6 flex flex-col shadow-2xl space-y-4"
+              className="fixed top-0 right-0 bottom-0 w-full sm:w-[420px] bg-white dark:bg-[#12141C] border-l border-slate-200 dark:border-[#1E2230] z-50 p-6 flex flex-col shadow-2xl space-y-4"
             >
-              <div className="flex items-center justify-between pb-4 border-b border-[#1E2230]">
+              <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-[#1E2230]">
                 <div>
-                  <h2 className="text-base font-semibold text-white">Log Custom Meal</h2>
-                  <p className="text-xs text-slate-400">Record nutritional intake and macros</p>
+                  <h2 className="text-base font-semibold text-slate-900 dark:text-white">Log Custom Meal</h2>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Record nutritional intake and macros</p>
                 </div>
                 <button
                   onClick={() => setIsDrawerOpen(false)}
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.05] border border-transparent hover:border-[#1E2230] transition-colors"
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/[0.05] border border-transparent hover:border-slate-200 dark:hover:border-[#1E2230] transition-colors"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -496,19 +496,19 @@ export default function DietDashboard() {
               {/* Custom Meal Form */}
               <form onSubmit={handleCustomMealSubmit} className="space-y-4 flex-1 overflow-y-auto pr-1">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-400 mb-1.5">Meal / Food Description</label>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-400 mb-1.5">Meal / Food Description</label>
                   <input
                     type="text"
                     placeholder="e.g. Grilled Chicken & Sweet Potato"
                     value={customForm.name}
                     onChange={(e) => setCustomForm({ ...customForm, name: e.target.value })}
-                    className="w-full bg-[#0E1017] border border-[#1E2230] rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
+                    className="w-full bg-slate-50 dark:bg-[#0E1017] border border-slate-200 dark:border-[#1E2230] rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 transition-colors"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-400 mb-1.5">Category</label>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-400 mb-1.5">Category</label>
                   <div className="grid grid-cols-4 gap-1.5">
                     {['breakfast', 'lunch', 'dinner', 'snack'].map((type) => (
                       <button
@@ -518,7 +518,7 @@ export default function DietDashboard() {
                         className={`py-2 text-xs font-medium rounded-lg capitalize transition-all border ${
                           customForm.type === type
                             ? 'bg-indigo-600 border-indigo-500 text-white shadow-sm'
-                            : 'bg-[#0E1017] border-[#1E2230] text-slate-400 hover:border-slate-700 hover:text-white'
+                            : 'bg-slate-50 dark:bg-[#0E1017] border-slate-200 dark:border-[#1E2230] text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-700 hover:text-slate-900 dark:hover:text-white'
                         }`}
                       >
                         {type}
@@ -528,46 +528,46 @@ export default function DietDashboard() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-400 mb-1.5">Total Calories (kcal)</label>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-400 mb-1.5">Total Calories (kcal)</label>
                   <input
                     type="number"
                     placeholder="e.g. 450"
                     value={customForm.calories}
                     onChange={(e) => setCustomForm({ ...customForm, calories: e.target.value })}
-                    className="w-full bg-[#0E1017] border border-[#1E2230] rounded-xl px-3.5 py-2.5 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
+                    className="w-full bg-slate-50 dark:bg-[#0E1017] border border-slate-200 dark:border-[#1E2230] rounded-xl px-3.5 py-2.5 text-xs font-mono text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 transition-colors"
                     required
                   />
                 </div>
 
                 <div className="grid grid-cols-3 gap-2">
                   <div>
-                    <label className="block text-[11px] font-semibold text-indigo-400 mb-1 text-center">Protein (g)</label>
+                    <label className="block text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 mb-1 text-center">Protein (g)</label>
                     <input
                       type="number"
                       placeholder="0"
                       value={customForm.protein}
                       onChange={(e) => setCustomForm({ ...customForm, protein: e.target.value })}
-                      className="w-full bg-[#0E1017] border border-[#1E2230] rounded-lg px-2 py-2 text-xs font-mono text-center text-white focus:outline-none focus:border-indigo-500 transition-colors"
+                      className="w-full bg-slate-50 dark:bg-[#0E1017] border border-slate-200 dark:border-[#1E2230] rounded-lg px-2 py-2 text-xs font-mono text-center text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500 transition-colors"
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-semibold text-emerald-400 mb-1 text-center">Carbs (g)</label>
+                    <label className="block text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 mb-1 text-center">Carbs (g)</label>
                     <input
                       type="number"
                       placeholder="0"
                       value={customForm.carbs}
                       onChange={(e) => setCustomForm({ ...customForm, carbs: e.target.value })}
-                      className="w-full bg-[#0E1017] border border-[#1E2230] rounded-lg px-2 py-2 text-xs font-mono text-center text-white focus:outline-none focus:border-indigo-500 transition-colors"
+                      className="w-full bg-slate-50 dark:bg-[#0E1017] border border-slate-200 dark:border-[#1E2230] rounded-lg px-2 py-2 text-xs font-mono text-center text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500 transition-colors"
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-semibold text-amber-400 mb-1 text-center">Fat (g)</label>
+                    <label className="block text-[11px] font-semibold text-amber-600 dark:text-amber-400 mb-1 text-center">Fat (g)</label>
                     <input
                       type="number"
                       placeholder="0"
                       value={customForm.fat}
                       onChange={(e) => setCustomForm({ ...customForm, fat: e.target.value })}
-                      className="w-full bg-[#0E1017] border border-[#1E2230] rounded-lg px-2 py-2 text-xs font-mono text-center text-white focus:outline-none focus:border-indigo-500 transition-colors"
+                      className="w-full bg-slate-50 dark:bg-[#0E1017] border border-slate-200 dark:border-[#1E2230] rounded-lg px-2 py-2 text-xs font-mono text-center text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500 transition-colors"
                     />
                   </div>
                 </div>
@@ -584,7 +584,7 @@ export default function DietDashboard() {
 
               <button 
                 onClick={() => setIsDrawerOpen(false)} 
-                className="w-full py-2 bg-[#0E1017] border border-[#1E2230] text-slate-400 hover:text-white rounded-xl font-semibold text-xs transition-colors"
+                className="w-full py-2 bg-slate-100 hover:bg-slate-200 dark:bg-[#0E1017] border border-slate-200 dark:border-[#1E2230] text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-xl font-semibold text-xs transition-colors shadow-sm"
               >
                 Close
               </button>
@@ -596,50 +596,50 @@ export default function DietDashboard() {
       {/* Targets Modal */}
       <AnimatePresence>
         {isTargetsModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 dark:bg-black/75 backdrop-blur-sm">
             <motion.div 
               initial={{ scale: 0.96, opacity: 0 }} 
               animate={{ scale: 1, opacity: 1 }} 
               exit={{ scale: 0.96, opacity: 0 }}
-              className="relative bg-[#12141C] border border-[#1E2230] rounded-2xl p-6 w-full max-w-sm shadow-2xl space-y-4"
+              className="relative bg-white dark:bg-[#12141C] border border-slate-200 dark:border-[#1E2230] rounded-2xl p-6 w-full max-w-sm shadow-2xl space-y-4"
             >
-              <h2 className="text-base font-semibold text-white">Edit Macro Targets</h2>
+              <h2 className="text-base font-semibold text-slate-900 dark:text-white">Edit Macro Targets</h2>
               <div className="space-y-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-400 mb-1.5">Calories (kcal)</label>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-400 mb-1.5">Calories (kcal)</label>
                   <input 
                     type="number" 
                     value={tempTargets.calories} 
                     onChange={e => setTempTargets({...tempTargets, calories: Number(e.target.value)})} 
-                    className="w-full bg-[#0E1017] border border-[#1E2230] rounded-xl px-3.5 py-2 text-xs font-mono text-white focus:outline-none focus:border-indigo-500" 
+                    className="w-full bg-slate-50 dark:bg-[#0E1017] border border-slate-200 dark:border-[#1E2230] rounded-xl px-3.5 py-2 text-xs font-mono text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500" 
                   />
                 </div>
                 <div className="grid grid-cols-3 gap-2">
                   <div>
-                    <label className="block text-[11px] font-semibold text-indigo-400 mb-1 text-center">Protein (g)</label>
+                    <label className="block text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 mb-1 text-center">Protein (g)</label>
                     <input 
                       type="number" 
                       value={tempTargets.protein} 
                       onChange={e => setTempTargets({...tempTargets, protein: Number(e.target.value)})} 
-                      className="w-full bg-[#0E1017] border border-[#1E2230] rounded-lg px-2 py-2 text-xs font-mono text-center text-white focus:outline-none focus:border-indigo-500" 
+                      className="w-full bg-slate-50 dark:bg-[#0E1017] border border-slate-200 dark:border-[#1E2230] rounded-lg px-2 py-2 text-xs font-mono text-center text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500" 
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-semibold text-emerald-400 mb-1 text-center">Carbs (g)</label>
+                    <label className="block text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 mb-1 text-center">Carbs (g)</label>
                     <input 
                       type="number" 
                       value={tempTargets.carbs} 
                       onChange={e => setTempTargets({...tempTargets, carbs: Number(e.target.value)})} 
-                      className="w-full bg-[#0E1017] border border-[#1E2230] rounded-lg px-2 py-2 text-xs font-mono text-center text-white focus:outline-none focus:border-indigo-500" 
+                      className="w-full bg-slate-50 dark:bg-[#0E1017] border border-slate-200 dark:border-[#1E2230] rounded-lg px-2 py-2 text-xs font-mono text-center text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500" 
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-semibold text-amber-400 mb-1 text-center">Fat (g)</label>
+                    <label className="block text-[11px] font-semibold text-amber-600 dark:text-amber-400 mb-1 text-center">Fat (g)</label>
                     <input 
                       type="number" 
                       value={tempTargets.fat} 
                       onChange={e => setTempTargets({...tempTargets, fat: Number(e.target.value)})} 
-                      className="w-full bg-[#0E1017] border border-[#1E2230] rounded-lg px-2 py-2 text-xs font-mono text-center text-white focus:outline-none focus:border-indigo-500" 
+                      className="w-full bg-slate-50 dark:bg-[#0E1017] border border-slate-200 dark:border-[#1E2230] rounded-lg px-2 py-2 text-xs font-mono text-center text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500" 
                     />
                   </div>
                 </div>
@@ -647,7 +647,7 @@ export default function DietDashboard() {
               <div className="flex gap-2.5 pt-3">
                 <button 
                   onClick={() => setIsTargetsModalOpen(false)} 
-                  className="flex-1 py-2.5 bg-[#0E1017] border border-[#1E2230] text-slate-400 hover:text-white rounded-xl font-semibold text-xs transition-colors"
+                  className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-[#0E1017] border border-slate-200 dark:border-[#1E2230] text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-xl font-semibold text-xs transition-colors shadow-sm"
                 >
                   Cancel
                 </button>

@@ -283,29 +283,29 @@ export default function DailyWorkoutPage() {
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="max-w-2xl mx-auto mt-20 bg-[#12141C] border border-[#1E2230] p-8 md:p-10 rounded-2xl text-center shadow-2xl relative overflow-hidden"
+        className="max-w-2xl mx-auto mt-20 bg-white dark:bg-[#12141C] border border-slate-200 dark:border-[#1E2230] p-8 md:p-10 rounded-2xl text-center shadow-xl dark:shadow-2xl relative overflow-hidden"
       >
         <Trophy className="w-16 h-16 text-amber-400 mx-auto mb-5" />
-        <h1 className="text-3xl font-semibold text-white tracking-tight mb-3">Workout Complete</h1>
-        <p className="text-slate-400 text-sm mb-8">You crushed &quot;{workout.name}&quot;. Great job staying consistent with progressive overload.</p>
+        <h1 className="text-3xl font-semibold text-slate-900 dark:text-white tracking-tight mb-3">Workout Complete</h1>
+        <p className="text-slate-500 dark:text-slate-400 text-sm mb-8">You crushed &quot;{workout.name}&quot;. Great job staying consistent with progressive overload.</p>
         
         <div className="flex justify-center gap-8 mb-8">
           <div className="text-center">
-            <div className="text-3xl font-mono font-bold text-white">{Math.max(1, Math.round(secondsElapsed / 60))}</div>
-            <div className="text-xs text-slate-400 uppercase font-semibold mt-1">Minutes</div>
+            <div className="text-3xl font-mono font-bold text-slate-900 dark:text-white">{Math.max(1, Math.round(secondsElapsed / 60))}</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 uppercase font-semibold mt-1">Minutes</div>
           </div>
           <div className="text-center">
-            <div className="text-3xl font-mono font-bold text-emerald-400">{Math.max(50, currentCompleted * 25 || 280)}</div>
-            <div className="text-xs text-slate-400 uppercase font-semibold mt-1">Calories</div>
+            <div className="text-3xl font-mono font-bold text-emerald-500 dark:text-emerald-400">{Math.max(50, currentCompleted * 25 || 280)}</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 uppercase font-semibold mt-1">Calories</div>
           </div>
           <div className="text-center">
-            <div className="text-3xl font-mono font-bold text-amber-400">+{earnedPoints}</div>
-            <div className="text-xs text-slate-400 uppercase font-semibold mt-1">XP Points</div>
+            <div className="text-3xl font-mono font-bold text-amber-500 dark:text-amber-400">+{earnedPoints}</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 uppercase font-semibold mt-1">XP Points</div>
           </div>
         </div>
 
-        <div className="flex items-center justify-center gap-2 mb-8 text-xs font-semibold text-slate-300 bg-[#0E1017] border border-[#1E2230] py-2 px-4 rounded-xl w-fit mx-auto">
-          <Award className="w-4 h-4 text-indigo-400" />
+        <div className="flex items-center justify-center gap-2 mb-8 text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-[#0E1017] border border-slate-200 dark:border-[#1E2230] py-2 px-4 rounded-xl w-fit mx-auto">
+          <Award className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
           <span>Current Level: {userLevel}</span>
         </div>
 
