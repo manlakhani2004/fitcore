@@ -104,38 +104,46 @@ export function Sidebar() {
   const sidebarContent = (
     <div className="flex flex-col h-full bg-[#10121A] border-r border-[#1C202C] overflow-hidden select-none">
       {/* Brand Header */}
-      <div className="h-16 px-5 border-b border-[#1C202C] flex items-center justify-between">
+      <div className="h-18 px-5 border-b border-[#1C202C] flex items-center justify-between shrink-0">
         {!collapsed ? (
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 via-indigo-600 to-emerald-500 p-[1px] shadow-sm">
-              <div className="w-full h-full bg-[#10121A] rounded-[7px] flex items-center justify-center">
-                <span className="font-mono text-sm font-black text-white tracking-tighter">FC</span>
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 via-indigo-600 to-emerald-500 p-[1.5px] shadow-md shadow-indigo-500/20">
+              <div className="w-full h-full bg-[#10121A] rounded-[10px] flex items-center justify-center">
+                <span className="font-mono text-sm font-black text-white tracking-tight">FC</span>
               </div>
             </div>
-            <div className="flex items-baseline gap-1">
-              <span className="text-base font-semibold tracking-tight text-white">FitCore</span>
-              <span className="text-[10px] font-mono font-medium text-slate-400 uppercase tracking-widest">PRO</span>
+            <div className="flex flex-col">
+              <div className="flex items-center gap-1.5">
+                <span className="text-lg font-bold tracking-tight text-white leading-none">FitCore</span>
+                <span className="text-[10px] font-mono font-bold text-indigo-400 bg-indigo-500/15 border border-indigo-500/30 px-1.5 py-0.5 rounded leading-none">
+                  PRO
+                </span>
+              </div>
+              <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider mt-1">
+                {user?.role === 'coach' ? 'Coach Platform' : user?.role === 'admin' ? 'Admin HQ' : 'Athlete Portal'}
+              </span>
             </div>
           </Link>
         ) : (
           <div className="mx-auto">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 via-indigo-600 to-emerald-500 p-[1px] shadow-sm">
-              <div className="w-full h-full bg-[#10121A] rounded-[7px] flex items-center justify-center">
-                <span className="font-mono text-sm font-black text-white tracking-tighter">FC</span>
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 via-indigo-600 to-emerald-500 p-[1.5px] shadow-md">
+              <div className="w-full h-full bg-[#10121A] rounded-[10px] flex items-center justify-center">
+                <span className="font-mono text-sm font-black text-white tracking-tight">FC</span>
               </div>
             </div>
           </div>
         )}
       </div>
 
-      {/* Nav Links */}
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        {!collapsed && (
-          <div className="px-3 pb-2 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
-            {user?.role === 'coach' ? 'Coach Navigation' : user?.role === 'admin' ? 'Administration' : 'Athlete Portal'}
-          </div>
-        )}
+      {/* Nav Section Label */}
+      {!collapsed && (
+        <div className="px-5 pt-5 pb-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+          Navigation
+        </div>
+      )}
 
+      {/* Nav Links */}
+      <nav className="flex-1 px-3 py-2 space-y-1.5 overflow-y-auto">
         {navItems.map((item) => {
           const isActive = pathname.startsWith(item.href);
           const isChatTab = (user?.role === 'coach' && item.name === 'Inbox') || (user?.role === 'member' && item.name === 'My Coach');
@@ -143,25 +151,25 @@ export function Sidebar() {
 
           return (
             <Link key={item.name} href={item.href}>
-              <span className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all group ${
+              <span className={`relative flex items-center gap-3.5 px-3.5 py-3 rounded-xl transition-all group ${
                 isActive 
-                  ? 'bg-white/[0.08] text-white shadow-sm border border-white/[0.08]' 
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'
+                  ? 'bg-indigo-600/15 text-white font-semibold border border-indigo-500/30 shadow-sm' 
+                  : 'text-slate-300 hover:text-white hover:bg-white/[0.05]'
               }`}>
                 <div className="relative shrink-0 flex items-center justify-center">
-                  <item.icon className={`w-4 h-4 transition-colors ${
+                  <item.icon className={`w-5 h-5 transition-colors ${
                     isActive ? 'text-indigo-400' : 'text-slate-400 group-hover:text-slate-200'
                   }`} />
                   {collapsed && showBadge && (
-                    <span className="absolute -top-1 -right-1 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-[#10121A] animate-pulse" />
+                    <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-rose-500 rounded-full ring-2 ring-[#10121A] animate-pulse" />
                   )}
                 </div>
 
                 {!collapsed && (
                   <div className="flex-1 flex items-center justify-between min-w-0">
-                    <span className="tracking-wide">{item.name}</span>
+                    <span className="text-[14.5px] font-medium tracking-normal">{item.name}</span>
                     {showBadge && (
-                      <span className="ml-auto bg-rose-500 text-white text-[10px] font-bold font-mono px-1.5 py-0.2 rounded-full shadow-sm animate-pulse">
+                      <span className="ml-auto bg-rose-500 text-white text-xs font-bold font-mono px-2 py-0.5 rounded-full shadow-sm shadow-rose-500/40 animate-pulse">
                         {unreadCount > 99 ? '99+' : unreadCount}
                       </span>
                     )}
@@ -173,17 +181,39 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* User Footer / Logout */}
-      <div className="p-3 border-t border-[#1C202C] space-y-2">
-        <button
-          onClick={() => setShowLogoutModal(true)}
-          className={`flex items-center gap-2.5 px-3 py-2 rounded-xl w-full text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 text-xs font-medium transition-colors ${
-            collapsed ? 'justify-center' : ''
-          }`}
-        >
-          <LogOut className="w-4 h-4" />
-          {!collapsed && <span>Sign Out</span>}
-        </button>
+      {/* Footer Profile & Logout Card */}
+      <div className="p-3 border-t border-[#1C202C] bg-[#0E1017]">
+        {!collapsed ? (
+          <div className="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-surface/70 border border-border">
+            <Link 
+              href={user?.role === 'coach' ? '/coach/profile' : user?.role === 'admin' ? '/admin/settings' : '/member/settings?tab=profile'}
+              className="flex items-center gap-2.5 min-w-0 flex-1 hover:opacity-90 transition-opacity"
+            >
+              <div className="w-8 h-8 rounded-lg bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center font-bold text-xs text-indigo-300 shrink-0">
+                {user?.name?.charAt(0) || 'U'}
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-semibold text-white truncate leading-tight">{user?.name || 'Athlete'}</p>
+                <p className="text-[10px] text-slate-400 capitalize truncate font-medium mt-0.5">{user?.role || 'Member'}</p>
+              </div>
+            </Link>
+            <button
+              onClick={() => setShowLogoutModal(true)}
+              className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors shrink-0"
+              title="Sign Out"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={() => setShowLogoutModal(true)}
+            className="w-full flex items-center justify-center p-2 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+            title="Sign Out"
+          >
+            <LogOut className="w-5 h-5" />
+          </button>
+        )}
       </div>
     </div>
   );
@@ -192,8 +222,8 @@ export function Sidebar() {
     <>
       {/* Desktop Sidebar */}
       <motion.aside
-        initial={{ width: 250 }}
-        animate={{ width: collapsed ? 76 : 250 }}
+        initial={{ width: 265 }}
+        animate={{ width: collapsed ? 80 : 265 }}
         className="hidden md:block h-screen sticky top-0 z-20 shrink-0 relative"
       >
         {sidebarContent}
@@ -212,7 +242,7 @@ export function Sidebar() {
       <div className="md:hidden fixed top-4 left-4 z-50">
         <button
           onClick={() => setMobileOpen(true)}
-          className="bg-[#12141C] p-2 rounded-lg border border-[#1C202C] shadow-lg text-slate-200"
+          className="bg-[#12141C] p-2.5 rounded-lg border border-[#1C202C] shadow-lg text-slate-200"
         >
           <Menu className="w-5 h-5" />
         </button>
@@ -234,7 +264,7 @@ export function Sidebar() {
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ type: "spring", damping: 22 }}
-              className="fixed inset-y-0 left-0 w-64 z-50 md:hidden"
+              className="fixed inset-y-0 left-0 w-72 z-50 md:hidden"
             >
               {sidebarContent}
             </motion.aside>
