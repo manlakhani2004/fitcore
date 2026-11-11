@@ -1,6 +1,8 @@
 const Post = require('../models/Post');
 const Challenge = require('../models/Challenge');
 const User = require('../models/User');
+const UserProfile = require('../models/UserProfile');
+const WorkoutLog = require('../models/WorkoutLog');
 
 // @desc    Create a new post
 // @route   POST /api/community/posts
@@ -33,7 +35,7 @@ exports.createPost = async (req, res) => {
             imageUrl: imageUrl || ''
         });
 
-        await post.populate('author', 'name email avatar');
+        await post.populate('author', 'name email avatar role bio followers');
 
         res.status(201).json({ success: true, data: post });
     } catch (err) {
@@ -65,23 +67,201 @@ exports.uploadPostImage = async (req, res) => {
     }
 };
 
-// @desc    Get feed (all posts)
+// @desc    Get feed (all posts, following, or user posts)
 // @route   GET /api/community/posts
 // @access  Private
 exports.getPosts = async (req, res) => {
     try {
-        const posts = await Post.find()
+        const { filter = 'all' } = req.query;
+        let query = {};
+
+        if (filter === 'me') {
+            query.author = req.user.id;
+        } else if (filter === 'following') {
+            const currentUser = await User.findById(req.user.id).select('following');
+            const followingIds = currentUser?.following || [];
+            query.author = { $in: followingIds };
+        }
+
+        const posts = await Post.find(query)
             .sort({ createdAt: -1 })
-            .populate('author', 'name email avatar')
-            .populate('comments.author', 'name email avatar');
+            .populate('author', 'name email avatar role bio followers')
+            .populate('comments.author', 'name email avatar role');
             
-        // Filter out orphan posts whose author was deleted
-        const validPosts = posts.filter(p => p.author != null);
+        // Filter out orphan posts whose author was deleted and filter orphan comments
+        const validPosts = posts
+            .filter(p => p.author != null)
+            .map(p => {
+                if (p.comments && p.comments.length > 0) {
+                    p.comments = p.comments.filter(c => c.author != null);
+                }
+                return p;
+            });
             
         res.status(200).json({ success: true, count: validPosts.length, data: validPosts });
     } catch (err) {
-        console.error(err);
+        console.error('getPosts error:', err);
         res.status(500).json({ success: false, message: 'Server Error' });
+    }
+};
+
+// @desc    Delete a post
+// @route   DELETE /api/community/posts/:id
+// @access  Private
+exports.deletePost = async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.id);
+        if (!post) {
+            return res.status(404).json({ success: false, message: 'Post not found' });
+        }
+
+        // Author of the post or an Admin can delete
+        const isAuthor = post.author.toString() === req.user.id;
+        const isAdmin = req.user.role === 'admin';
+
+        if (!isAuthor && !isAdmin) {
+            return res.status(403).json({ success: false, message: 'You are not authorized to delete this post.' });
+        }
+
+        await Post.deleteOne({ _id: post._id });
+        res.status(200).json({ success: true, message: 'Post deleted successfully.' });
+    } catch (err) {
+        console.error('deletePost error:', err);
+        res.status(500).json({ success: false, message: 'Failed to delete post.' });
+    }
+};
+
+// @desc    Delete a comment
+// @route   DELETE /api/community/posts/:postId/comments/:commentId
+// @access  Private
+exports.deleteComment = async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.postId);
+        if (!post) {
+            return res.status(404).json({ success: false, message: 'Post not found' });
+        }
+
+        const comment = post.comments.id(req.params.commentId);
+        if (!comment) {
+            return res.status(404).json({ success: false, message: 'Comment not found' });
+        }
+
+        const isCommentAuthor = comment.author.toString() === req.user.id;
+        const isPostAuthor = post.author.toString() === req.user.id;
+        const isAdmin = req.user.role === 'admin';
+
+        if (!isCommentAuthor && !isPostAuthor && !isAdmin) {
+            return res.status(403).json({ success: false, message: 'You are not authorized to delete this comment.' });
+        }
+
+        post.comments.pull(req.params.commentId);
+        await post.save();
+        await post.populate('comments.author', 'name email avatar role');
+
+        res.status(200).json({ success: true, data: post.comments, message: 'Comment removed.' });
+    } catch (err) {
+        console.error('deleteComment error:', err);
+        res.status(500).json({ success: false, message: 'Failed to delete comment.' });
+    }
+};
+
+// @desc    Follow or unfollow an athlete
+// @route   POST /api/community/users/:id/follow
+// @access  Private
+exports.toggleFollowUser = async (req, res) => {
+    try {
+        const targetUserId = req.params.id;
+
+        if (targetUserId === req.user.id) {
+            return res.status(400).json({ success: false, message: 'You cannot follow yourself.' });
+        }
+
+        const targetUser = await User.findById(targetUserId);
+        if (!targetUser) {
+            return res.status(404).json({ success: false, message: 'Athlete not found.' });
+        }
+
+        const currentUser = await User.findById(req.user.id);
+        if (!currentUser) {
+            return res.status(404).json({ success: false, message: 'Current user session invalid.' });
+        }
+
+        if (!targetUser.followers) targetUser.followers = [];
+        if (!currentUser.following) currentUser.following = [];
+
+        const isFollowing = currentUser.following.some(id => id.toString() === targetUserId);
+
+        if (isFollowing) {
+            currentUser.following = currentUser.following.filter(id => id.toString() !== targetUserId);
+            targetUser.followers = targetUser.followers.filter(id => id.toString() !== req.user.id);
+        } else {
+            currentUser.following.push(targetUserId);
+            targetUser.followers.push(req.user.id);
+        }
+
+        await currentUser.save();
+        await targetUser.save();
+
+        res.status(200).json({ 
+            success: true, 
+            isFollowing: !isFollowing,
+            followersCount: targetUser.followers.length,
+            followingCount: targetUser.following.length,
+            message: !isFollowing ? `Now following ${targetUser.name}` : `Unfollowed ${targetUser.name}`
+        });
+    } catch (err) {
+        console.error('toggleFollowUser error:', err);
+        res.status(500).json({ success: false, message: 'Unable to update follow status.' });
+    }
+};
+
+// @desc    Get athlete community profile modal/card
+// @route   GET /api/community/users/:id/profile
+// @access  Private
+exports.getUserCommunityProfile = async (req, res) => {
+    try {
+        const targetUser = await User.findById(req.params.id).select('name email role avatar bio followers following createdAt');
+        if (!targetUser) {
+            return res.status(404).json({ success: false, message: 'Athlete not found.' });
+        }
+
+        const userProfile = await UserProfile.findOne({ userId: targetUser._id }).select('fitnessGoals height weight gender');
+        const workoutsCount = await WorkoutLog.countDocuments({ userId: targetUser._id });
+
+        const athletePosts = await Post.find({ author: targetUser._id })
+            .sort({ createdAt: -1 })
+            .limit(6)
+            .populate('author', 'name email avatar role');
+
+        const isFollowing = (targetUser.followers || []).some(id => id.toString() === req.user.id);
+
+        res.status(200).json({
+            success: true,
+            data: {
+                user: {
+                    _id: targetUser._id,
+                    name: targetUser.name,
+                    email: targetUser.email,
+                    role: targetUser.role,
+                    avatar: targetUser.avatar,
+                    bio: targetUser.bio || '',
+                    createdAt: targetUser.createdAt,
+                    followersCount: targetUser.followers?.length || 0,
+                    followingCount: targetUser.following?.length || 0,
+                    isFollowing,
+                    isSelf: targetUser._id.toString() === req.user.id
+                },
+                profile: userProfile || null,
+                metrics: {
+                    totalWorkouts: workoutsCount || 0,
+                    totalPosts: athletePosts.length
+                },
+                recentPosts: athletePosts
+            }
+        });
+    } catch (err) {
+        console.error('getUserCommunityProfile error:', err);
+        res.status(500).json({ success: false, message: 'Failed to load athlete profile.' });
     }
 };
 
@@ -130,7 +310,7 @@ exports.addComment = async (req, res) => {
         });
 
         await post.save();
-        await post.populate('comments.author', 'name email avatar');
+        await post.populate('comments.author', 'name email avatar role');
         res.status(201).json({ success: true, data: post.comments });
     } catch (err) {
         console.error(err);

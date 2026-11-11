@@ -24,6 +24,19 @@ const UserSchema = new mongoose.Schema({
         default: false
     },
     avatar: String,
+    bio: {
+        type: String,
+        maxlength: 250,
+        default: ''
+    },
+    followers: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }],
+    following: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }],
     emailVerifyToken: String,
     resetPasswordToken: String,
     resetPasswordExpires: Date,
