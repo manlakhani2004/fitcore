@@ -32,7 +32,10 @@ exports.getPosts = async (req, res) => {
             .populate('author', 'name email avatar')
             .populate('comments.author', 'name email avatar');
             
-        res.status(200).json({ success: true, count: posts.length, data: posts });
+        // Filter out orphan posts whose author was deleted
+        const validPosts = posts.filter(p => p.author != null);
+            
+        res.status(200).json({ success: true, count: validPosts.length, data: validPosts });
     } catch (err) {
         console.error(err);
         res.status(500).json({ success: false, message: 'Server Error' });
@@ -84,6 +87,7 @@ exports.addComment = async (req, res) => {
         });
 
         await post.save();
+        await post.populate('comments.author', 'name email avatar');
         res.status(201).json({ success: true, data: post.comments });
     } catch (err) {
         console.error(err);

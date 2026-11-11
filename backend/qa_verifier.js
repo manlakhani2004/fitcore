@@ -62,6 +62,7 @@ async function runQA() {
 
     await mongoose.connect('mongodb://127.0.0.1:27017/fitcore', { directConnection: true });
     const User = require('./models/User');
+    const Post = require('./models/Post');
 
     let totalTests = 0;
     let passedTests = 0;
@@ -356,9 +357,10 @@ async function runQA() {
         console.log(`SUCCESS RATE: ${Math.round((passedTests / totalTests) * 100)}%`);
         console.log('========================================\n');
 
-        // Cleanup test accounts
+        // Cleanup test accounts and test posts
         await User.deleteMany({ email: { $in: [memberEmail, coachEmail, adminEmail] } });
-        console.log('[QA CLEANUP] Cleaned up temporary test accounts.');
+        await Post.deleteMany({ content: 'Just smashed a heavy chest session! Loving FitCore!' });
+        console.log('[QA CLEANUP] Cleaned up temporary test accounts and test posts.');
 
     } catch (err) {
         console.error('Fatal error during QA verification:', err);

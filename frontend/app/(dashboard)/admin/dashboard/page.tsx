@@ -148,7 +148,7 @@ export default function AdminDashboard() {
               {users.map((u) => (
                 <tr key={u._id} className="hover:bg-background/50 transition-colors">
                   <td className="p-4">
-                    <div className="font-bold">{u.firstName} {u.lastName}</div>
+                    <div className="font-bold">{u.name || (u.firstName ? `${u.firstName} ${u.lastName || ''}`.trim() : 'User')}</div>
                     <div className="text-xs text-text-muted">{u.email}</div>
                   </td>
                   <td className="p-4">
