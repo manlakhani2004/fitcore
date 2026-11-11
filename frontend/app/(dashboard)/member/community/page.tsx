@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Image as ImageIcon, Send, MessageCircle } from "lucide-react";
+import { Image as ImageIcon, Send, MessageCircle, X, Loader2 } from "lucide-react";
 import { LikeButton } from "@/components/ui/LikeButton";
 import { useAuthStore } from "@/store/authStore";
 import api from "@/lib/api";
@@ -22,13 +22,28 @@ function getDisplayInitial(author: any): string {
   return name.charAt(0).toUpperCase() || "A";
 }
 
+function formatImageUrl(url?: string): string {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:') || url.startsWith('blob:')) {
+    return url;
+  }
+  const backendBase = process.env.NEXT_PUBLIC_API_URL 
+    ? process.env.NEXT_PUBLIC_API_URL.replace(/\/api\/?$/, '') 
+    : 'http://localhost:5000';
+  return `${backendBase}${url.startsWith('/') ? '' : '/'}${url}`;
+}
+
 export default function CommunityPage() {
   const user = useAuthStore((state) => state.user);
   const [posts, setPosts] = useState<any[]>([]);
   const [newPostContent, setNewPostContent] = useState("");
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isPosting, setIsPosting] = useState(false);
   const [expandedComments, setExpandedComments] = useState<string | null>(null);
   const [commentInputs, setCommentInputs] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(true);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fetchPosts = async () => {
     try {
@@ -47,21 +62,66 @@ export default function CommunityPage() {
     fetchPosts();
   }, []);
 
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file (PNG, JPG, WEBP)');
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('Image size must be under 10MB');
+      return;
+    }
+
+    setSelectedImage(file);
+    const objectUrl = URL.createObjectURL(file);
+    setPreviewUrl(objectUrl);
+  };
+
+  const removeSelectedImage = () => {
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
+    setSelectedImage(null);
+    setPreviewUrl(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   const handlePostSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newPostContent.trim()) return;
+    if (!newPostContent.trim() && !selectedImage) return;
 
+    setIsPosting(true);
     try {
-      const res = await api.post('/community/posts', {
-        content: newPostContent
+      const formData = new FormData();
+      if (newPostContent.trim()) {
+        formData.append('content', newPostContent.trim());
+      }
+      if (selectedImage) {
+        formData.append('image', selectedImage);
+      }
+
+      const res = await api.post('/community/posts', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       });
+
       if (res.data.success) {
-        toast.success("Posted successfully!");
+        toast.success("Posted to community!");
         setNewPostContent("");
+        removeSelectedImage();
         fetchPosts(); // Refresh posts
       }
-    } catch (err) {
-      toast.error("Failed to create post");
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Failed to create post");
+    } finally {
+      setIsPosting(false);
     }
   };
 
@@ -95,14 +155,14 @@ export default function CommunityPage() {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-display font-bold">Community Feed</h1>
-        <p className="text-text-muted mt-1">Share your progress and hype up others.</p>
+        <p className="text-text-muted mt-1">Share your progress, lift PRs, and hype up others.</p>
       </div>
 
       {/* Post Creator */}
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-surface rounded-3xl p-6 border border-border"
+        className="bg-surface rounded-3xl p-6 border border-border shadow-sm"
       >
         <form onSubmit={handlePostSubmit}>
           <div className="flex gap-4">
@@ -113,19 +173,68 @@ export default function CommunityPage() {
               value={newPostContent}
               onChange={(e) => setNewPostContent(e.target.value)}
               placeholder="Share your latest workout, milestone, or training win..."
-              className="w-full bg-background border border-border rounded-xl p-4 text-sm focus:outline-none focus:border-primary transition-colors resize-none h-24"
+              className="w-full bg-background border border-border rounded-xl p-4 text-sm focus:outline-none focus:border-primary transition-colors resize-none h-24 text-text-primary"
             />
           </div>
+
+          {/* Image Attachment Preview */}
+          {previewUrl && (
+            <div className="mt-3 pl-14 relative inline-block group">
+              <div className="relative rounded-2xl overflow-hidden border border-border max-w-sm max-h-60 bg-black/5 dark:bg-black/20 shadow-sm">
+                <img 
+                  src={previewUrl} 
+                  alt="Selected preview" 
+                  className="w-full h-auto max-h-60 object-cover" 
+                />
+                <button
+                  type="button"
+                  onClick={removeSelectedImage}
+                  className="absolute top-2 right-2 p-1.5 rounded-full bg-slate-900/80 hover:bg-slate-900 text-white backdrop-blur-sm transition-transform active:scale-90 shadow-md"
+                  title="Remove image"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <p className="text-[11px] text-text-muted mt-1 font-medium">
+                {selectedImage?.name} • {((selectedImage?.size || 0) / (1024 * 1024)).toFixed(1)} MB
+              </p>
+            </div>
+          )}
+
           <div className="flex justify-between items-center mt-4 pl-14">
-            <button type="button" className="text-text-muted hover:text-primary transition-colors p-2">
-              <ImageIcon className="w-5 h-5" />
+            <input 
+              ref={fileInputRef} 
+              type="file" 
+              accept="image/*" 
+              className="hidden" 
+              onChange={handleImageSelect} 
+            />
+            <button 
+              type="button" 
+              onClick={() => fileInputRef.current?.click()}
+              className="flex items-center gap-1.5 text-xs font-semibold text-text-muted hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 px-3 py-1.5 rounded-xl border border-transparent hover:border-indigo-500/20 transition-all cursor-pointer"
+              title="Attach a photo"
+            >
+              <ImageIcon className="w-4 h-4 text-indigo-500" />
+              <span>{selectedImage ? "Change Photo" : "Photo"}</span>
             </button>
+
             <button 
               type="submit"
-              disabled={!newPostContent.trim()}
-              className="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2 rounded-full text-sm font-semibold shadow-md shadow-indigo-500/20 transition-all disabled:opacity-50 flex items-center gap-2"
+              disabled={(!newPostContent.trim() && !selectedImage) || isPosting}
+              className="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2 rounded-full text-sm font-semibold shadow-md shadow-indigo-500/20 transition-all disabled:opacity-50 flex items-center gap-2 cursor-pointer"
             >
-              Post <Send className="w-4 h-4" />
+              {isPosting ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Posting...</span>
+                </>
+              ) : (
+                <>
+                  <span>Post</span>
+                  <Send className="w-4 h-4" />
+                </>
+              )}
             </button>
           </div>
         </form>
@@ -157,7 +266,7 @@ export default function CommunityPage() {
                 <div className="p-6 flex items-center gap-4">
                   <div className="w-10 h-10 rounded-full bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30 flex items-center justify-center font-bold text-sm shrink-0 overflow-hidden shadow-sm">
                     {post.author?.avatar ? (
-                      <img src={post.author.avatar} alt={authorName} className="w-full h-full object-cover" />
+                      <img src={formatImageUrl(post.author.avatar)} alt={authorName} className="w-full h-full object-cover" />
                     ) : (
                       <span>{authorInitial}</span>
                     )}
@@ -169,14 +278,23 @@ export default function CommunityPage() {
                 </div>
 
                 {/* Post Content */}
-                <div className="px-6 pb-4">
-                  <p className="text-text-primary leading-relaxed text-sm whitespace-pre-line">{post.content}</p>
-                </div>
+                {post.content && (
+                  <div className="px-6 pb-4">
+                    <p className="text-text-primary leading-relaxed text-sm whitespace-pre-line">{post.content}</p>
+                  </div>
+                )}
 
                 {/* Optional Image */}
                 {post.imageUrl && (
                   <div className="px-6 pb-4">
-                    <img src={post.imageUrl} alt="Post attachment" className="w-full h-auto rounded-2xl border border-border" />
+                    <div className="rounded-2xl overflow-hidden border border-border bg-black/5 dark:bg-black/20 max-h-[500px] flex items-center justify-center">
+                      <img 
+                        src={formatImageUrl(post.imageUrl)} 
+                        alt="Post attachment" 
+                        className="w-full h-auto max-h-[500px] object-contain rounded-2xl" 
+                        loading="lazy"
+                      />
+                    </div>
                   </div>
                 )}
 
@@ -187,7 +305,7 @@ export default function CommunityPage() {
                   </div>
                   <button 
                     onClick={() => setExpandedComments(expandedComments === post._id ? null : post._id)}
-                    className="flex items-center gap-2 text-text-muted hover:text-primary transition-colors p-2 rounded-full"
+                    className="flex items-center gap-2 text-text-muted hover:text-primary transition-colors p-2 rounded-full cursor-pointer"
                   >
                     <MessageCircle className="w-5 h-5" />
                     <span className="text-sm font-bold">{post.comments?.length || 0}</span>
@@ -213,7 +331,7 @@ export default function CommunityPage() {
                             <div key={c._id} className="flex gap-3 items-start">
                               <div className="w-8 h-8 rounded-full bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30 flex items-center justify-center text-xs font-bold shrink-0 overflow-hidden mt-0.5">
                                 {c.author?.avatar ? (
-                                  <img src={c.author.avatar} alt={commentAuthorName} className="w-full h-full object-cover" />
+                                  <img src={formatImageUrl(c.author.avatar)} alt={commentAuthorName} className="w-full h-full object-cover" />
                                 ) : (
                                   <span>{commentInitial}</span>
                                 )}
@@ -242,7 +360,7 @@ export default function CommunityPage() {
                             />
                             <button 
                               onClick={() => handleCommentSubmit(post._id)}
-                              className="absolute right-2 top-1/2 -translate-y-1/2 text-primary hover:text-primary-hover p-1"
+                              className="absolute right-2 top-1/2 -translate-y-1/2 text-primary hover:text-primary-hover p-1 cursor-pointer"
                             >
                               <Send className="w-4 h-4" />
                             </button>

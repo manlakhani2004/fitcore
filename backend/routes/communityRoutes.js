@@ -1,7 +1,9 @@
 const express = require('express');
 const { protect } = require('../middleware/authMiddleware');
+const { upload } = require('../config/cloudinary');
 const {
     createPost,
+    uploadPostImage,
     getPosts,
     toggleLike,
     addComment,
@@ -15,7 +17,9 @@ router.use(protect);
 
 router.route('/posts')
     .get(getPosts)
-    .post(createPost);
+    .post(upload.fields([{ name: 'image', maxCount: 1 }, { name: 'file', maxCount: 1 }]), createPost);
+
+router.post('/upload', upload.fields([{ name: 'image', maxCount: 1 }, { name: 'file', maxCount: 1 }]), uploadPostImage);
 
 router.post('/posts/:id/like', toggleLike);
 router.post('/posts/:id/comments', addComment);

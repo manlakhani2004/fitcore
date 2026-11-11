@@ -7,18 +7,52 @@ const User = require('../models/User');
 // @access  Private
 exports.createPost = async (req, res) => {
     try {
-        const { content, imageUrl } = req.body;
+        const { content } = req.body;
+        let imageUrl = req.body.imageUrl || '';
+
+        // Check if an image was uploaded via multipart/form-data
+        const file = req.file || (req.files?.image?.[0]) || (req.files?.file?.[0]);
+        if (file) {
+            imageUrl = file.path?.startsWith('http') 
+                ? file.path 
+                : `${req.protocol}://${req.get('host')}/uploads/${file.filename}`;
+        }
+
+        if (!content && !imageUrl) {
+            return res.status(400).json({ success: false, message: 'Please provide post content or an image' });
+        }
 
         const post = await Post.create({
             author: req.user.id,
-            content,
-            imageUrl
+            content: content || '',
+            imageUrl: imageUrl || undefined
         });
+
+        await post.populate('author', 'name email avatar');
 
         res.status(201).json({ success: true, data: post });
     } catch (err) {
-        console.error(err);
+        console.error('createPost error:', err);
         res.status(500).json({ success: false, message: 'Server Error' });
+    }
+};
+
+// @desc    Upload image for community post
+// @route   POST /api/community/upload
+// @access  Private
+exports.uploadPostImage = async (req, res) => {
+    try {
+        const file = req.file || (req.files?.image?.[0]) || (req.files?.file?.[0]);
+        if (!file) {
+            return res.status(400).json({ success: false, message: 'Please select an image file to upload' });
+        }
+        const imageUrl = file.path?.startsWith('http') 
+            ? file.path 
+            : `${req.protocol}://${req.get('host')}/uploads/${file.filename}`;
+        res.status(200).json({ success: true, url: imageUrl });
+    } catch (err) {
+        console.error('uploadPostImage error:', err);
+        res.status(500).json({ success: false, message: 'Image upload failed' });
     }
 };
 
