@@ -19,6 +19,7 @@ export default function WorkoutsDashboard() {
   const [heatmap, setHeatmap] = useState<number[]>(Array(35).fill(0));
   const [isLoading, setIsLoading] = useState(true);
   const [selectedExercise, setSelectedExercise] = useState<any | null>(null);
+  const [displayLimit, setDisplayLimit] = useState(24);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -61,21 +62,29 @@ export default function WorkoutsDashboard() {
     fetchData();
   }, []);
 
+  // Reset pagination limit on filter change
+  useEffect(() => {
+    setDisplayLimit(24);
+  }, [activeTab, searchQuery]);
+
   const filteredExercises = exercises.filter(ex => {
     const matchesTab = activeTab === 'All' || (ex.muscleGroups && ex.muscleGroups.some((m: string) => m.toLowerCase() === activeTab.toLowerCase()));
     const matchesSearch = ex.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-      ex.muscleGroups?.some((m: string) => m.toLowerCase().includes(searchQuery.toLowerCase()));
+      ex.muscleGroups?.some((m: string) => m.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      ex.equipment?.some((eq: string) => eq.toLowerCase().includes(searchQuery.toLowerCase()));
     return matchesTab && matchesSearch;
   });
+
+  const displayedExercises = filteredExercises.slice(0, displayLimit);
 
   return (
     <div className="max-w-7xl mx-auto space-y-10 pb-10">
       
       {/* Header & Quick Start */}
-      <div className="bg-surface p-8 rounded-3xl border border-border">
+      <div className="bg-surface p-8 rounded-3xl border border-border shadow-sm">
         <div>
           <h1 className="text-3xl font-display font-bold">Your Training</h1>
-          <p className="text-text-muted mt-2">Track progress, explore exercises, and crush your fitness goals with progressive overload.</p>
+          <p className="text-text-muted mt-2">Track progress, explore verified exercises with animated movement guides, and crush your fitness goals.</p>
           <div className="flex flex-wrap items-center gap-3 mt-6">
             <Link href="/member/workouts/today">
               <motion.button 
@@ -105,7 +114,7 @@ export default function WorkoutsDashboard() {
               <Dumbbell className="text-primary w-6 h-6" /> Exercise Library
             </h2>
             <span className="text-xs font-bold text-text-muted bg-surface px-3 py-1.5 rounded-full border border-border">
-              {filteredExercises.length} Movements
+              {filteredExercises.length} Movements Available
             </span>
           </div>
 
@@ -132,7 +141,7 @@ export default function WorkoutsDashboard() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
               <input 
                 type="text" 
-                placeholder="Search exercises..." 
+                placeholder="Search by name, muscle, equipment..." 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full bg-surface border border-border rounded-full pl-9 pr-4 py-2 text-sm focus:outline-none focus:border-primary transition-colors text-text-primary"
@@ -143,7 +152,7 @@ export default function WorkoutsDashboard() {
           {/* Grid */}
           <motion.div layout className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <AnimatePresence>
-              {filteredExercises.map((ex, i) => (
+              {displayedExercises.map((ex, i) => (
                 <motion.div
                   layout
                   initial={{ opacity: 0, scale: 0.95 }}
@@ -153,11 +162,17 @@ export default function WorkoutsDashboard() {
                   onClick={() => setSelectedExercise(ex)}
                   className="group bg-surface border border-border rounded-2xl p-4 flex gap-4 hover:border-primary/50 transition-colors cursor-pointer"
                 >
-                  <div className="w-24 h-24 bg-background rounded-xl flex flex-col items-center justify-center text-border group-hover:bg-primary/10 group-hover:text-primary transition-colors relative overflow-hidden shrink-0">
-                    {ex.thumbnailUrl && (
-                      <img src={ex.thumbnailUrl} alt={ex.name} className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity" />
+                  <div className="w-24 h-24 bg-white/5 rounded-xl flex flex-col items-center justify-center text-border group-hover:bg-primary/10 group-hover:text-primary transition-colors relative overflow-hidden shrink-0 p-1">
+                    {ex.thumbnailUrl ? (
+                      <img 
+                        src={ex.thumbnailUrl} 
+                        alt={ex.name} 
+                        className="w-full h-full object-contain rounded-lg opacity-85 group-hover:opacity-100 transition-opacity" 
+                        loading="lazy"
+                      />
+                    ) : (
+                      <Play className="w-8 h-8 opacity-40 group-hover:opacity-100" />
                     )}
-                    <Play className="w-8 h-8 z-10 opacity-50 group-hover:opacity-100" />
                   </div>
                   
                   <div className="flex-1 flex flex-col justify-center min-w-0">
@@ -165,6 +180,9 @@ export default function WorkoutsDashboard() {
                     <div className="flex flex-wrap gap-1.5 text-[11px] mb-2">
                       <span className="bg-background px-2 py-0.5 rounded text-text-muted border border-border">{ex.muscleGroups?.[0] || 'General'}</span>
                       <span className="bg-background px-2 py-0.5 rounded text-text-muted border border-border capitalize">{ex.difficulty || 'beginner'}</span>
+                      {ex.equipment?.[0] && (
+                        <span className="bg-background px-2 py-0.5 rounded text-primary/80 border border-border">{ex.equipment[0]}</span>
+                      )}
                     </div>
                     <span className="text-xs text-text-muted font-mono">
                       {ex.duration ? `${ex.duration}s hold` : `${ex.sets || 3} Sets x ${ex.reps || 10} Reps`}
@@ -174,6 +192,18 @@ export default function WorkoutsDashboard() {
               ))}
             </AnimatePresence>
           </motion.div>
+
+          {/* Load More Button */}
+          {filteredExercises.length > displayLimit && (
+            <div className="pt-4 text-center">
+              <button 
+                onClick={() => setDisplayLimit(prev => prev + 24)}
+                className="px-6 py-3 rounded-2xl bg-surface border border-border hover:border-primary text-text-primary text-xs font-bold transition-all shadow-sm hover:bg-background"
+              >
+                Load More Exercises ({Math.min(displayLimit, filteredExercises.length)} of {filteredExercises.length})
+              </button>
+            </div>
+          )}
           
           {filteredExercises.length === 0 && (
             <div className="text-center py-12 border border-dashed border-border rounded-2xl text-text-muted space-y-2">
@@ -234,10 +264,10 @@ export default function WorkoutsDashboard() {
 
       </div>
 
-      {/* Exercise Detail Modal */}
+      {/* Exercise Detail Modal with Animated Movement GIF */}
       <AnimatePresence>
         {selectedExercise && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md">
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -246,16 +276,28 @@ export default function WorkoutsDashboard() {
             >
               <button 
                 onClick={() => setSelectedExercise(null)}
-                className="absolute top-5 right-5 p-2 rounded-xl text-text-muted hover:text-text-primary hover:bg-background transition-colors"
+                className="absolute top-5 right-5 p-2 rounded-xl text-text-muted hover:text-text-primary hover:bg-background transition-colors z-20"
               >
                 <X className="w-5 h-5" />
               </button>
 
               <div className="space-y-6">
+                
+                {/* Animated Movement GIF Preview */}
+                {(selectedExercise.videoUrl || selectedExercise.thumbnailUrl) && (
+                  <div className="w-full h-64 bg-white/5 rounded-2xl overflow-hidden border border-border flex items-center justify-center relative p-3">
+                    <img 
+                      src={selectedExercise.videoUrl || selectedExercise.thumbnailUrl} 
+                      alt={selectedExercise.name} 
+                      className="max-h-full max-w-full object-contain rounded-xl"
+                    />
+                  </div>
+                )}
+
                 <div>
                   <div className="flex items-center gap-2 mb-2">
                     <span className="px-3 py-1 rounded-full text-xs font-bold bg-primary/10 text-primary border border-primary/20">
-                      {selectedExercise.muscleGroups?.join(' & ') || 'General'}
+                      {selectedExercise.muscleGroups?.join(', ') || 'General'}
                     </span>
                     <span className="px-3 py-1 rounded-full text-xs font-bold bg-accent/10 text-accent border border-accent/20 capitalize">
                       {selectedExercise.difficulty || 'beginner'}

@@ -281,10 +281,10 @@ const seedDB = async () => {
             { upsert: true, new: true }
         );
 
-        console.log('Seeding Exercise Library...');
-        const { exercises } = require('./seedExercises');
-        await Exercise.deleteMany();
-        await Exercise.insertMany(exercises);
+        console.log('Seeding FitMindAI Exercise Library...');
+        const { seed: seedFitMind } = require('./seedFitMindExercises');
+        // FitMind seeder handles wipe & bulk insertion of all 1,323 movements
+        await seedFitMind();
 
         console.log('Data successfully seeded!');
         console.log('--- TEST ACCOUNTS (Password: man@1610) ---');
