@@ -18,14 +18,19 @@ exports.createPost = async (req, res) => {
                 : `${req.protocol}://${req.get('host')}/uploads/${file.filename}`;
         }
 
-        if (!content && !imageUrl) {
-            return res.status(400).json({ success: false, message: 'Please provide post content or an image' });
+        const trimmedContent = (content || '').trim();
+
+        if (!trimmedContent && !imageUrl) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Please write a caption or attach a photo before posting.' 
+            });
         }
 
         const post = await Post.create({
             author: req.user.id,
-            content: content || '',
-            imageUrl: imageUrl || undefined
+            content: trimmedContent,
+            imageUrl: imageUrl || ''
         });
 
         await post.populate('author', 'name email avatar');
@@ -33,7 +38,11 @@ exports.createPost = async (req, res) => {
         res.status(201).json({ success: true, data: post });
     } catch (err) {
         console.error('createPost error:', err);
-        res.status(500).json({ success: false, message: 'Server Error' });
+        if (err.name === 'ValidationError') {
+            const firstError = Object.values(err.errors)[0]?.message || 'Please provide valid post data.';
+            return res.status(400).json({ success: false, message: firstError });
+        }
+        res.status(500).json({ success: false, message: 'Unable to publish post. Please try again.' });
     }
 };
 

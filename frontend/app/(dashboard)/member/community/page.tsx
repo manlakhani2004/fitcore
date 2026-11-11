@@ -94,7 +94,10 @@ export default function CommunityPage() {
 
   const handlePostSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newPostContent.trim() && !selectedImage) return;
+    if (!newPostContent.trim() && !selectedImage) {
+      toast.error("Please write a message or attach a photo before posting.");
+      return;
+    }
 
     setIsPosting(true);
     try {
@@ -113,13 +116,14 @@ export default function CommunityPage() {
       });
 
       if (res.data.success) {
-        toast.success("Posted to community!");
+        toast.success("Post published to community feed!");
         setNewPostContent("");
         removeSelectedImage();
         fetchPosts(); // Refresh posts
       }
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Failed to create post");
+      const errorMsg = err.response?.data?.message || "Unable to publish post. Please try again.";
+      toast.error(errorMsg, { id: 'post-error' });
     } finally {
       setIsPosting(false);
     }
@@ -127,16 +131,20 @@ export default function CommunityPage() {
 
   const handleCommentSubmit = async (postId: string) => {
     const content = commentInputs[postId];
-    if (!content?.trim()) return;
+    if (!content?.trim()) {
+      toast.error("Please enter a comment before submitting.");
+      return;
+    }
 
     try {
-      const res = await api.post(`/community/posts/${postId}/comments`, { content });
+      const res = await api.post(`/community/posts/${postId}/comments`, { content: content.trim() });
       if (res.data.success) {
+        toast.success("Comment added!");
         setCommentInputs(prev => ({ ...prev, [postId]: "" }));
         fetchPosts(); // Refresh posts to show new comment
       }
-    } catch (err) {
-      toast.error("Failed to add comment");
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Unable to add comment. Please try again.");
     }
   };
 

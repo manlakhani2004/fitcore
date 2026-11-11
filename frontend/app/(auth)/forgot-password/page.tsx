@@ -14,18 +14,16 @@ export default function ForgotPasswordPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) return toast.error("Please enter your email");
+    if (!email.trim()) return toast.error("Please enter your registered email address.");
     setIsLoading(true);
     try {
-      const res = await api.post("/auth/forgot-password", { email });
+      const res = await api.post("/auth/forgot-password", { email: email.trim() });
       if (res.data.success) {
         setSent(true);
-        if (res.data.resetToken) {
-          toast.success(`Dev mode - Token: ${res.data.resetToken}`);
-        }
+        toast.success("Password reset instructions sent to your email.");
       }
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Unable to send reset email. Please try again.");
     } finally {
       setIsLoading(false);
     }

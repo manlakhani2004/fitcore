@@ -61,7 +61,40 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-background text-text-primary selection:bg-primary/30 transition-colors duration-150">
         <ThemeProvider>
           {children}
-          <Toaster position="top-right" />
+          <Toaster 
+            position="top-right" 
+            gutter={8}
+            toastOptions={{
+              duration: 3500,
+              className: 'fitcore-toast',
+              style: {
+                background: 'var(--bg-surface-elevated, #161822)',
+                color: 'var(--text-main, #FFFFFF)',
+                border: '1px solid var(--border-color, rgba(255, 255, 255, 0.1))',
+                borderRadius: '16px',
+                padding: '12px 18px',
+                fontSize: '13.5px',
+                fontWeight: '500',
+                letterSpacing: '-0.01em',
+                boxShadow: 'var(--card-shadow, 0 10px 30px -5px rgba(0, 0, 0, 0.5))',
+                backdropFilter: 'blur(16px)',
+                WebkitBackdropFilter: 'blur(16px)',
+                maxWidth: '420px',
+              },
+              success: {
+                iconTheme: {
+                  primary: '#10B981',
+                  secondary: '#FFFFFF',
+                },
+              },
+              error: {
+                iconTheme: {
+                  primary: '#EF4444',
+                  secondary: '#FFFFFF',
+                },
+              },
+            }}
+          />
         </ThemeProvider>
       </body>
     </html>

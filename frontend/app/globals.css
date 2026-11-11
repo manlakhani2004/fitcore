@@ -324,3 +324,25 @@ html.theme-transitioning textarea {
   border-color: rgba(99, 102, 241, 0.35);
   background: var(--color-surface-hover);
 }
+
+/* ==========================================================================
+   Senior Industry-Grade Toast Styling (Linear / Apple / Stripe standard)
+   ========================================================================== */
+.fitcore-toast {
+  font-family: var(--font-sans) !important;
+  line-height: 1.45 !important;
+}
+
+html:not(.dark) .fitcore-toast {
+  background: #FFFFFF !important;
+  color: #0F172A !important;
+  border-color: #E2E8F0 !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 0 1px 1px rgba(0, 0, 0, 0.04) !important;
+}
+
+html.dark .fitcore-toast {
+  background: #161822 !important;
+  color: #F8FAFC !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.65), inset 0 1px 0 0 rgba(255, 255, 255, 0.08) !important;
+}

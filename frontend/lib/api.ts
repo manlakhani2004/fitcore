@@ -79,10 +79,14 @@ api.interceptors.response.use(
       // Don't toast role authorization errors - they're expected for protected routes
       return Promise.reject(error);
     } else if (!error.response) {
-      toast.error('Network error. Please check your connection.');
-    } else if (error.response?.status !== 401) {
-      const message = error.response?.data?.message || 'Something went wrong';
-      toast.error(message);
+      toast.error('Network connectivity lost. Please check your internet connection.', { id: 'network-error' });
+    } else if (error.response?.status !== 401 && !error.config?.skipGlobalToast) {
+      const serverMsg = error.response?.data?.message;
+      if (serverMsg && serverMsg !== 'Server Error' && serverMsg !== 'Internal Server Error') {
+        toast.error(serverMsg, { id: serverMsg });
+      } else if (error.response?.status >= 500) {
+        toast.error('Unable to complete request. Please try again shortly.', { id: 'server-error' });
+      }
     }
     return Promise.reject(error);
   }
