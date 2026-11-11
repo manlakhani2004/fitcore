@@ -6,6 +6,8 @@ import { NotificationDrawer } from "@/components/ui/NotificationDrawer";
 import { useState, useEffect } from "react";
 import api from "@/lib/api";
 
+import Link from "next/link";
+
 export function TopNav() {
   const user = useAuthStore((state) => state.user);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
@@ -45,7 +47,10 @@ export function TopNav() {
             )}
           </button>
 
-          <div className="flex items-center gap-3 pl-6 border-l border-border cursor-pointer group">
+          <Link 
+            href={user?.role === 'coach' ? '/coach/profile' : user?.role === 'admin' ? '/admin/settings' : '/member/settings?tab=profile'}
+            className="flex items-center gap-3 pl-6 border-l border-border cursor-pointer group"
+          >
             <div className="text-right hidden sm:block">
               <p className="text-sm font-medium text-text-primary group-hover:text-primary transition-colors">{user?.name || 'User'}</p>
               <p className="text-xs text-text-muted capitalize">{user?.role || 'Member'}</p>
@@ -55,7 +60,7 @@ export function TopNav() {
                 {user?.name?.charAt(0) || 'U'}
               </div>
             </div>
-          </div>
+          </Link>
         </div>
       </header>
 

@@ -77,20 +77,28 @@ export default function CoachProfilePage({ params }: { params: Promise<{ id: str
   }, [id, selectedDay]);
 
   const handleBookingConfirm = async () => {
+    if (!selectedSlot) {
+      toast.error("Please select a time slot");
+      return;
+    }
     try {
       const date = new Date();
       date.setDate(date.getDate() + ((selectedDay + 7 - date.getDay()) % 7));
+      const [startH, startM] = selectedSlot.split(':').map(Number);
+      const endH = String((startH + 1) % 24).padStart(2, '0');
+      const endM = String(startM || 0).padStart(2, '0');
       await api.post('/appointments/book', {
         coachId: id,
         date: date.toISOString().split('T')[0],
         startTime: selectedSlot,
-        endTime: String(Number(selectedSlot.split(':')[0]) + 1).padStart(2, '0') + ':00',
+        endTime: `${endH}:${endM}`,
         type: 'online'
       });
       toast.success("Appointment Confirmed!");
       setSelectedSlot(null);
     } catch (err) {
       toast.error("Booking failed. Slot might be taken.");
+      throw err;
     }
   };
 

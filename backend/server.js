@@ -1,7 +1,7 @@
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
 const cookieParser = require('cookie-parser');
 const connectDB = require('./config/db');
 const { apiLimiter } = require('./middleware/rateLimiter');
@@ -61,6 +61,7 @@ app.use('/api/appointments', require('./routes/appointmentRoutes'));
 app.use('/api/payments', require('./routes/paymentRoutes'));
 app.use('/api/reports', require('./routes/reportsRoutes'));
 app.use('/api/tasks', require('./routes/taskRoutes'));
+app.use('/api/check-ins', require('./routes/checkInRoutes'));
 
 app.get('/', (req, res) => res.send('API Running'));
 

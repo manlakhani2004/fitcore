@@ -48,7 +48,7 @@ exports.getUsers = async (req, res) => {
             return res.status(403).json({ success: false, message: 'Not authorized as admin' });
         }
 
-        const users = await User.find().select('-password').sort({ createdAt: -1 });
+        const users = await User.find().select('-password -passwordHash').sort({ createdAt: -1 });
 
         res.status(200).json({ success: true, count: users.length, data: users });
     } catch (err) {
@@ -76,7 +76,7 @@ exports.updateUserRole = async (req, res) => {
             req.params.id,
             { role },
             { new: true, runValidators: true }
-        ).select('-password');
+        ).select('-password -passwordHash');
 
         if (!user) {
             return res.status(404).json({ success: false, message: 'User not found' });
@@ -209,6 +209,48 @@ exports.createCoupon = async (req, res) => {
     try {
         const coupon = await Coupon.create(req.body);
         res.status(201).json({ success: true, data: coupon });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Server Error' });
+    }
+};
+
+// @desc    Get system settings
+// @route   GET /api/admin/settings
+// @access  Private (Admin)
+exports.getSettings = async (req, res) => {
+    try {
+        const SystemSetting = require('../models/SystemSetting');
+        let settings = await SystemSetting.findOne();
+        if (!settings) {
+            settings = await SystemSetting.create({
+                platformName: process.env.APP_NAME || 'FitCore',
+                supportEmail: 'support@fitcore.com',
+                stripePublicKey: 'pk_test_sample',
+                stripeSecretKey: 'sk_test_placeholder'
+            });
+        }
+        res.status(200).json({ success: true, data: settings });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Server Error' });
+    }
+};
+
+// @desc    Update system settings
+// @route   PUT /api/admin/settings
+// @access  Private (Admin)
+exports.updateSettings = async (req, res) => {
+    try {
+        const SystemSetting = require('../models/SystemSetting');
+        let settings = await SystemSetting.findOne();
+        if (!settings) {
+            settings = await SystemSetting.create(req.body);
+        } else {
+            Object.assign(settings, req.body);
+            await settings.save();
+        }
+        res.status(200).json({ success: true, data: settings });
     } catch (err) {
         console.error(err);
         res.status(500).json({ success: false, message: 'Server Error' });

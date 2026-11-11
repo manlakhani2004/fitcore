@@ -130,9 +130,49 @@ exports.getWorkoutHistory = async (req, res) => {
     try {
         const history = await WorkoutLog.find({ memberId: req.user.id })
             .sort({ date: -1 })
-            .populate('programId', 'name');
+            .populate('programId', 'name')
+            .populate('exercisesCompleted.exerciseId', 'name');
             
         res.status(200).json({ success: true, data: history });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Server Error' });
+    }
+};
+
+// @desc    Get member's last performance metrics per exercise
+// @route   GET /api/workouts/last-performance
+// @access  Private
+exports.getLastPerformance = async (req, res) => {
+    try {
+        const history = await WorkoutLog.find({ memberId: req.user.id })
+            .sort({ date: -1 })
+            .limit(25)
+            .populate('exercisesCompleted.exerciseId', 'name');
+
+        const performanceMap = {};
+
+        for (const log of history) {
+            if (Array.isArray(log.exercisesCompleted)) {
+                for (const item of log.exercisesCompleted) {
+                    const exName = item.name || item.exerciseId?.name;
+                    if (exName) {
+                        const key = exName.trim().toLowerCase();
+                        if (!performanceMap[key]) {
+                            performanceMap[key] = {
+                                name: exName,
+                                weight: item.weightUsed || 0,
+                                reps: item.repsCompleted || 0,
+                                sets: item.setsCompleted || 0,
+                                date: log.date
+                            };
+                        }
+                    }
+                }
+            }
+        }
+
+        res.status(200).json({ success: true, data: performanceMap });
     } catch (err) {
         console.error(err);
         res.status(500).json({ success: false, message: 'Server Error' });

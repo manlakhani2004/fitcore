@@ -10,7 +10,9 @@ const {
     updatePlan,
     deletePlan,
     getCoupons,
-    createCoupon
+    createCoupon,
+    getSettings,
+    updateSettings
 } = require('../controllers/adminController');
 
 const router = express.Router();
@@ -22,6 +24,8 @@ router.get('/users', getUsers);
 router.put('/users/:id/role', updateUserRole);
 router.get('/coaches/pending', getPendingCoaches);
 router.put('/coaches/:id/approve', approveCoach);
+router.get('/settings', getSettings);
+router.put('/settings', updateSettings);
 
 // Membership management
 router.post('/memberships/plans', createPlan);

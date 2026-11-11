@@ -32,6 +32,10 @@ const CoachProfileSchema = new mongoose.Schema({
     totalReviews: {
         type: Number,
         default: 0
+    },
+    googleMeetLink: {
+        type: String,
+        default: ''
     }
 }, { timestamps: true });
 

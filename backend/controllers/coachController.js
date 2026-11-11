@@ -162,12 +162,26 @@ exports.getCoachAvailability = async (req, res) => {
     }
 };
 
-// @desc    Update coach availability
+// @desc    Update coach availability (single day or bulk schedule)
 // @route   PUT /api/coaches/availability
 // @access  Private
 exports.updateAvailability = async (req, res) => {
     try {
-        const { dayOfWeek, slots } = req.body;
+        const { dayOfWeek, slots, schedule } = req.body;
+
+        if (Array.isArray(schedule)) {
+            for (const item of schedule) {
+                if (typeof item.dayOfWeek === 'number') {
+                    await CoachAvailability.findOneAndUpdate(
+                        { coachId: req.user.id, dayOfWeek: item.dayOfWeek },
+                        { coachId: req.user.id, dayOfWeek: item.dayOfWeek, slots: item.slots || [] },
+                        { upsert: true, new: true }
+                    );
+                }
+            }
+            const updated = await CoachAvailability.find({ coachId: req.user.id });
+            return res.status(200).json({ success: true, data: updated });
+        }
 
         let availability = await CoachAvailability.findOne({ coachId: req.user.id, dayOfWeek });
         

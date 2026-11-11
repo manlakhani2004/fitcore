@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { Users, DollarSign, Activity, ShieldAlert, MoreVertical } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuthStore } from "@/store/authStore";
+import { useRouter } from "next/navigation";
 import api from "@/lib/api";
 import toast from "react-hot-toast";
 
@@ -16,6 +18,8 @@ export default function AdminDashboard() {
   });
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { user } = useAuthStore();
+  const router = useRouter();
 
   const fetchAdminData = async () => {
     try {
@@ -28,18 +32,24 @@ export default function AdminDashboard() {
         setStats(statsRes.data.data);
       }
       if (usersRes.data.success) {
-        setUsers(usersRes.data.data);
+        setUsers(usersRes.data.data || []);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to fetch admin data', err);
+      const msg = err.response?.data?.message || 'Failed to fetch admin data';
+      toast.error(msg);
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
+    if (user && user.role !== 'admin') {
+      router.replace(user.role === 'coach' ? '/coach/dashboard' : '/member/workouts');
+      return;
+    }
     fetchAdminData();
-  }, []);
+  }, [user, router]);
 
   const handleRoleChange = async (userId: string, newRole: string) => {
     try {

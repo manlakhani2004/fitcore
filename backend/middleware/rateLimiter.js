@@ -4,6 +4,7 @@ const { rateLimit } = require('express-rate-limit');
 const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     limit: 500, // Limit each IP to 500 requests per window
+    skip: () => process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test',
     standardHeaders: 'draft-8',
     legacyHeaders: false,
     message: {
@@ -16,6 +17,7 @@ const apiLimiter = rateLimit({
 const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     limit: 30, // Limit each IP to 30 authentication attempts per 15 minutes
+    skip: () => process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test',
     standardHeaders: 'draft-8',
     legacyHeaders: false,
     message: {

@@ -190,10 +190,38 @@ async function runQA() {
             totalDuration: 45,
             caloriesBurned: 350,
             exercisesCompleted: [
-                { name: 'Barbell Bench Press', sets: [{ setNumber: 1, reps: 10, weight: 80 }] }
+                { name: 'Barbell Bench Press', setsCompleted: 3, repsCompleted: 10, weightUsed: 80 }
             ]
         }, memberHeaders);
         assert('Member can log workout without UserGamification crash', logWorkoutRes.status === 200 || logWorkoutRes.status === 201);
+
+        // 3.4 Progressive Overload Last Performance
+        const lastPerfRes = await request('GET', '/api/workouts/last-performance', null, memberHeaders);
+        assert('Member can fetch last-performance progressive overload history', lastPerfRes.status === 200 && lastPerfRes.data.success);
+
+        // 3.5 Weekly Sunday Check-In Suite
+        const checkInSubmit = await request('POST', '/api/check-ins', {
+            weight: 78.5,
+            sleepHours: 8,
+            sleepQuality: 5,
+            energyLevel: 4,
+            stressLevel: 2,
+            dietAdherence: '100% On Plan',
+            workoutsCompleted: 4,
+            notes: 'Felt very energized this week, squats felt smooth.'
+        }, memberHeaders);
+        assert('Member can submit weekly check-in', checkInSubmit.status === 201 && checkInSubmit.data.success);
+
+        const checkInId = checkInSubmit.data?.data?._id;
+        const myCheckInsRes = await request('GET', '/api/check-ins/my-check-ins', null, memberHeaders);
+        assert('Member can fetch their check-in history', myCheckInsRes.status === 200 && myCheckInsRes.data.count >= 1);
+
+        if (checkInId) {
+            const reviewRes = await request('PUT', `/api/check-ins/${checkInId}/review`, {
+                feedback: 'Outstanding adherence! Let’s add 2.5kg to your squats next week.'
+            }, coachHeaders);
+            assert('Coach can review and submit feedback for athlete check-in', reviewRes.status === 200 && reviewRes.data.data.status === 'reviewed');
+        }
 
         // 4. DIET, NUTRITION & HYDRATION SUITE
         console.log('\n--- 4. Diet & Hydration Suite ---');
@@ -244,6 +272,35 @@ async function runQA() {
         // 6.1 Member checks coach availability
         const coachesList = await request('GET', '/api/coaches', null, memberHeaders);
         assert('Member can fetch public coach catalog', coachesList.status === 200 && Array.isArray(coachesList.data.data));
+
+        // 6.2 Book an appointment
+        const coachUser = await User.findOne({ email: coachEmail });
+        const futureDate = new Date();
+        futureDate.setDate(futureDate.getDate() + 2);
+        const bookRes = await request('POST', '/api/appointments/book', {
+            coachId: coachUser._id.toString(),
+            date: futureDate.toISOString().split('T')[0],
+            startTime: '10:00',
+            endTime: '11:00',
+            type: 'online'
+        }, memberHeaders);
+        assert('Member can book an appointment with coach', bookRes.status === 201 && bookRes.data.success);
+        
+        const apptId = bookRes.data.data?._id;
+
+        // 6.3 Coach schedule includes the appointment
+        const coachScheduleRes = await request('GET', '/api/appointments/coach-schedule', null, coachHeaders);
+        assert('Coach schedule retrieves assigned sessions', coachScheduleRes.status === 200 && Array.isArray(coachScheduleRes.data.data));
+
+        // 6.4 Coach can complete appointment
+        if (apptId) {
+            const completeRes = await request('PUT', `/api/appointments/${apptId}/complete`, null, coachHeaders);
+            assert('Coach can mark session as completed', completeRes.status === 200 && completeRes.data.data.status === 'completed');
+        }
+
+        // 6.5 Member payment history records appointment fee
+        const payHistoryRes = await request('GET', '/api/payments/history', null, memberHeaders);
+        assert('Appointment booking persists payment record', payHistoryRes.status === 200 && payHistoryRes.data.data.some(p => p.type === 'appointment'));
 
         // 7. MEMBERSHIPS & BILLING SUITE
         console.log('\n--- 7. Memberships & Billing Suite ---');

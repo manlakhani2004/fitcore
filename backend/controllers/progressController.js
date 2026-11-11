@@ -46,9 +46,15 @@ exports.getPhotos = async (req, res) => {
 // @access  Private
 exports.uploadPhotos = async (req, res) => {
     try {
-        const frontUrl = req.files && req.files['front'] ? req.files['front'][0].path : null;
-        const sideUrl = req.files && req.files['side'] ? req.files['side'][0].path : null;
-        const backUrl = req.files && req.files['back'] ? req.files['back'][0].path : null;
+        const getFileUrl = (field) => {
+            if (!req.files || !req.files[field] || !req.files[field][0]) return null;
+            const f = req.files[field][0];
+            return f.path?.startsWith('http') ? f.path : `/uploads/${f.filename}`;
+        };
+
+        const frontUrl = getFileUrl('front');
+        const sideUrl = getFileUrl('side');
+        const backUrl = getFileUrl('back');
 
         const photoLog = await ProgressPhoto.create({
             memberId: req.user.id,

@@ -1,21 +1,55 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Settings, Save, Upload, Link as LinkIcon, Mail, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
+import api from "@/lib/api";
 
 export default function AdminSettingsPage() {
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [platformName, setPlatformName] = useState("FitCore");
-  const [stripePK, setStripePK] = useState("pk_test_123456789");
-  const [stripeSK, setStripeSK] = useState("sk_test_123456789");
+  const [supportEmail, setSupportEmail] = useState("support@fitcore.com");
+  const [stripePK, setStripePK] = useState("");
+  const [stripeSK, setStripeSK] = useState("");
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const res = await api.get('/admin/settings');
+        if (res.data.success && res.data.data) {
+          const s = res.data.data;
+          setPlatformName(s.platformName || "FitCore");
+          setSupportEmail(s.supportEmail || "support@fitcore.com");
+          setStripePK(s.stripePublicKey || "");
+          setStripeSK(s.stripeSecretKey || "");
+        }
+      } catch (err) {
+        console.error("Failed to load settings", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSettings();
+  }, []);
 
   const saveSettings = async () => {
     setSaving(true);
-    // Simulate saving - in production, this would call an admin/settings API
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    toast.success("Settings saved (UI only - backend persistence not implemented)");
-    setSaving(false);
+    try {
+      const res = await api.put('/admin/settings', {
+        platformName,
+        supportEmail,
+        stripePublicKey: stripePK,
+        stripeSecretKey: stripeSK
+      });
+      if (res.data.success) {
+        toast.success("Settings saved successfully!");
+      }
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Failed to save settings");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (

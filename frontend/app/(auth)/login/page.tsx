@@ -45,7 +45,7 @@ export default function LoginPage() {
         } else if (res.data.data.role === 'coach') {
           router.push('/coach/dashboard');
         } else {
-          router.push('/member/profile');
+          router.push('/member/dashboard');
         }
       } else {
         toast.error(res.data.message || "Invalid credentials");

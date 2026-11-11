@@ -15,7 +15,7 @@ export default function GenericDashboardRedirect() {
     } else if (user?.role === 'coach') {
       router.replace('/coach/dashboard');
     } else {
-      router.replace('/member/profile');
+      router.replace('/member/dashboard');
     }
   }, [user, router]);
 

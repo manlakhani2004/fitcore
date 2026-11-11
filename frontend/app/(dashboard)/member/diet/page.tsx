@@ -13,6 +13,7 @@ export default function DietDashboard() {
   const [waterGlasses, setWaterGlasses] = useState(0);
   const [meals, setMeals] = useState<any[]>([]);
   const [targets, setTargets] = useState({ calories: 2500, protein: 180, carbs: 250, fat: 80 });
+  const [assignedPlan, setAssignedPlan] = useState<any>(null);
   
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isTargetsModalOpen, setIsTargetsModalOpen] = useState(false);
@@ -22,10 +23,11 @@ export default function DietDashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [mealsRes, macrosRes, profileRes] = await Promise.all([
+        const [mealsRes, macrosRes, profileRes, planRes] = await Promise.all([
           api.get('/diet/meals'),
           api.get('/diet/macros/today'),
-          api.get('/users/profile')
+          api.get('/users/profile'),
+          api.get('/diet/my-plan').catch(() => ({ data: { success: false } }))
         ]);
         
         if (mealsRes.data.success) {
@@ -43,7 +45,20 @@ export default function DietDashboard() {
           setWaterGlasses(data.waterIntake || 0);
         }
 
-        if (profileRes.data.success && profileRes.data.data?.macroTargets) {
+        if (planRes.data?.success && planRes.data.data) {
+          const plan = planRes.data.data;
+          setAssignedPlan(plan);
+          if (plan.caloriesTarget) {
+            const planTargets = {
+              calories: plan.caloriesTarget,
+              protein: plan.macrosTarget?.protein || 180,
+              carbs: plan.macrosTarget?.carbs || 250,
+              fat: plan.macrosTarget?.fat || 80
+            };
+            setTargets(planTargets);
+            setTempTargets(planTargets);
+          }
+        } else if (profileRes.data.success && profileRes.data.data?.macroTargets) {
           setTargets(profileRes.data.data.macroTargets);
           setTempTargets(profileRes.data.data.macroTargets);
         }
@@ -133,6 +148,29 @@ export default function DietDashboard() {
         </button>
       </div>
 
+      {assignedPlan && (
+        <div className="bg-primary/10 border border-primary/20 p-5 rounded-3xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold shrink-0 shadow-md">
+              <Apple className="w-6 h-6" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-accent/20 text-accent">Active Protocol</span>
+                {assignedPlan.coachId?.name && (
+                  <span className="text-xs text-text-muted">Coach {assignedPlan.coachId.name}</span>
+                )}
+              </div>
+              <h3 className="font-display font-bold text-lg text-text-primary mt-0.5">{assignedPlan.name}</h3>
+              <p className="text-xs text-text-muted">Targets {assignedPlan.caloriesTarget} kcal • P: {assignedPlan.macrosTarget?.protein}g • C: {assignedPlan.macrosTarget?.carbs}g • F: {assignedPlan.macrosTarget?.fat}g</p>
+            </div>
+          </div>
+          <Link href="/member/diet/plans" className="text-xs font-bold text-primary hover:underline px-4 py-2 rounded-xl bg-background border border-border shrink-0">
+            View Details ↗
+          </Link>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         {/* Left Col: Macros */}
@@ -160,6 +198,12 @@ export default function DietDashboard() {
                   size={180} 
                   strokeWidth={14} 
                 />
+                <div className="mt-3 text-center">
+                  <span className="text-xs text-text-muted">Remaining</span>
+                  <p className="font-mono font-bold text-sm text-accent">
+                    {Math.max(0, targets.calories - consumed.calories)} kcal
+                  </p>
+                </div>
               </div>
 
               {/* P/C/F Smaller Gauges */}

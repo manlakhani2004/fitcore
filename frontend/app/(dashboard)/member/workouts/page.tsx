@@ -68,30 +68,28 @@ export default function WorkoutsDashboard() {
     <div className="max-w-7xl mx-auto space-y-10 pb-10">
       
       {/* Header & Quick Start */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 bg-surface p-8 rounded-3xl border border-border">
+      <div className="bg-surface p-8 rounded-3xl border border-border">
         <div>
           <h1 className="text-3xl font-display font-bold">Your Training</h1>
-          <p className="text-text-muted mt-2">Track progress, explore exercises, and crush your goals.</p>
-          <div className="flex gap-3 mt-4">
-            <Link href="/member/workouts/programs" className="inline-flex items-center gap-2 text-sm font-bold text-primary hover:text-primary-hover transition-colors bg-primary/10 px-4 py-2 rounded-xl">
-              <LayoutList className="w-4 h-4" /> View Programs
+          <p className="text-text-muted mt-2">Track progress, explore exercises, and crush your fitness goals with progressive overload.</p>
+          <div className="flex flex-wrap items-center gap-3 mt-6">
+            <Link href="/member/workouts/today">
+              <motion.button 
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                className="bg-primary hover:bg-primary-hover text-white px-6 py-3.5 rounded-xl font-bold shadow-lg hover:shadow-primary/30 transition-all flex items-center gap-2"
+              >
+                <Play className="w-4 h-4 fill-current" /> Start Today's Session
+              </motion.button>
+            </Link>
+            <Link href="/member/workouts/live" className="inline-flex items-center gap-2 text-sm font-bold text-text-primary hover:text-primary transition-colors bg-background border border-border px-5 py-3.5 rounded-xl">
+              <Activity className="w-4 h-4 text-accent" /> Free Live Timer
+            </Link>
+            <Link href="/member/workouts/programs" className="inline-flex items-center gap-2 text-sm font-bold text-primary hover:text-primary-hover transition-colors bg-primary/10 px-5 py-3.5 rounded-xl">
+              <LayoutList className="w-4 h-4" /> Assigned Programs
             </Link>
           </div>
-          <Link href="/member/workouts/live" className="inline-block mt-6">
-            <button className="bg-primary hover:bg-primary-hover text-white px-8 py-3 rounded-xl font-bold transition-all shadow-lg hover:-translate-y-1">
-              Start Workout
-            </button>
-          </Link>
         </div>
-        <Link href="/member/workouts/today">
-          <motion.button 
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="bg-primary hover:bg-primary-hover text-white px-8 py-4 rounded-xl font-bold shadow-lg hover:shadow-primary/30 transition-all flex items-center gap-2"
-          >
-            <Play className="w-5 h-5 fill-current" /> Start Today's Workout
-          </motion.button>
-        </Link>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

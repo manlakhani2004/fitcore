@@ -7,7 +7,8 @@ const {
     getPrograms,
     getMyProgram,
     logWorkout,
-    getWorkoutHistory
+    getWorkoutHistory,
+    getLastPerformance
 } = require('../controllers/workoutController');
 
 const router = express.Router();
@@ -25,5 +26,6 @@ router.route('/programs')
 router.get('/my-program', getMyProgram);
 router.post('/log', logWorkout);
 router.get('/history', getWorkoutHistory);
+router.get('/last-performance', getLastPerformance);
 
 module.exports = router;

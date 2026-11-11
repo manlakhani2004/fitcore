@@ -2,6 +2,7 @@ const express = require('express');
 const { protect, authorize } = require('../middleware/authMiddleware');
 const {
     getClients,
+    getUnreadCount,
     getClientDetails,
     updateNotes,
     getDashboardStats,
@@ -21,6 +22,7 @@ router.use(protect);
 router.use(authorize('coach'));
 
 router.route('/stats').get(getDashboardStats);
+router.route('/unread-count').get(getUnreadCount);
 router.route('/clients').get(getClients);
 router.route('/clients/:id').get(getClientDetails);
 router.route('/clients/:id/notes').put(updateNotes);

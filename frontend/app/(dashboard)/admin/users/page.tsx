@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Users, Search, MoreVertical, Edit, UserX, Shield, Loader2 } from "lucide-react";
+import { Users, Search, MoreVertical, Edit, UserX, Shield, Loader2, RefreshCw } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuthStore } from "@/store/authStore";
+import { useRouter } from "next/navigation";
 import api from "@/lib/api";
 import toast from "react-hot-toast";
 
@@ -12,21 +14,32 @@ export default function AdminUsersPage() {
   const [roleFilter, setRoleFilter] = useState("all");
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const { user } = useAuthStore();
+  const router = useRouter();
 
   useEffect(() => {
+    if (user && user.role !== 'admin') {
+      toast.error("Admin access required");
+      router.replace(user.role === 'coach' ? '/coach/dashboard' : '/member/workouts');
+      return;
+    }
     fetchUsers();
-  }, []);
+  }, [user, router]);
 
   const fetchUsers = async () => {
     try {
       const res = await api.get('/admin/users');
       if (res.data.success) {
-        setUsers(res.data.data);
+        setUsers(res.data.data || []);
       }
-    } catch (err) {
-      toast.error("Failed to fetch users");
+    } catch (err: any) {
+      console.error("fetchUsers error:", err);
+      const msg = err.response?.data?.message || "Failed to fetch users";
+      toast.error(msg);
     } finally {
       setIsLoading(false);
+      setIsRefreshing(false);
     }
   };
 
@@ -70,16 +83,26 @@ export default function AdminUsersPage() {
               className="w-full bg-background border border-border rounded-xl pl-10 pr-4 py-2 text-sm focus:outline-none focus:border-primary transition-colors"
             />
           </div>
-          <select 
-            value={roleFilter}
-            onChange={(e) => setRoleFilter(e.target.value)}
-            className="bg-background border border-border rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-primary transition-colors"
-          >
-            <option value="all">All Roles</option>
-            <option value="member">Members</option>
-            <option value="coach">Coaches</option>
-            <option value="admin">Admins</option>
-          </select>
+          <div className="flex items-center gap-3">
+            <select 
+              value={roleFilter}
+              onChange={(e) => setRoleFilter(e.target.value)}
+              className="bg-background border border-border rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-primary transition-colors font-medium"
+            >
+              <option value="all">All Roles</option>
+              <option value="member">Members</option>
+              <option value="coach">Coaches</option>
+              <option value="admin">Admins</option>
+            </select>
+            <button
+              onClick={() => { setIsRefreshing(true); fetchUsers(); }}
+              disabled={isRefreshing || isLoading}
+              title="Refresh users list"
+              className="p-2 bg-background hover:bg-border border border-border rounded-xl text-text-muted hover:text-text-primary transition-colors flex items-center justify-center"
+            >
+              <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-primary' : ''}`} />
+            </button>
+          </div>
         </div>
 
         <div className="overflow-x-auto min-h-[400px]">

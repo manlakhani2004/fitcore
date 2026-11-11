@@ -16,7 +16,8 @@ const {
     getMyCoach,
     setMyCoach,
     getMyMessages,
-    sendMyMessage
+    sendMyMessage,
+    getMemberUnreadCount
 } = require('../controllers/userController');
 
 const router = express.Router();
@@ -43,6 +44,7 @@ router.delete('/account', deleteAccount);
 // Messaging
 router.get('/my-coach', getMyCoach);
 router.put('/my-coach', setMyCoach);
+router.get('/unread-messages', getMemberUnreadCount);
 router.route('/my-messages')
     .get(getMyMessages)
     .post(sendMyMessage);

@@ -1,5 +1,6 @@
 const UserProfile = require('../models/UserProfile');
 const User = require('../models/User');
+const CoachProfile = require('../models/CoachProfile');
 const WorkoutLog = require('../models/WorkoutLog');
 const DietLog = require('../models/DietLog');
 const ClientAssignment = require('../models/ClientAssignment');
@@ -68,10 +69,14 @@ exports.uploadProfilePicture = async (req, res) => {
             profile = new UserProfile({ userId: req.user.id });
         }
 
-        profile.avatar = req.file.path; // Cloudinary URL
+        const avatarUrl = req.file.path?.startsWith('http') 
+            ? req.file.path 
+            : `/uploads/${req.file.filename}`;
+
+        profile.avatar = avatarUrl;
         await profile.save();
 
-        await User.findByIdAndUpdate(req.user.id, { avatar: req.file.path });
+        await User.findByIdAndUpdate(req.user.id, { avatar: avatarUrl });
 
         res.status(200).json({ success: true, data: profile.avatar });
     } catch (err) {
@@ -300,7 +305,29 @@ exports.getMyMessages = async (req, res) => {
             ]
         }).sort({ createdAt: 1 });
 
+        // Automatically mark incoming messages from coach as read
+        await Message.updateMany(
+            { senderId: assignment.coachId, receiverId: req.user.id, isRead: false },
+            { isRead: true }
+        );
+
         res.status(200).json({ success: true, data: messages });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Server Error' });
+    }
+};
+
+// @desc    Get member unread messages count from coach
+// @route   GET /api/users/unread-messages
+// @access  Private
+exports.getMemberUnreadCount = async (req, res) => {
+    try {
+        const unread = await Message.countDocuments({
+            receiverId: req.user.id,
+            isRead: false
+        });
+        res.status(200).json({ success: true, data: { totalUnread: unread } });
     } catch (err) {
         console.error(err);
         res.status(500).json({ success: false, message: 'Server Error' });
@@ -347,19 +374,30 @@ exports.sendMyMessage = async (req, res) => {
 exports.setMyCoach = async (req, res) => {
     try {
         const { coachId } = req.body;
-        const coach = await User.findById(coachId);
+        let coach = await User.findById(coachId);
+        let resolvedCoachId = coachId;
+
+        if (!coach) {
+            // Check if coachId was a CoachProfile ID
+            const profile = await CoachProfile.findById(coachId);
+            if (profile && profile.userId) {
+                coach = await User.findById(profile.userId);
+                resolvedCoachId = profile.userId.toString();
+            }
+        }
+
         if (!coach || coach.role !== 'coach') {
             return res.status(400).json({ success: false, message: 'Invalid coach' });
         }
 
         // Prevent users from choosing themselves
-        if (req.user.id === coachId) {
+        if (req.user.id === resolvedCoachId) {
             return res.status(400).json({ success: false, message: 'You cannot be your own coach' });
         }
 
         const assignment = await ClientAssignment.findOneAndUpdate(
             { clientId: req.user.id },
-            { coachId, clientId: req.user.id, status: 'active' },
+            { coachId: resolvedCoachId, clientId: req.user.id, status: 'active' },
             { upsert: true, new: true }
         ).populate('coachId', 'name email avatar');
         res.status(200).json({ success: true, data: assignment });

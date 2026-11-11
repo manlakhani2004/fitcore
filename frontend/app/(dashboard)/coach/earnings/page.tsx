@@ -50,7 +50,7 @@ export default function CoachEarningsPage() {
   }, []);
 
   // Base monthly metrics
-  const clientCount = clients.length || 2;
+  const clientCount = clients.length;
   
   // Month-indexed variation multiplier
   const monthIdx = MONTHS.indexOf(selectedMonth);

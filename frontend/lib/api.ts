@@ -43,8 +43,7 @@ api.interceptors.response.use(
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
-        }).then((token) => {
-          originalRequest.headers.Authorization = `Bearer ${token}`;
+        }).then(() => {
           return api(originalRequest);
         });
       }
@@ -60,7 +59,7 @@ api.interceptors.response.use(
             useAuthStore.getState().setUser(res.data.user);
           }
           // Resume queue (cookies will be attached automatically)
-          processQueue(null, '');
+          processQueue(null, null);
           return api(originalRequest);
         }
       } catch (refreshError) {

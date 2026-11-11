@@ -1,4 +1,4 @@
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY || 'sk_test_dummy');
 const MembershipPlan = require('../models/MembershipPlan');
 const UserMembership = require('../models/UserMembership');
 const Coupon = require('../models/Coupon');
@@ -61,8 +61,15 @@ exports.purchaseMembership = async (req, res) => {
 
         const finalPrice = Math.max(0, plan.price - discount);
 
-        // Check if Stripe is configured or running dummy test key
-        if (!process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY.includes('sk_test_dummy')) {
+        // Check if Stripe is configured or running dummy / placeholder test key
+        const stripeKey = process.env.STRIPE_SECRET_KEY || '';
+        const isMockStripe = !stripeKey || 
+            stripeKey.includes('dummy') || 
+            stripeKey.includes('placeholder') || 
+            stripeKey.includes('your_stripe_secret') ||
+            stripeKey.startsWith('sk_test_placeholder');
+
+        if (isMockStripe) {
             // MOCK / LOCAL DEV FLOW: Immediately activate membership & create Payment record
             const startDate = new Date();
             const endDate = new Date(startDate.getTime() + plan.duration * 24 * 60 * 60 * 1000);

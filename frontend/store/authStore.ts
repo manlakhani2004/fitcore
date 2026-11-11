@@ -25,6 +25,7 @@ export const useAuthStore = create<AuthState>()((set) => ({
       await fetch((process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api') + '/auth/logout', { 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include'
       });
     } catch (err) {
       console.error('Logout error', err);

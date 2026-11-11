@@ -19,6 +19,7 @@ const WorkoutLogSchema = new mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Exercise'
         },
+        name: String,
         setsCompleted: Number,
         repsCompleted: Number,
         weightUsed: Number // optional

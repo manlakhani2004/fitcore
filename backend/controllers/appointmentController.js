@@ -1,6 +1,18 @@
 const mongoose = require('mongoose');
 const Appointment = require('../models/Appointment');
 const CoachAvailability = require('../models/CoachAvailability');
+const CoachProfile = require('../models/CoachProfile');
+const Payment = require('../models/Payment');
+
+// Helper to resolve coach User ID from either CoachProfile ID or User ID
+async function resolveCoachUserId(id) {
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) return null;
+    const profile = await CoachProfile.findById(id);
+    if (profile && profile.userId) {
+        return profile.userId.toString();
+    }
+    return id.toString();
+}
 
 // @desc    Get available slots for a coach on a date
 // @route   GET /api/appointments/available-slots/:coachId/:date
@@ -11,27 +23,49 @@ exports.getAvailableSlots = async (req, res) => {
         if (!mongoose.Types.ObjectId.isValid(coachId)) {
             return res.status(200).json({ success: true, data: [] });
         }
-        
-        const dateObj = new Date(date);
-        const dayOfWeek = dateObj.getUTCDay();
 
-        const availability = await CoachAvailability.findOne({ coachId, dayOfWeek });
-        if (!availability) {
-            return res.status(200).json({ success: true, data: [] });
+        const resolvedCoachId = await resolveCoachUserId(coachId);
+        const [y, m, d] = String(date).split('-').map(Number);
+        const dayOfWeek = (y && m && d) ? new Date(y, m - 1, d).getDay() : new Date(date).getDay();
+
+        let availability = await CoachAvailability.findOne({ 
+            $or: [{ coachId: resolvedCoachId }, { coachId }],
+            dayOfWeek
+        });
+        
+        let slots;
+        if (availability) {
+            slots = availability.slots || [];
+        } else {
+            // Default general slots (Mon-Fri 9am - 5pm, weekends off)
+            if (dayOfWeek === 0 || dayOfWeek === 6) {
+                slots = [];
+            } else {
+                slots = [
+                    { startTime: '09:00', endTime: '10:00' },
+                    { startTime: '10:00', endTime: '11:00' },
+                    { startTime: '11:00', endTime: '12:00' },
+                    { startTime: '14:00', endTime: '15:00' },
+                    { startTime: '15:00', endTime: '16:00' },
+                    { startTime: '16:00', endTime: '17:00' }
+                ];
+            }
         }
 
         const bookedAppointments = await Appointment.find({
-            coachId,
-            date,
+            coachId: { $in: [resolvedCoachId, coachId] },
+            date: new Date(date),
             status: 'confirmed'
         });
 
-        const availableSlots = availability.slots.map(slot => {
+        const availableSlots = slots.map(slot => {
             const isBooked = bookedAppointments.some(appt => appt.startTime === slot.startTime);
             return {
                 startTime: slot.startTime,
                 endTime: slot.endTime,
-                isBooked
+                time: slot.startTime,
+                isBooked,
+                available: !isBooked
             };
         });
 
@@ -48,6 +82,7 @@ exports.getAvailableSlots = async (req, res) => {
 exports.bookAppointment = async (req, res) => {
     try {
         const { coachId, date, type, notes } = req.body;
+        const resolvedCoachId = await resolveCoachUserId(coachId) || coachId;
         const startTime = req.body.startTime || req.body.time;
 
         if (!startTime) {
@@ -57,28 +92,51 @@ exports.bookAppointment = async (req, res) => {
         let endTime = req.body.endTime;
         if (!endTime && startTime.includes(':')) {
             const [startH, startM] = startTime.split(':').map(Number);
-            endTime = `${String(startH + 1).padStart(2, '0')}:${String(startM || 0).padStart(2, '0')}`;
+            endTime = `${String((startH + 1) % 24).padStart(2, '0')}:${String(startM || 0).padStart(2, '0')}`;
         }
 
-        const existingAppt = await Appointment.findOne({ coachId, date, startTime, status: 'confirmed' });
+        const existingAppt = await Appointment.findOne({ 
+            coachId: { $in: [resolvedCoachId, coachId] }, 
+            date: new Date(date), 
+            startTime, 
+            status: 'confirmed' 
+        });
         if (existingAppt) {
             return res.status(400).json({ success: false, message: 'Slot already booked' });
         }
 
+        const appointmentId = new mongoose.Types.ObjectId();
+
+        // Fetch coach profile to get rate and custom Google Meet link if set
+        const profile = await CoachProfile.findOne({ $or: [{ userId: resolvedCoachId }, { _id: coachId }] });
+        const rate = profile?.hourlyRate || 50;
+
         const meetingLink = type === 'online' 
-            ? `https://meet.google.com/mock-id-${Math.floor(Math.random() * 10000)}` 
+            ? (profile?.googleMeetLink || '')
             : undefined;
 
         const appointment = await Appointment.create({
+            _id: appointmentId,
             memberId: req.user.id,
-            coachId,
-            date,
+            coachId: resolvedCoachId,
+            date: new Date(date),
             startTime,
             endTime: endTime || startTime,
             type: type || 'online',
             notes,
             status: 'confirmed',
-            meetingLink
+            meetingLink,
+            paymentStatus: 'paid'
+        });
+
+        // Record completed appointment payment
+        await Payment.create({
+            userId: req.user.id,
+            type: 'appointment',
+            amount: rate,
+            currency: 'inr',
+            status: 'completed',
+            stripePaymentId: `mock_appt_${appointment._id}`
         });
 
         res.status(201).json({ success: true, data: appointment });
@@ -172,8 +230,85 @@ exports.confirmAppointment = async (req, res) => {
             return res.status(403).json({ success: false, message: 'Not authorized to confirm this appointment' });
         }
 
+        if (req.body.meetingLink) {
+            appointment.meetingLink = req.body.meetingLink;
+        }
+
         appointment.status = 'confirmed';
         await appointment.save();
+
+        res.status(200).json({ success: true, data: appointment });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Server Error' });
+    }
+};
+
+// @desc    Mark appointment as completed
+// @route   PUT /api/appointments/:id/complete
+// @access  Private (Coach)
+exports.completeAppointment = async (req, res) => {
+    try {
+        if (req.user.role !== 'coach') {
+            return res.status(403).json({ success: false, message: 'Not authorized' });
+        }
+
+        let appointment = await Appointment.findById(req.params.id);
+        
+        if (!appointment) {
+            return res.status(404).json({ success: false, message: 'Appointment not found' });
+        }
+
+        if (appointment.coachId.toString() !== req.user.id) {
+            return res.status(403).json({ success: false, message: 'Not authorized to complete this appointment' });
+        }
+
+        appointment.status = 'completed';
+        await appointment.save();
+
+        res.status(200).json({ success: true, data: appointment });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Server Error' });
+    }
+};
+
+// @desc    Update appointment meeting link
+// @route   PUT /api/appointments/:id/meeting-link
+// @access  Private
+exports.updateMeetingLink = async (req, res) => {
+    try {
+        let { meetingLink, saveAsDefault } = req.body;
+        let appointment = await Appointment.findById(req.params.id);
+        if (!appointment) {
+            return res.status(404).json({ success: false, message: 'Appointment not found' });
+        }
+
+        // Verify coach or member
+        if (appointment.coachId.toString() !== req.user.id && appointment.memberId.toString() !== req.user.id) {
+            return res.status(403).json({ success: false, message: 'Not authorized to update this appointment' });
+        }
+
+        if (meetingLink) {
+            meetingLink = String(meetingLink).trim();
+            // If coach entered just a meet code e.g. "abc-defg-hij"
+            if (/^[a-z0-9]{3}-[a-z0-9]{4}-[a-z0-9]{3}$/i.test(meetingLink)) {
+                meetingLink = `https://meet.google.com/${meetingLink.toLowerCase()}`;
+            } else if (!meetingLink.startsWith('http://') && !meetingLink.startsWith('https://')) {
+                meetingLink = `https://${meetingLink}`;
+            }
+        }
+
+        appointment.meetingLink = meetingLink;
+        await appointment.save();
+
+        // Optionally persist as coach's default room for future sessions
+        if (saveAsDefault && req.user.role === 'coach') {
+            await CoachProfile.findOneAndUpdate(
+                { userId: req.user.id },
+                { googleMeetLink: meetingLink }
+            );
+        }
 
         res.status(200).json({ success: true, data: appointment });
     } catch (err) {

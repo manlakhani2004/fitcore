@@ -3,13 +3,19 @@
 import { useState, useEffect, use } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { ArrowLeft, Dumbbell, Apple, Activity, Edit3, Check, Target, Plus, Calendar, TrendingUp, Loader2, ListTodo, Trash2, Clock } from "lucide-react";
+import { 
+  ArrowLeft, Dumbbell, Apple, Activity, Edit3, Check, Target, 
+  Plus, Calendar, TrendingUp, Loader2, ListTodo, Trash2, Clock, 
+  ClipboardCheck, Moon, BatteryCharging, AlertCircle, CheckCircle2, 
+  MessageSquare, Send, Award, Scale
+} from "lucide-react";
 import api from "@/lib/api";
 import toast from "react-hot-toast";
 
 const TABS = [
   { key: 'programs', label: 'Programs', icon: Dumbbell },
   { key: 'diet', label: 'Diet Plans', icon: Apple },
+  { key: 'checkins', label: 'Check-Ins', icon: ClipboardCheck },
   { key: 'progress', label: 'Progress', icon: TrendingUp },
   { key: 'notes', label: 'Notes', icon: Edit3 },
 ];
@@ -23,8 +29,8 @@ export default function ClientDetailsPage({ params }: { params: Promise<{ id: st
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const tab = params.get('tab');
+    const searchParams = new URLSearchParams(window.location.search);
+    const tab = searchParams.get('tab');
     if (tab) setActiveTab(tab);
   }, []);
 
@@ -48,6 +54,12 @@ export default function ClientDetailsPage({ params }: { params: Promise<{ id: st
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [taskForm, setTaskForm] = useState({ title: '', description: '', date: new Date().toISOString().split('T')[0], type: 'general' });
 
+  // Weekly Check-Ins
+  const [checkIns, setCheckIns] = useState<any[]>([]);
+  const [loadingCheckIns, setLoadingCheckIns] = useState(false);
+  const [feedbackInputs, setFeedbackInputs] = useState<Record<string, string>>({});
+  const [submittingFeedback, setSubmittingFeedback] = useState<Record<string, boolean>>({});
+
   const fetchData = async () => {
     try {
       const res = await api.get(`/coach-dashboard/clients/${id}`);
@@ -56,10 +68,37 @@ export default function ClientDetailsPage({ params }: { params: Promise<{ id: st
         setNotes(res.data.data.assignment?.coachNotes || '');
         if (res.data.data.profile?.macroTargets) setMacroTargets(res.data.data.profile.macroTargets);
       }
-    } catch { toast.error('Failed to load client'); } finally { setLoading(false); }
+    } catch { 
+      toast.error('Failed to load client'); 
+    } finally { 
+      setLoading(false); 
+    }
   };
 
-  useEffect(() => { fetchData(); }, [id]);
+  const fetchCheckIns = async () => {
+    setLoadingCheckIns(true);
+    try {
+      const res = await api.get(`/check-ins/client/${id}`);
+      if (res.data?.success) {
+        setCheckIns(res.data.data || []);
+        // Initialize feedback inputs
+        const initialMap: Record<string, string> = {};
+        res.data.data.forEach((ci: any) => {
+          initialMap[ci._id] = ci.coachFeedback || '';
+        });
+        setFeedbackInputs(initialMap);
+      }
+    } catch (err) {
+      console.debug("Failed to fetch check-ins for client", err);
+    } finally {
+      setLoadingCheckIns(false);
+    }
+  };
+
+  useEffect(() => { 
+    fetchData(); 
+    fetchCheckIns();
+  }, [id]);
 
   const saveNotes = async () => {
     try {
@@ -101,6 +140,27 @@ export default function ClientDetailsPage({ params }: { params: Promise<{ id: st
     } catch { toast.error('Failed to update macros'); }
   };
 
+  const handleSendFeedback = async (checkInId: string) => {
+    const feedbackText = feedbackInputs[checkInId]?.trim();
+    if (!feedbackText) {
+      toast.error("Please enter feedback before submitting");
+      return;
+    }
+
+    setSubmittingFeedback(prev => ({ ...prev, [checkInId]: true }));
+    try {
+      const res = await api.put(`/check-ins/${checkInId}/review`, { feedback: feedbackText });
+      if (res.data?.success) {
+        toast.success("Feedback sent to athlete! 🎯");
+        await fetchCheckIns();
+      }
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Failed to submit review");
+    } finally {
+      setSubmittingFeedback(prev => ({ ...prev, [checkInId]: false }));
+    }
+  };
+
   // Daily Tasks
   const fetchTasks = async () => {
     try {
@@ -134,7 +194,7 @@ export default function ClientDetailsPage({ params }: { params: Promise<{ id: st
   if (loading) return <div className="flex h-64 items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
   if (!data) return <div className="text-center py-20 text-text-muted">Client not found</div>;
 
-  const client = data.assignment?.clientId || {};
+  const client = data.client || (typeof data.assignment?.clientId === 'object' ? data.assignment?.clientId : {}) || {};
   const programs = data.programs || [];
   const dietPlans = data.dietPlans || [];
   const measurements = data.measurements || [];
@@ -153,12 +213,16 @@ export default function ClientDetailsPage({ params }: { params: Promise<{ id: st
       <div className="bg-surface border border-border p-8 rounded-3xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-8 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
         <div className="flex items-center gap-6 relative z-10">
-          <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-3xl font-display font-bold text-white shadow-lg">
-            {client.name?.charAt(0) || '?'}
+          <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-3xl font-display font-bold text-white shadow-lg overflow-hidden shrink-0">
+            {client.avatar ? (
+              <img src={client.avatar} alt={client.name || 'Client'} className="w-full h-full object-cover" />
+            ) : (
+              client.name?.charAt(0) || '?'
+            )}
           </div>
           <div>
             <h1 className="text-3xl font-display font-bold">{client.name || 'Client'}</h1>
-            <p className="text-text-muted text-sm">{client.email}</p>
+            <p className="text-text-muted text-sm">{client.email || ''}</p>
           </div>
         </div>
         <div className="flex gap-3 relative z-10">
@@ -181,6 +245,11 @@ export default function ClientDetailsPage({ params }: { params: Promise<{ id: st
                 activeTab === tab.key ? 'bg-primary text-white shadow-md' : 'text-text-muted hover:text-text-primary'
               }`}>
               <Icon className="w-4 h-4" /> {tab.label}
+              {tab.key === 'checkins' && checkIns.length > 0 && (
+                <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full font-mono">
+                  {checkIns.length}
+                </span>
+              )}
             </button>
           );
         })}
@@ -234,99 +303,20 @@ export default function ClientDetailsPage({ params }: { params: Promise<{ id: st
             programs.map((p: any, i: number) => (
               <motion.div key={p._id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
                 className="bg-surface border border-border rounded-2xl p-5 flex items-start gap-4">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
                   <Dumbbell className="w-5 h-5" />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <h3 className="font-bold">{p.name}</h3>
-                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                      p.difficulty === 'beginner' ? 'bg-accent/20 text-accent' :
-                      p.difficulty === 'intermediate' ? 'bg-warning/20 text-warning' : 'bg-danger/20 text-danger'
-                    }`}>{p.difficulty}</span>
+                    <span className="text-xs bg-background border border-border px-2 py-0.5 rounded-md font-mono">{p.difficulty}</span>
                   </div>
                   {p.description && <p className="text-sm text-text-muted mt-1">{p.description}</p>}
-                  <p className="text-xs text-text-muted mt-2 flex items-center gap-1">
-                    <Calendar className="w-3 h-3" /> {p.durationWeeks} weeks • {p.goal?.replace('_', ' ')}
-                  </p>
+                  <p className="text-xs text-text-muted mt-2">{p.durationWeeks} weeks • {p.goal?.replace('_', ' ')}</p>
                 </div>
               </motion.div>
             ))
           )}
-
-          {/* Daily Tasks */}
-          <div className="border-t border-border pt-8 mt-8">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-display font-bold flex items-center gap-2">
-                <ListTodo className="w-5 h-5 text-primary" /> Daily Tasks
-              </h2>
-              <button onClick={() => setShowTaskForm(!showTaskForm)}
-                className="flex items-center gap-2 bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-xl transition-all text-sm font-medium">
-                <Plus className="w-4 h-4" /> Add Task
-              </button>
-            </div>
-
-            {showTaskForm && (
-              <motion.form initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
-                onSubmit={createTask} className="bg-surface border border-border rounded-2xl p-5 space-y-4 mb-6">
-                <input type="text" placeholder="Task title *" value={taskForm.title}
-                  onChange={e => setTaskForm({ ...taskForm, title: e.target.value })}
-                  className="w-full bg-background border border-border rounded-xl px-4 py-2.5 focus:outline-none focus:border-primary transition-colors" />
-                <textarea placeholder="Description (optional)" value={taskForm.description}
-                  onChange={e => setTaskForm({ ...taskForm, description: e.target.value })}
-                  className="w-full bg-background border border-border rounded-xl px-4 py-2.5 focus:outline-none focus:border-primary transition-colors resize-none" rows={2} />
-                <div className="flex gap-4">
-                  <input type="date" value={taskForm.date}
-                    onChange={e => setTaskForm({ ...taskForm, date: e.target.value })}
-                    className="bg-background border border-border rounded-xl px-4 py-2.5 focus:outline-none focus:border-primary transition-colors" />
-                  <select value={taskForm.type} onChange={e => setTaskForm({ ...taskForm, type: e.target.value })}
-                    className="bg-background border border-border rounded-xl px-4 py-2.5 focus:outline-none focus:border-primary transition-colors">
-                    <option value="general">General</option>
-                    <option value="workout">Workout</option>
-                    <option value="diet">Diet</option>
-                    <option value="habit">Habit</option>
-                  </select>
-                </div>
-                <button type="submit" className="bg-primary hover:bg-primary-hover text-white px-6 py-2.5 rounded-xl transition-all font-medium">Add Task</button>
-              </motion.form>
-            )}
-
-            {tasks.length === 0 ? (
-              <p className="text-text-muted text-sm text-center py-8 border border-dashed border-border rounded-2xl">No tasks assigned yet.</p>
-            ) : (
-              <div className="space-y-2">
-                {tasks.map((t: any, i: number) => (
-                  <motion.div key={t._id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}
-                    className={`bg-surface border rounded-xl p-4 flex items-start gap-3 ${t.completed ? 'border-accent/20 bg-accent/5' : 'border-border'}`}>
-                    <div className={`mt-0.5 ${t.completed ? 'text-accent' : 'text-text-muted'}`}>
-                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${t.completed ? 'border-accent bg-accent text-white' : 'border-text-muted'}`}>
-                        {t.completed && <Check className="w-3 h-3" />}
-                      </div>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className={`font-medium text-sm ${t.completed ? 'line-through text-text-muted' : ''}`}>{t.title}</span>
-                        <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
-                          t.type === 'workout' ? 'bg-primary/20 text-primary' :
-                          t.type === 'diet' ? 'bg-accent/20 text-accent' :
-                          t.type === 'habit' ? 'bg-warning/20 text-warning' :
-                          'bg-background text-text-muted border border-border'
-                        }`}>{t.type}</span>
-                      </div>
-                      {t.description && <p className="text-xs text-text-muted mt-0.5">{t.description}</p>}
-                      <p className="text-[10px] text-text-muted mt-1 flex items-center gap-1">
-                        <Clock className="w-3 h-3" /> {new Date(t.date).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <button onClick={() => deleteTask(t._id)}
-                      className="p-1.5 text-text-muted hover:text-danger transition-colors rounded-lg hover:bg-danger/10 shrink-0">
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </motion.div>
-                ))}
-              </div>
-            )}
-          </div>
         </div>
       )}
 
@@ -351,32 +341,20 @@ export default function ClientDetailsPage({ params }: { params: Promise<{ id: st
                   <option value="muscle_gain">Muscle Gain</option>
                   <option value="maintenance">Maintenance</option>
                 </select>
-                <input type="number" placeholder="Calories" value={dietForm.caloriesTarget}
+                <input type="number" placeholder="Daily Calories" value={dietForm.caloriesTarget}
                   onChange={e => setDietForm({ ...dietForm, caloriesTarget: Number(e.target.value) })}
-                  className="w-32 bg-background border border-border rounded-xl px-4 py-2.5 focus:outline-none focus:border-primary transition-colors text-center" />
+                  className="w-36 bg-background border border-border rounded-xl px-4 py-2.5 focus:outline-none focus:border-primary transition-colors text-center" />
               </div>
-              <div className="bg-background border border-border rounded-xl p-4 space-y-3">
-                <h4 className="font-bold text-sm">Macro Targets</h4>
-                <div className="flex gap-2">
-                  <div className="flex-1">
-                    <label className="text-xs text-text-muted">Protein (g)</label>
-                    <input type="number" value={dietForm.macrosTarget.protein}
-                      onChange={e => setDietForm({ ...dietForm, macrosTarget: { ...dietForm.macrosTarget, protein: Number(e.target.value) } })}
-                      className="w-full bg-surface border border-border px-3 py-2 rounded-lg text-sm text-center" />
-                  </div>
-                  <div className="flex-1">
-                    <label className="text-xs text-text-muted">Carbs (g)</label>
-                    <input type="number" value={dietForm.macrosTarget.carbs}
-                      onChange={e => setDietForm({ ...dietForm, macrosTarget: { ...dietForm.macrosTarget, carbs: Number(e.target.value) } })}
-                      className="w-full bg-surface border border-border px-3 py-2 rounded-lg text-sm text-center" />
-                  </div>
-                  <div className="flex-1">
-                    <label className="text-xs text-text-muted">Fat (g)</label>
-                    <input type="number" value={dietForm.macrosTarget.fat}
-                      onChange={e => setDietForm({ ...dietForm, macrosTarget: { ...dietForm.macrosTarget, fat: Number(e.target.value) } })}
-                      className="w-full bg-surface border border-border px-3 py-2 rounded-lg text-sm text-center" />
-                  </div>
-                </div>
+              <div className="grid grid-cols-3 gap-3">
+                <input type="number" placeholder="Protein (g)" value={dietForm.macrosTarget.protein}
+                  onChange={e => setDietForm({ ...dietForm, macrosTarget: { ...dietForm.macrosTarget, protein: Number(e.target.value) } })}
+                  className="bg-background border border-border rounded-xl px-4 py-2 text-center text-sm focus:outline-none focus:border-primary" />
+                <input type="number" placeholder="Carbs (g)" value={dietForm.macrosTarget.carbs}
+                  onChange={e => setDietForm({ ...dietForm, macrosTarget: { ...dietForm.macrosTarget, carbs: Number(e.target.value) } })}
+                  className="bg-background border border-border rounded-xl px-4 py-2 text-center text-sm focus:outline-none focus:border-primary" />
+                <input type="number" placeholder="Fat (g)" value={dietForm.macrosTarget.fat}
+                  onChange={e => setDietForm({ ...dietForm, macrosTarget: { ...dietForm.macrosTarget, fat: Number(e.target.value) } })}
+                  className="bg-background border border-border rounded-xl px-4 py-2 text-center text-sm focus:outline-none focus:border-primary" />
               </div>
               <button type="submit" className="bg-primary hover:bg-primary-hover text-white px-6 py-2.5 rounded-xl transition-all font-medium">Assign</button>
             </motion.form>
@@ -390,7 +368,7 @@ export default function ClientDetailsPage({ params }: { params: Promise<{ id: st
             dietPlans.map((p: any, i: number) => (
               <motion.div key={p._id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
                 className="bg-surface border border-border rounded-2xl p-5 flex items-start gap-4">
-                <div className="w-10 h-10 rounded-xl bg-accent/10 text-accent flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center text-accent shrink-0">
                   <Apple className="w-5 h-5" />
                 </div>
                 <div className="flex-1">
@@ -425,6 +403,131 @@ export default function ClientDetailsPage({ params }: { params: Promise<{ id: st
             </div>
             <button onClick={saveMacros} className="bg-accent hover:bg-emerald-500 text-white px-6 py-2.5 rounded-xl transition-all font-medium">Save Macros</button>
           </div>
+        </div>
+      )}
+
+      {/* WEEKLY CHECK-INS TAB */}
+      {activeTab === 'checkins' && (
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-display font-bold flex items-center gap-2">
+              <ClipboardCheck className="w-5 h-5 text-accent" /> Athlete Weekly Check-Ins
+            </h2>
+            <span className="text-xs text-text-muted font-mono">{checkIns.length} recorded</span>
+          </div>
+
+          {loadingCheckIns ? (
+            <div className="flex justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-accent" /></div>
+          ) : checkIns.length === 0 ? (
+            <div className="text-center py-16 text-text-muted border border-dashed border-border rounded-3xl">
+              <ClipboardCheck className="w-12 h-12 mx-auto mb-3 opacity-50" />
+              <p>No weekly check-ins submitted by {client.name || 'this client'} yet.</p>
+              <p className="text-xs mt-1">When the athlete submits their Sunday check-in, you can review it and leave coaching feedback here.</p>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {checkIns.map((ci) => {
+                const dateStr = new Date(ci.date).toLocaleDateString('en-US', {
+                  weekday: 'short',
+                  month: 'short',
+                  day: 'numeric',
+                  year: 'numeric'
+                });
+                const isSubmitting = submittingFeedback[ci._id];
+
+                return (
+                  <div key={ci._id} className="bg-surface border border-border rounded-2xl p-6 sm:p-8 space-y-6 shadow-sm">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border pb-4">
+                      <div>
+                        <div className="flex items-center gap-3">
+                          <h3 className="font-bold text-lg">{dateStr} Check-In</h3>
+                          <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border ${
+                            ci.status === 'reviewed' 
+                              ? 'bg-accent/10 text-accent border-accent/20' 
+                              : 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20'
+                          }`}>
+                            {ci.status === 'reviewed' ? 'Reviewed' : 'Action Needed'}
+                          </span>
+                        </div>
+                        <p className="text-xs text-text-muted mt-1">
+                          Fasted Weight: <span className="font-mono font-bold text-accent">{ci.weight} kg</span> • Workouts Done: <span className="font-bold text-text-primary">{ci.workoutsCompleted || 0}</span>
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Vitals Grid */}
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                      <div className="bg-background border border-border p-3.5 rounded-xl">
+                        <div className="flex items-center gap-1.5 text-text-muted text-xs mb-1">
+                          <Moon className="w-3.5 h-3.5 text-primary" /> Sleep
+                        </div>
+                        <div className="font-bold font-mono text-sm">{ci.sleepHours || 7.5} hrs • {ci.sleepQuality || 4}/5★</div>
+                      </div>
+                      <div className="bg-background border border-border p-3.5 rounded-xl">
+                        <div className="flex items-center gap-1.5 text-text-muted text-xs mb-1">
+                          <BatteryCharging className="w-3.5 h-3.5 text-accent" /> Energy Level
+                        </div>
+                        <div className="font-bold font-mono text-sm">{ci.energyLevel || 4}/5 Rating</div>
+                      </div>
+                      <div className="bg-background border border-border p-3.5 rounded-xl">
+                        <div className="flex items-center gap-1.5 text-text-muted text-xs mb-1">
+                          <AlertCircle className="w-3.5 h-3.5 text-yellow-400" /> Stress Level
+                        </div>
+                        <div className="font-bold font-mono text-sm">{ci.stressLevel || 2}/5 Rating</div>
+                      </div>
+                      <div className="bg-background border border-border p-3.5 rounded-xl">
+                        <div className="flex items-center gap-1.5 text-text-muted text-xs mb-1">
+                          <Award className="w-3.5 h-3.5 text-purple-400" /> Nutrition
+                        </div>
+                        <div className="font-bold text-xs text-accent truncate">{ci.dietAdherence || '100% On Plan'}</div>
+                      </div>
+                    </div>
+
+                    {/* Athlete Notes */}
+                    {ci.notes && (
+                      <div className="bg-background/60 border border-border p-4 rounded-xl">
+                        <span className="text-xs font-bold uppercase text-text-muted block mb-1">Athlete Reflections & Questions</span>
+                        <p className="text-sm text-text-primary italic">"{ci.notes}"</p>
+                      </div>
+                    )}
+
+                    {/* Coach Feedback Input / Display */}
+                    <div className="bg-background border border-border rounded-xl p-5 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold uppercase tracking-wider text-accent flex items-center gap-1.5">
+                          <MessageSquare className="w-3.5 h-3.5" /> Coach Feedback & Training Adjustments
+                        </span>
+                        {ci.coachFeedbackDate && (
+                          <span className="text-[11px] text-text-muted font-mono">
+                            Sent {new Date(ci.coachFeedbackDate).toLocaleDateString()}
+                          </span>
+                        )}
+                      </div>
+
+                      <textarea
+                        rows={3}
+                        placeholder="Provide feedback on their metrics, progressive overload, or adjust calories/sets for next week..."
+                        value={feedbackInputs[ci._id] ?? ''}
+                        onChange={(e) => setFeedbackInputs(prev => ({ ...prev, [ci._id]: e.target.value }))}
+                        className="w-full bg-surface border border-border rounded-xl p-3 text-sm focus:outline-none focus:border-accent resize-none"
+                      />
+
+                      <div className="flex justify-end">
+                        <button
+                          onClick={() => handleSendFeedback(ci._id)}
+                          disabled={isSubmitting}
+                          className="bg-accent hover:bg-emerald-400 text-surface px-5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shadow-sm"
+                        >
+                          {isSubmitting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
+                          {ci.status === 'reviewed' ? 'Update Feedback' : 'Submit Review & Notify Athlete'}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
 

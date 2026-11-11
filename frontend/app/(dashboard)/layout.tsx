@@ -9,11 +9,12 @@ import { useEffect, useRef } from "react";
 import api from "@/lib/api";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, logout, setUser } = useAuthStore();
+  const { isAuthenticated, logout, setUser, user } = useAuthStore();
   const router = useRouter();
   const pathname = usePathname();
   const initDone = useRef(false);
 
+  // 1. Initial auth sync & refresh on mount
   useEffect(() => {
     if (initDone.current) return;
     initDone.current = true;
@@ -21,16 +22,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     api.post('/auth/refresh-token').then(res => {
       if (res.data?.success && res.data?.user) {
         setUser(res.data.user);
-        
-        // RBAC Check
-        const role = res.data.user.role;
-        if (role === 'member' && (pathname.startsWith('/coach') || pathname.startsWith('/admin'))) {
-          router.replace('/member/workouts');
-        } else if (role === 'coach' && (pathname.startsWith('/member') || pathname.startsWith('/admin'))) {
-          router.replace('/coach/dashboard');
-        } else if (role === 'admin' && (pathname.startsWith('/member') || pathname.startsWith('/coach'))) {
-          router.replace('/admin/dashboard');
-        }
       } else {
         logout();
         router.replace('/login');
@@ -39,7 +30,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       logout();
       router.replace('/login');
     });
-  }, [pathname, router, setUser, logout]);
+  }, [logout, router, setUser]);
+
+  // 2. Strict Continuous RBAC Guard on every route navigation
+  useEffect(() => {
+    if (!user) return;
+    const role = user.role;
+    if (role === 'member' && (pathname.startsWith('/coach') || pathname.startsWith('/admin'))) {
+      router.replace('/member/dashboard');
+    } else if (role === 'coach' && (pathname.startsWith('/member') || pathname.startsWith('/admin'))) {
+      router.replace('/coach/dashboard');
+    } else if (role === 'admin' && (pathname.startsWith('/member') || pathname.startsWith('/coach'))) {
+      router.replace('/admin/dashboard');
+    }
+  }, [pathname, user, router]);
 
   if (!isAuthenticated) return null;
 

@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import api from "@/lib/api";
 import {
   LayoutDashboard,
   User,
@@ -30,29 +31,24 @@ import { useAuthStore } from "@/store/authStore";
 import { useRouter } from "next/navigation";
 
 const MEMBER_NAV = [
-  { name: "My Coach", href: "/member/my-coach", icon: User },
-  { name: "Daily Tasks", href: "/member/tasks", icon: CheckCircle2 },
+  { name: "Dashboard", href: "/member/dashboard", icon: LayoutDashboard },
   { name: "Workouts", href: "/member/workouts", icon: Dumbbell },
-  { name: "Diet", href: "/member/diet", icon: Apple },
+  { name: "Nutrition", href: "/member/diet", icon: Apple },
   { name: "Progress", href: "/member/progress", icon: LineChart },
+  { name: "My Coach", href: "/member/my-coach", icon: User },
   { name: "Community", href: "/member/community", icon: MessageSquare },
-  { name: "Coaches", href: "/member/coaches", icon: Users },
-  { name: "Appointments", href: "/member/appointments", icon: Calendar },
-  { name: "Payments", href: "/member/payments", icon: CreditCard },
-  { name: "Profile", href: "/member/profile", icon: Settings },
+  { name: "Membership", href: "/member/membership", icon: Sparkles },
+  { name: "Settings", href: "/member/settings", icon: Settings },
 ];
 
 const COACH_NAV = [
   { name: "Dashboard", href: "/coach/dashboard", icon: LayoutDashboard },
   { name: "Clients", href: "/coach/clients", icon: Users },
-  { name: "Client Tasks", href: "/coach/tasks", icon: CheckCircle2 },
-  { name: "Programs", href: "/coach/programs", icon: Dumbbell },
-  { name: "Diet Plans", href: "/coach/diet", icon: Apple },
-  { name: "Earnings", href: "/coach/earnings", icon: CreditCard },
-  { name: "Client Progress", href: "/coach/progress", icon: LineChart },
-  { name: "Inbox", href: "/coach/inbox", icon: MessageSquare },
+  { name: "Library", href: "/coach/programs", icon: Dumbbell },
   { name: "Schedule", href: "/coach/schedule", icon: Calendar },
-  { name: "Coach Profile", href: "/coach/profile", icon: User },
+  { name: "Inbox", href: "/coach/inbox", icon: MessageSquare },
+  { name: "Earnings", href: "/coach/earnings", icon: CreditCard },
+  { name: "Profile", href: "/coach/profile", icon: User },
 ];
 
 const ADMIN_NAV = [
@@ -70,9 +66,37 @@ export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const pathname = usePathname();
   const { logout, user } = useAuthStore();
   const router = useRouter();
+
+  // Poll unread messages count in background
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchUnread = async () => {
+      try {
+        if (user.role === 'coach') {
+          const res = await api.get('/coach-dashboard/unread-count');
+          if (res.data?.success) {
+            setUnreadCount(res.data.data?.totalUnread || 0);
+          }
+        } else if (user.role === 'member') {
+          const res = await api.get('/users/unread-messages');
+          if (res.data?.success) {
+            setUnreadCount(res.data.data?.totalUnread || 0);
+          }
+        }
+      } catch {
+        // non-fatal
+      }
+    };
+
+    fetchUnread();
+    const interval = setInterval(fetchUnread, 5000);
+    return () => clearInterval(interval);
+  }, [user, pathname]);
 
   const navItems = user?.role === 'admin' ? ADMIN_NAV : user?.role === 'coach' ? COACH_NAV : MEMBER_NAV;
 
@@ -101,11 +125,28 @@ export function Sidebar() {
       <nav className="flex-1 px-4 py-4 space-y-2 overflow-y-auto">
         {navItems.map((item) => {
           const isActive = pathname.startsWith(item.href);
+          const isChatTab = (user?.role === 'coach' && item.name === 'Inbox') || (user?.role === 'member' && item.name === 'My Coach');
+          const showBadge = isChatTab && unreadCount > 0;
+
           return (
             <Link key={item.name} href={item.href}>
-              <span className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all group ${isActive ? 'bg-primary/10 text-primary' : 'text-text-muted hover:bg-border/50 hover:text-text-primary'}`}>
-                <item.icon className={`w-5 h-5 ${isActive ? 'text-primary' : 'text-text-muted group-hover:text-text-primary'}`} />
-                {!collapsed && <span className="font-medium whitespace-nowrap">{item.name}</span>}
+              <span className={`relative flex items-center gap-3 px-3 py-3 rounded-xl transition-all group ${isActive ? 'bg-primary/10 text-primary' : 'text-text-muted hover:bg-border/50 hover:text-text-primary'}`}>
+                <div className="relative shrink-0 flex items-center justify-center">
+                  <item.icon className={`w-5 h-5 ${isActive ? 'text-primary' : 'text-text-muted group-hover:text-text-primary'}`} />
+                  {collapsed && showBadge && (
+                    <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-danger rounded-full ring-2 ring-surface animate-pulse" />
+                  )}
+                </div>
+                {!collapsed && (
+                  <div className="flex-1 flex items-center justify-between min-w-0">
+                    <span className="font-medium whitespace-nowrap">{item.name}</span>
+                    {showBadge && (
+                      <span className="ml-auto bg-danger text-white text-[11px] font-extrabold px-2 py-0.5 rounded-full shadow-md shadow-danger/40 animate-pulse">
+                        {unreadCount > 99 ? '99+' : unreadCount}
+                      </span>
+                    )}
+                  </div>
+                )}
               </span>
             </Link>
           );

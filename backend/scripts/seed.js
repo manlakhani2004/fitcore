@@ -13,6 +13,10 @@ const CoachProfile = require('../models/CoachProfile');
 const ClientAssignment = require('../models/ClientAssignment');
 const Payment = require('../models/Payment');
 const MeasurementLog = require('../models/MeasurementLog');
+const CoachAvailability = require('../models/CoachAvailability');
+const WorkoutProgram = require('../models/WorkoutProgram');
+const DietPlan = require('../models/DietPlan');
+const SystemSetting = require('../models/SystemSetting');
 
 // Connect to DB
 mongoose.connect(process.env.MONGODB_URI);
@@ -26,6 +30,10 @@ const seedDB = async () => {
         await ClientAssignment.deleteMany();
         await Payment.deleteMany();
         await MeasurementLog.deleteMany();
+        await CoachAvailability.deleteMany();
+        await WorkoutProgram.deleteMany();
+        await DietPlan.deleteMany();
+        await SystemSetting.deleteMany();
 
         console.log('Database cleared!');
 
@@ -162,6 +170,115 @@ const seedDB = async () => {
             weight -= 1; // Losing weight over time
             bodyFat -= 0.5;
         }
+
+        console.log('Creating Coach Availability...');
+        const standardSlots = [
+            { startTime: '09:00', endTime: '10:00', isBooked: false },
+            { startTime: '10:00', endTime: '11:00', isBooked: false },
+            { startTime: '11:00', endTime: '12:00', isBooked: false },
+            { startTime: '14:00', endTime: '15:00', isBooked: false },
+            { startTime: '15:00', endTime: '16:00', isBooked: false },
+            { startTime: '16:00', endTime: '17:00', isBooked: false }
+        ];
+
+        for (const coach of [coaches[0], coaches[1]]) {
+            for (let day = 0; day <= 6; day++) {
+                await CoachAvailability.create({
+                    coachId: coach._id,
+                    dayOfWeek: day,
+                    slots: standardSlots
+                });
+            }
+        }
+
+        console.log('Creating Sample Workout Program & Diet Plan for Member 1...');
+        await WorkoutProgram.create({
+            coachId: coaches[0]._id,
+            assignedTo: members[0]._id,
+            name: '12-Week Hypertrophy & Strength',
+            description: 'Custom coach-designed progression focused on compound lifts and progressive overload.',
+            goal: 'muscle_gain',
+            durationWeeks: 12,
+            difficulty: 'intermediate',
+            schedule: [
+                {
+                    day: 1,
+                    dayNumber: 1,
+                    dayName: 'Upper Body Power',
+                    exercises: [
+                        { name: 'Barbell Bench Press', sets: 4, reps: 8, restSeconds: 90 },
+                        { name: 'Bent-Over Barbell Row', sets: 4, reps: 10, restSeconds: 90 },
+                        { name: 'Overhead Dumbbell Press', sets: 3, reps: 10, restSeconds: 60 },
+                        { name: 'Incline Dumbbell Curl', sets: 3, reps: 12, restSeconds: 60 }
+                    ]
+                },
+                {
+                    day: 2,
+                    dayNumber: 2,
+                    dayName: 'Lower Body Strength',
+                    exercises: [
+                        { name: 'Barbell Back Squat', sets: 4, reps: 6, restSeconds: 120 },
+                        { name: 'Romanian Deadlift', sets: 3, reps: 10, restSeconds: 90 },
+                        { name: 'Walking Lunges', sets: 3, reps: 12, restSeconds: 60 },
+                        { name: 'Hanging Leg Raises', sets: 3, reps: 15, restSeconds: 45 }
+                    ]
+                },
+                {
+                    day: 3,
+                    dayNumber: 3,
+                    dayName: 'Active Recovery & Core',
+                    exercises: [
+                        { name: 'Plank Hold', sets: 3, reps: 60, restSeconds: 45 },
+                        { name: 'Bicycle Crunches', sets: 3, reps: 20, restSeconds: 45 }
+                    ]
+                },
+                {
+                    day: 4,
+                    dayNumber: 4,
+                    dayName: 'Push Hypertrophy',
+                    exercises: [
+                        { name: 'Incline Dumbbell Press', sets: 4, reps: 10, restSeconds: 90 },
+                        { name: 'Dumbbell Lateral Raises', sets: 4, reps: 15, restSeconds: 60 },
+                        { name: 'Cable Tricep Pushdown', sets: 3, reps: 12, restSeconds: 60 }
+                    ]
+                },
+                {
+                    day: 5,
+                    dayNumber: 5,
+                    dayName: 'Pull & Conditioning',
+                    exercises: [
+                        { name: 'Lat Pulldown', sets: 4, reps: 10, restSeconds: 75 },
+                        { name: 'Leg Press', sets: 3, reps: 12, restSeconds: 90 },
+                        { name: 'Battle Ropes', sets: 3, reps: 30, restSeconds: 60 }
+                    ]
+                }
+            ]
+        });
+
+        await DietPlan.create({
+            coachId: coaches[0]._id,
+            assignedTo: members[0]._id,
+            name: 'Lean Bulk High-Protein Protocol',
+            goal: 'muscle_gain',
+            caloriesTarget: 2600,
+            macrosTarget: {
+                protein: 180,
+                carbs: 280,
+                fat: 75
+            }
+        });
+
+        console.log('Seeding Default System Settings...');
+        await SystemSetting.findOneAndUpdate(
+            {},
+            {
+                platformName: 'FitCore',
+                supportEmail: 'support@fitcore.com',
+                currency: 'INR',
+                allowRegistrations: true
+            },
+            { upsert: true, new: true }
+        );
 
         console.log('Data successfully seeded!');
         console.log('--- TEST ACCOUNTS (Password: man@1610) ---');
