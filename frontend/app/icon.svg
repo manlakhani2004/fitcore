@@ -1,41 +1,5 @@
-<svg width="32" height="32" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="favicon-bg" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#1E1B4B" />
-      <stop offset="55%" stop-color="#0F172A" />
-      <stop offset="100%" stop-color="#020617" />
-    </linearGradient>
-
-    <linearGradient id="favicon-edge" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#818CF8" stop-opacity="0.9" />
-      <stop offset="50%" stop-color="#6366F1" stop-opacity="0.4" />
-      <stop offset="100%" stop-color="#06B6D4" stop-opacity="0.9" />
-    </linearGradient>
-
-    <linearGradient id="favicon-f" x1="8" y1="8" x2="34" y2="34" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#A5B4FC" />
-      <stop offset="40%" stop-color="#6366F1" />
-      <stop offset="100%" stop-color="#0284C7" />
-    </linearGradient>
-
-    <linearGradient id="favicon-spark" x1="22" y1="18" x2="36" y2="32" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#00F5A0" />
-      <stop offset="100%" stop-color="#00D9F5" />
-    </linearGradient>
-  </defs>
-
-  <!-- Squircle Base -->
-  <rect x="1" y="1" width="38" height="38" rx="11" fill="url(#favicon-bg)" stroke="url(#favicon-edge)" stroke-width="1.5" />
-
-  <!-- Kinetic F Spine -->
-  <path d="M 11 11.5 C 11 10.12 12.12 9 13.5 9 L 17 9 L 17 29.5 C 17 30.88 15.88 32 14.5 32 L 13.5 32 C 12.12 32 11 30.88 11 29.5 Z" fill="url(#favicon-f)" />
-
-  <!-- Upper Speed Wing -->
-  <path d="M 17 9 L 30 9 C 31.15 9 32.02 10.05 31.62 11.12 L 29.8 15 C 29.48 15.62 28.85 16 28.18 16 L 17 16 Z" fill="url(#favicon-f)" />
-
-  <!-- Center Core Wing -->
-  <path d="M 17 18.5 L 25 18.5 C 26.15 18.5 27.02 19.55 26.62 20.62 L 25.1 24.3 C 24.78 24.92 24.15 25.3 23.48 25.3 L 17 25.3 Z" fill="url(#favicon-f)" />
-
-  <!-- Electric Spark -->
-  <path d="M 30.5 21.5 L 32 25.5 L 36 27 L 32 28.5 L 30.5 32.5 L 29 28.5 L 25 27 L 29 25.5 Z" fill="url(#favicon-spark)" />
+<svg width="32" height="32" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="36" height="36" rx="9" fill="#0F172A" />
+  <path d="M 10 26 L 14.5 10 H 26 L 24.5 14 H 17.5 L 16.5 17.5 H 22.5 L 21 21.5 H 15.5 L 13.5 26 H 10 Z" fill="#FFFFFF" />
+  <rect x="23" y="21.5" width="4.5" height="4.5" rx="1.5" fill="#6366F1" />
 </svg>
