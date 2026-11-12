@@ -31,6 +31,7 @@ import {
 import { useAuthStore } from "@/store/authStore";
 import { useRouter } from "next/navigation";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { FitCoreLogo } from "@/components/ui/FitCoreLogo";
 
 const MEMBER_NAV = [
   { name: "Dashboard", href: "/member/dashboard", icon: LayoutDashboard },
@@ -106,34 +107,15 @@ export function Sidebar() {
     <div className="flex flex-col h-full bg-surface border-r border-border overflow-hidden select-none transition-colors">
       {/* Brand Header */}
       <div className="h-18 px-5 border-b border-border flex items-center justify-between shrink-0">
-        {!collapsed ? (
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 via-indigo-600 to-emerald-500 p-[1.5px] shadow-md shadow-indigo-500/20">
-              <div className="w-full h-full bg-surface rounded-[10px] flex items-center justify-center">
-                <span className="font-mono text-sm font-black text-indigo-600 dark:text-white tracking-tight">FC</span>
-              </div>
-            </div>
-            <div className="flex flex-col">
-              <div className="flex items-center gap-1.5">
-                <span className="text-lg font-bold tracking-tight text-text-primary leading-none">FitCore</span>
-                <span className="text-[10px] font-mono font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 dark:bg-indigo-500/15 border border-indigo-500/30 px-1.5 py-0.5 rounded leading-none">
-                  PRO
-                </span>
-              </div>
-              <span className="text-[10px] font-medium text-text-muted uppercase tracking-wider mt-1">
-                {user?.role === 'coach' ? 'Coach Platform' : user?.role === 'admin' ? 'Admin HQ' : 'Athlete Portal'}
-              </span>
-            </div>
-          </Link>
-        ) : (
-          <div className="mx-auto">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 via-indigo-600 to-emerald-500 p-[1.5px] shadow-md">
-              <div className="w-full h-full bg-surface rounded-[10px] flex items-center justify-center">
-                <span className="font-mono text-sm font-black text-indigo-600 dark:text-white tracking-tight">FC</span>
-              </div>
-            </div>
-          </div>
-        )}
+        <Link href="/" className="flex items-center w-full">
+          <FitCoreLogo
+            size="md"
+            collapsed={collapsed}
+            badgeText={user?.role === 'coach' ? 'COACH' : user?.role === 'admin' ? 'ADMIN' : 'PRO'}
+            subtitle={user?.role === 'coach' ? 'Coach Platform' : user?.role === 'admin' ? 'Admin HQ' : 'Athlete Portal'}
+            className={collapsed ? "mx-auto" : ""}
+          />
+        </Link>
       </div>
 
       {/* Nav Section Label */}

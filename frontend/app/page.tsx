@@ -8,6 +8,7 @@ import {
   Star, Users, Zap 
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { FitCoreLogo } from "@/components/ui/FitCoreLogo";
 
 export default function LandingPage() {
   const containerVariants = {
@@ -29,9 +30,7 @@ export default function LandingPage() {
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="font-display font-bold text-2xl tracking-tight">
-            Fit<span className="text-primary">Core</span>
-          </div>
+          <FitCoreLogo size="sm" badgeText="v2.0" href="/" />
           <div className="hidden md:flex items-center gap-8 text-sm font-bold text-text-muted">
             <Link href="/" className="text-primary transition-colors">Home</Link>
             <Link href="/about" className="hover:text-primary transition-colors">About</Link>

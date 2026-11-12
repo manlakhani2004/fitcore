@@ -4,6 +4,7 @@ import { useAuthStore } from "@/store/authStore";
 import { Bell, ShieldCheck, ChevronDown } from "lucide-react";
 import { NotificationDrawer } from "@/components/ui/NotificationDrawer";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { FitCoreLogo } from "@/components/ui/FitCoreLogo";
 import { useState, useEffect } from "react";
 import api from "@/lib/api";
 import Link from "next/link";
@@ -32,8 +33,11 @@ export function TopNav() {
       <header className="h-16 bg-surface/80 backdrop-blur-xl border-b border-border sticky top-0 z-30 px-6 sm:px-8 flex items-center justify-between w-full select-none transition-colors">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 lg:hidden pl-10">
-            <span className="font-semibold text-base tracking-tight text-text-primary">FitCore</span>
-            <span className="text-[10px] font-mono text-text-muted">PRO</span>
+            <FitCoreLogo
+              size="xs"
+              badgeText={user?.role === 'coach' ? 'COACH' : user?.role === 'admin' ? 'ADMIN' : 'PRO'}
+              showBadge={true}
+            />
           </div>
         </div>
 

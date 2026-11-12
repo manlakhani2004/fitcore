@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { FitCoreLogo } from "@/components/ui/FitCoreLogo";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -12,14 +13,12 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-accent/10 blur-[120px] rounded-full" />
 
         <div className="relative z-10">
-          <h1 className="text-4xl font-display font-bold flex items-center gap-3">
-            <span className="text-primary">
-              <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M20 2L35.5885 11V29L20 38L4.41154 29V11L20 2Z" fill="#6C63FF" stroke="#00F5A0" strokeWidth="2" strokeLinejoin="round"/>
-              </svg>
-            </span>
-            FitCore
-          </h1>
+          <FitCoreLogo
+            size="lg"
+            badgeText="PRO"
+            subtitle="Elite Fitness Network"
+            href="/"
+          />
         </div>
         
         <div className="relative z-10 max-w-lg mt-20">

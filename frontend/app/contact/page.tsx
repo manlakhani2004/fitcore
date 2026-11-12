@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { Mail, MessageSquare, MapPin } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { FitCoreLogo } from "@/components/ui/FitCoreLogo";
 import { useState } from "react";
 
 export default function ContactPage() {
@@ -23,11 +24,7 @@ export default function ContactPage() {
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <Link href="/">
-            <div className="font-display font-bold text-2xl tracking-tight cursor-pointer">
-              Fit<span className="text-primary">Core</span>
-            </div>
-          </Link>
+          <FitCoreLogo size="sm" badgeText="v2.0" href="/" />
           <div className="hidden md:flex items-center gap-8 text-sm font-bold text-text-muted">
             <Link href="/" className="hover:text-primary transition-colors">Home</Link>
             <Link href="/about" className="hover:text-primary transition-colors">About</Link>
